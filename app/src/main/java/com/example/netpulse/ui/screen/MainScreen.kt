@@ -81,14 +81,14 @@ fun MainScreen(
                         fontWeight = FontWeight.Medium
                     )
                 }
-                Row {
-                    IconButton(onClick = { }) {
-                        Icon(Icons.Outlined.History, contentDescription = null, tint = TextSecondary)
-                    }
-                    IconButton(onClick = { }) {
-                        Icon(Icons.Outlined.Settings, contentDescription = null, tint = TextSecondary)
-                    }
-                }
+//                Row {
+//                    IconButton(onClick = { }) {
+//                        Icon(Icons.Outlined.History, contentDescription = null, tint = TextSecondary)
+//                    }
+//                    IconButton(onClick = { }) {
+//                        Icon(Icons.Outlined.Settings, contentDescription = null, tint = TextSecondary)
+//                    }
+//                }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
