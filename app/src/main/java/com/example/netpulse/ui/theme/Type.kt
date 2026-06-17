@@ -1,46 +1,40 @@
 package com.example.netpulse.ui.theme
 
 import androidx.compose.material3.Typography
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-val AppTypography = Typography(
-
-    displaySmall = TextStyle(
-        fontSize = 28.sp,
-        fontWeight = FontWeight.Bold,
-        color = Color.White
-    ),
-
-    titleLarge = TextStyle(
-        fontSize = 22.sp,
-        fontWeight = FontWeight.SemiBold,
-        color = Color.White
-    ),
-
+val Typography = Typography(
     bodyLarge = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.5.sp
+    ),
+    titleLarge = TextStyle(
+        fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Medium,
-        color = LightColor2
+        fontSize = 18.sp,
+        lineHeight = 28.sp,
+        letterSpacing = 0.sp
     ),
-
-    bodyMedium = TextStyle(
-        fontSize = 20.sp,
-        fontWeight = FontWeight.SemiBold,
-        color = Color.White
-    ),
-
-    labelLarge = TextStyle(
-        fontSize = 16.sp,
-        fontWeight = FontWeight.Bold,
-        color = Color.Black
-    ),
-
-    bodySmall = TextStyle(
-        fontSize = 12.sp,
-        color = LightColor
+    labelSmall = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Medium,
+        fontSize = 11.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 0.5.sp
     )
+)
+
+val MonospaceFontFamily = FontFamily.Monospace
+
+val SpeedTypography = TextStyle(
+    fontFamily = MonospaceFontFamily,
+    fontWeight = FontWeight.Bold,
+    fontSize = 56.sp,
+    letterSpacing = 0.sp
 )

@@ -352,7 +352,7 @@ fun SpeedTestScreenContent(
             )
             EnhancedStatCard(
                 title = "Jitter",
-                value = if (uiState.hasResults) "%.1f ms".format(uiState.jitter) else "--",
+                value = if (uiState.hasResults) "%.1f ms".format(uiState.jitterValue) else "--",
                 icon = "📊",
                 color = Color(0xFF9C27B0),
                 modifier = Modifier.weight(1f)
@@ -503,7 +503,7 @@ fun StatusScreenContent(
                 item {
                     EnhancedStatCard(
                         title = "Jitter",
-                        value = "%.1f ms".format(uiState.jitter),
+                        value = "%.1f ms".format(uiState.jitterValue),
                         icon = "📊",
                         color = Color(0xFF9C27B0)
                     )

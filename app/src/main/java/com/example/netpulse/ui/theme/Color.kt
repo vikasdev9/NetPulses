@@ -1,53 +1,45 @@
 package com.example.netpulse.ui.theme
 
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+val Background = Color(0xFF0A0E1A)
+val CardSurface = Color(0xFF131929)
+val CardBorder = Color(0xFF1E2740)
+val PrimaryAccent = Color(0xFF3B8BFF)
+val GaugeCyan = Color(0xFF00D4FF)
+val GaugeBlue = Color(0xFF3B8BFF)
+val GaugeTrack = Color(0xFF1E2740)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+val TextPrimary = Color(0xFFFFFFFF)
+val TextSecondary = Color(0xFF8892A4)
 
-// Core brand hues (neon on deep blue)
-val Purple700 = Color(0xFF7C4DFF)
-val Teal200 = Color(0xFF64FFDA)
-val Pink = Color(0xFFFF57C1)
+val GreenAccentBg = Color(0xFF0D2E1A)
+val GreenAccentIcon = Color(0xFF00E676)
 
-// Accent greens for success/gauges
-val Green200 = Color(0xFF7CF7C4)
-val Green300 = Color(0xFF4BE4A1)
-val Green500 = Color(0xFF22C55E)
+val AmberAccentBg = Color(0xFF2E1F0D)
+val AmberAccentIcon = Color(0xFFFFB300)
 
-// Dark palette
-val DarkColor = Color(0xFF0D1220)     // deepest
-val DarkColor2 = Color(0xFF131A2C)    // base background
-val LightColor = Color(0xFF7F8BAA)
-val LightColor2 = Color(0xFFB3C0E0)
+val BlueAccentBg = Color(0xFF0D1E2E)
+val BlueAccentIcon = Color(0xFF3B8BFF)
 
-// Status/alerts
-val Red200 = Color(0xFFFF9AA2)
-val Red500 = Color(0xFFFF4D67)
-val RedGradient = Brush.linearGradient(
-    colors = listOf(Red500, Red200),
-    start = Offset.Zero,
-    end = Offset.Infinite
-)
+val CyanAccentBg = Color(0xFF0D2A2E)
+val CyanAccentIcon = Color(0xFF00D4FF)
 
-// Gradients
-val GreenGradient = Brush.linearGradient(
-    colors = listOf(Green300, Green200),
-    start = Offset(0f, 0f),
-    end = Offset(Float.POSITIVE_INFINITY, 0f)
+val StatusCyan = Color(0xFF00D4FF)
+val LiveBadgeBg = Color(0xFF00D4FF)
+
+// Missing colors and gradients
+val Teal200 = Color(0xFF00D4FF) // Using GaugeCyan as reference
+val DarkColor = Background
+val DarkColor2 = CardSurface
+val LightColor = TextPrimary
+val LightColor2 = TextSecondary
+
+val DarkGradient = Brush.verticalGradient(
+    colors = listOf(Background, CardSurface)
 )
 
 val IndigoGradient = Brush.verticalGradient(
-    colors = listOf(Color(0xFF0F1730), Color(0xFF0B1023))
-)
-
-val DarkGradient = Brush.verticalGradient(
-    colors = listOf(Color(0xFF1B2340), Color(0xFF0E1326))
+    colors = listOf(Color(0xFF1A1F3A), Color(0xFF2A3050))
 )

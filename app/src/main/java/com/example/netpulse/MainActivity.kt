@@ -16,15 +16,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.netpulse.data.Prefs
 import com.example.netpulse.navigation.NavRoutes
+import com.example.netpulse.ui.screen.MainScreen
 import com.example.netpulse.ui.screen.OnboardingScreen
-import com.example.netpulse.ui.screen.SpeedTestScreen
 import com.example.netpulse.ui.screen.SplashScreen
 import com.example.netpulse.ui.theme.NetPulseTheme
 import kotlinx.coroutines.launch
@@ -82,7 +81,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                             composable(NavRoutes.Home) {
-                                SpeedTestScreen()
+                                MainScreen()
                             }
                         }
                     }
