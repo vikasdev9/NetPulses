@@ -3,6 +3,7 @@ package com.example.netpulse.ui.screen
 import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,26 +33,51 @@ fun AnalyticsScreen(
     viewModel: AnalyticsViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             LargeTopAppBar(
-                title = { 
+                title = {
                     Column {
-                        Text("Network Analytics", fontWeight = FontWeight.ExtraBold, fontSize = 24.sp)
-                        Text("Real-time network intelligence", style = MaterialTheme.typography.bodySmall, color = TextSecondary)
+                        Text(
+                            text = "Network Analytics",
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = TextPrimary
+                        )
+                        if (scrollBehavior.state.collapsedFraction < 0.5f) {
+                            Text(
+                                text = "Real-time network intelligence",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = TextSecondary
+                            )
+                        }
                     }
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = TextPrimary
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { /* TODO: Settings or More */ }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = "More", tint = TextPrimary)
                     }
                 },
                 colors = TopAppBarDefaults.largeTopAppBarColors(
                     containerColor = Background,
+                    scrolledContainerColor = CardSurface.copy(alpha = 0.95f),
+                    navigationIconContentColor = TextPrimary,
                     titleContentColor = TextPrimary,
-                    navigationIconContentColor = TextPrimary
-                )
+                    actionIconContentColor = TextPrimary
+                ),
+                scrollBehavior = scrollBehavior
             )
         },
         containerColor = Background
@@ -60,7 +86,7 @@ fun AnalyticsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
+            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             // 1. Live Performance Indicators
