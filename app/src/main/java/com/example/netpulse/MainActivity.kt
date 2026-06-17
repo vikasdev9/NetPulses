@@ -22,8 +22,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.netpulse.data.Prefs
 import com.example.netpulse.navigation.NavRoutes
+import com.example.netpulse.ui.screen.HistoryScreen
 import com.example.netpulse.ui.screen.MainScreen
 import com.example.netpulse.ui.screen.OnboardingScreen
+import com.example.netpulse.ui.screen.SettingsScreen
 import com.example.netpulse.ui.screen.SplashScreen
 import com.example.netpulse.ui.theme.NetPulseTheme
 import kotlinx.coroutines.launch
@@ -81,7 +83,48 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                             composable(NavRoutes.Home) {
-                                MainScreen()
+                                MainScreen(
+                                    onNavigateToHistory = {
+                                        navController.navigate(NavRoutes.History) {
+                                            launchSingleTop = true
+                                        }
+                                    },
+                                    onNavigateToSettings = {
+                                        navController.navigate(NavRoutes.Settings) {
+                                            launchSingleTop = true
+                                        }
+                                    }
+                                )
+                            }
+                            composable(NavRoutes.History) {
+                                HistoryScreen(
+                                    onNavigateToHome = {
+                                        navController.navigate(NavRoutes.Home) {
+                                            popUpTo(NavRoutes.Home) { inclusive = false }
+                                            launchSingleTop = true
+                                        }
+                                    },
+                                    onNavigateToSettings = {
+                                        navController.navigate(NavRoutes.Settings) {
+                                            launchSingleTop = true
+                                        }
+                                    }
+                                )
+                            }
+                            composable(NavRoutes.Settings) {
+                                SettingsScreen(
+                                    onNavigateToHome = {
+                                        navController.navigate(NavRoutes.Home) {
+                                            popUpTo(NavRoutes.Home) { inclusive = false }
+                                            launchSingleTop = true
+                                        }
+                                    },
+                                    onNavigateToHistory = {
+                                        navController.navigate(NavRoutes.History) {
+                                            launchSingleTop = true
+                                        }
+                                    }
+                                )
                             }
                         }
                     }

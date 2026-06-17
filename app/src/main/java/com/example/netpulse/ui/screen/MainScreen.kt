@@ -28,13 +28,17 @@ import com.example.netpulse.ui.viewmodel.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(viewModel: SpeedTestViewModel = viewModel()) {
+fun MainScreen(
+    viewModel: SpeedTestViewModel = viewModel(),
+    onNavigateToHistory: () -> Unit = {},
+    onNavigateToSettings: () -> Unit = {}
+) {
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberScrollState()
 
     Scaffold(
         bottomBar = {
-            BottomNavigationBar()
+            BottomNavigationBar(onNavigateToHistory, onNavigateToSettings)
         },
         containerColor = Background
     ) { paddingValues ->
@@ -260,7 +264,7 @@ fun InfoChip(text: String) {
 }
 
 @Composable
-fun BottomNavigationBar() {
+fun BottomNavigationBar(onNavigateToHistory: () -> Unit, onNavigateToSettings: () -> Unit) {
     var selectedItem by remember { mutableStateOf(0) }
     
     NavigationBar(
@@ -282,8 +286,8 @@ fun BottomNavigationBar() {
         )
         NavigationBarItem(
             selected = selectedItem == 1,
-            onClick = { selectedItem = 1 },
-            icon = { Icon(Icons.Outlined.History, contentDescription = "History") },
+            onClick = onNavigateToHistory,
+            icon = { Icon(Icons.Default.History, contentDescription = "History") },
             label = { if (selectedItem == 1) Text("History") },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = PrimaryAccent,
@@ -294,8 +298,8 @@ fun BottomNavigationBar() {
         )
         NavigationBarItem(
             selected = selectedItem == 2,
-            onClick = { selectedItem = 2 },
-            icon = { Icon(Icons.Outlined.Settings, contentDescription = "Settings") },
+            onClick = onNavigateToSettings,
+            icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
             label = { if (selectedItem == 2) Text("Settings") },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = PrimaryAccent,
