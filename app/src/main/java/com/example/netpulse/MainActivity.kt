@@ -27,6 +27,7 @@ import com.example.netpulse.ui.screen.MainScreen
 import com.example.netpulse.ui.screen.OnboardingScreen
 import com.example.netpulse.ui.screen.SettingsScreen
 import com.example.netpulse.ui.screen.SplashScreen
+import com.example.netpulse.ui.screen.AnalyticsScreen
 import com.example.netpulse.ui.theme.NetPulseTheme
 import kotlinx.coroutines.launch
 
@@ -93,6 +94,18 @@ class MainActivity : ComponentActivity() {
                                         navController.navigate(NavRoutes.Settings) {
                                             launchSingleTop = true
                                         }
+                                    },
+                                    onNavigateToAnalytics = {
+                                        navController.navigate(NavRoutes.Analytics) {
+                                            launchSingleTop = true
+                                        }
+                                    }
+                                )
+                            }
+                            composable(NavRoutes.Analytics) {
+                                AnalyticsScreen(
+                                    onNavigateBack = {
+                                        navController.popBackStack()
                                     }
                                 )
                             }

@@ -6,4 +6,5 @@ object NavRoutes {
     const val Home = "home"
     const val History = "history"
     const val Settings = "settings"
+    const val Analytics = "analytics"
 }

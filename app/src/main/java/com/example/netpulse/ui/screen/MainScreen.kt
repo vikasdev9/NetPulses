@@ -31,7 +31,8 @@ import com.example.netpulse.ui.viewmodel.*
 fun MainScreen(
     viewModel: SpeedTestViewModel = viewModel(),
     onNavigateToHistory: () -> Unit = {},
-    onNavigateToSettings: () -> Unit = {}
+    onNavigateToSettings: () -> Unit = {},
+    onNavigateToAnalytics: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberScrollState()
@@ -81,30 +82,38 @@ fun MainScreen(
                         fontWeight = FontWeight.Medium
                     )
                 }
-//                Row {
-//                    IconButton(onClick = { }) {
-//                        Icon(Icons.Outlined.History, contentDescription = null, tint = TextSecondary)
-//                    }
-//                    IconButton(onClick = { }) {
-//                        Icon(Icons.Outlined.Settings, contentDescription = null, tint = TextSecondary)
-//                    }
-//                }
+
+                IconButton(
+                    onClick = onNavigateToAnalytics,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(CardSurface)
+                        .border(1.dp, CardBorder, RoundedCornerShape(10.dp))
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Analytics,
+                        contentDescription = "Analytics",
+                        tint = PrimaryAccent
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
 
             // Network Badge
             NetworkBadge()
+            Spacer(modifier = Modifier.height(10.dp))
             
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            // ISP Info
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                InfoChip(text = "IP: 103.24.xx.xx")
-                InfoChip(text = "ISP: Reliance Jio")
-            }
+//            Spacer(modifier = Modifier.height(12.dp))
+//
+//            // ISP Info
+//            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+//                InfoChip(text = "IP: 103.24.xx.xx")
+//                InfoChip(text = "ISP: Reliance Jio")
+//            }
 
-            Spacer(modifier = Modifier.height(40.dp))
+//            Spacer(modifier = Modifier.height(40.dp))
 
             // Speedometer Gauge
             val currentSpeed = when (val state = uiState.testState) {
@@ -131,7 +140,7 @@ fun MainScreen(
                 statusLabel = statusLabel
             )
 
-            Spacer(modifier = Modifier.height(40.dp))
+//            Spacer(modifier = Modifier.height(10.dp))
 
             // Metric Cards Grid
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
