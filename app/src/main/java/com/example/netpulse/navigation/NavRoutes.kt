@@ -8,4 +8,5 @@ object NavRoutes {
     const val Settings = "settings"
     const val Analytics = "analytics"
     const val Language = "language"
+    const val PrivacyPolicy = "privacy_policy"
 }

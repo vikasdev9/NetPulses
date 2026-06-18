@@ -29,6 +29,7 @@ import com.example.netpulse.ui.screen.SettingsScreen
 import com.example.netpulse.ui.screen.SplashScreen
 import com.example.netpulse.ui.screen.AnalyticsScreen
 import com.example.netpulse.ui.screen.LanguageScreen
+import com.example.netpulse.ui.screen.PrivacyPolicyScreen
 import com.example.netpulse.ui.theme.NetPulseTheme
 import com.example.netpulse.utils.LocaleUtils
 import kotlinx.coroutines.launch
@@ -142,6 +143,9 @@ class MainActivity : BaseActivity() {
                                         },
                                         onNavigateToLanguage = {
                                             navController.navigate(NavRoutes.Language)
+                                        },
+                                        onNavigateToPrivacyPolicy = {
+                                            navController.navigate(NavRoutes.PrivacyPolicy)
                                         }
                                     )
                                 }
@@ -156,6 +160,13 @@ class MainActivity : BaseActivity() {
                                             currentLang.value = lang.code
                                             recreate()
                                         },
+                                        onBack = {
+                                            navController.popBackStack()
+                                        }
+                                    )
+                                }
+                                composable(NavRoutes.PrivacyPolicy) {
+                                    PrivacyPolicyScreen(
                                         onBack = {
                                             navController.popBackStack()
                                         }

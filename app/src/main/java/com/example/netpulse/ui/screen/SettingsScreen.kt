@@ -37,6 +37,7 @@ fun SettingsScreen(
     onNavigateToHome: () -> Unit,
     onNavigateToHistory: () -> Unit,
     onNavigateToLanguage: () -> Unit,
+    onNavigateToPrivacyPolicy: () -> Unit,
     viewModel: SettingsViewModel = viewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -245,7 +246,7 @@ fun SettingsScreen(
                         icon = Icons.Outlined.Shield,
                         title = stringResource(R.string.settings_privacy_policy),
                         trailing = { ChevronIcon() },
-                        onClick = { viewModel.onPrivacyPolicy(context) },
+                        onClick = onNavigateToPrivacyPolicy,
                         showDivider = false
                     )
                 }
