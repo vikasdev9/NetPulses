@@ -24,6 +24,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.res.stringResource
+import com.example.netpulse.R
 import com.example.netpulse.data.SpeedResult
 import com.example.netpulse.ui.components.HistoryCard
 import com.example.netpulse.ui.components.ResultShareBottomSheet
@@ -52,7 +54,7 @@ fun HistoryScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Test History",
+                        stringResource(R.string.screen_history),
                         color = Color.White,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold
@@ -61,7 +63,7 @@ fun HistoryScreen(
                 actions = {
                     TextButton(onClick = { viewModel.clearAll() }) {
                         Text(
-                            "Clear All",
+                            stringResource(R.string.btn_clear_all),
                             color = PrimaryAccent,
                             fontSize = 14.sp
                         )
@@ -161,7 +163,12 @@ fun FilterChipsRow(
     selectedFilter: String,
     onFilterSelected: (String) -> Unit
 ) {
-    val filters = listOf("All", "WiFi", "5G", "4G", "This Week", "This Month")
+    val filters = listOf(
+        stringResource(R.string.filter_all),
+        "WiFi", "5G", "4G",
+        stringResource(R.string.filter_this_week),
+        stringResource(R.string.filter_this_month)
+    )
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
@@ -199,11 +206,20 @@ fun EmptyHistoryState() {
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            "No test history found",
-            color = TextSecondary,
-            fontSize = 16.sp
-        )
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                stringResource(R.string.history_empty_title),
+                color = Color.White,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                stringResource(R.string.history_empty_subtitle),
+                color = TextSecondary,
+                fontSize = 14.sp
+            )
+        }
     }
 }
 
@@ -228,7 +244,7 @@ fun HistoryBottomNavigationBar(onNavigateToHome: () -> Unit, onNavigateToSetting
             selected = true,
             onClick = { },
             icon = { Icon(Icons.Default.History, contentDescription = "History") },
-            label = { Text("History") },
+            label = { Text(stringResource(R.string.screen_history)) },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = PrimaryAccent,
                 selectedTextColor = PrimaryAccent,

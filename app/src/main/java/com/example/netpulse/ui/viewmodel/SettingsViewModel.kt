@@ -1,7 +1,9 @@
 package com.example.netpulse.ui.viewmodel
 
+import android.app.Application
 import android.content.Context
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
+import com.example.netpulse.utils.LocaleUtils
 import com.example.netpulse.utils.SettingsUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,12 +17,44 @@ data class SettingsState(
     val testDurationSeconds: Int = 20,     // options: 10, 20, 30
     val autoRunOnWifi: Boolean = true,
     val isPro: Boolean = false,
-    val appVersion: String = "1.0.0"
+    val appVersion: String = "1.0.0",
+    val currentLanguage: String = "English"
 )
 
-class SettingsViewModel : ViewModel() {
+class SettingsViewModel(application: Application) : AndroidViewModel(application) {
     private val _state = MutableStateFlow(SettingsState())
     val state: StateFlow<SettingsState> = _state
+
+    private val languageMap = mapOf(
+        "en" to "English",
+        "hi" to "हिंदी",
+        "ta" to "தமிழ்",
+        "te" to "తెలుగు",
+        "bn" to "বাংলা",
+        "mr" to "मराठी",
+        "de" to "Deutsch",
+        "nl" to "Nederlands",
+        "sv" to "Svenska",
+        "no" to "Norsk",
+        "da" to "Dansk",
+        "ar" to "العربية",
+        "pt" to "Português",
+        "fr" to "Français",
+        "es" to "Español",
+        "it" to "Italiano",
+        "ja" to "日本語",
+        "ko" to "한국어",
+        "id" to "Indonesia",
+        "tr" to "Türkçe",
+        "ru" to "Русский",
+        "pl" to "Polski"
+    )
+
+    init {
+        val langCode = LocaleUtils.getSavedLanguage(application)
+        val langName = languageMap[langCode] ?: "System Default"
+        _state.update { it.copy(currentLanguage = langName) }
+    }
 
     fun toggleDarkMode(enabled: Boolean) {
         _state.update { it.copy(isDarkMode = enabled) }

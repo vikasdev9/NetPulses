@@ -28,10 +28,12 @@ import com.example.netpulse.ui.screen.OnboardingScreen
 import com.example.netpulse.ui.screen.SettingsScreen
 import com.example.netpulse.ui.screen.SplashScreen
 import com.example.netpulse.ui.screen.AnalyticsScreen
+import com.example.netpulse.ui.screen.LanguageScreen
 import com.example.netpulse.ui.theme.NetPulseTheme
+import com.example.netpulse.utils.LocaleUtils
 import kotlinx.coroutines.launch
 
-class MainActivity : ComponentActivity() {
+class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val prefs = Prefs(applicationContext)
@@ -124,20 +126,44 @@ class MainActivity : ComponentActivity() {
                                     }
                                 )
                             }
-                            composable(NavRoutes.Settings) {
-                                SettingsScreen(
-                                    onNavigateToHome = {
-                                        navController.navigate(NavRoutes.Home) {
-                                            popUpTo(NavRoutes.Home) { inclusive = false }
-                                            launchSingleTop = true
+                            try {
+                                composable(NavRoutes.Settings) {
+                                    SettingsScreen(
+                                        onNavigateToHome = {
+                                            navController.navigate(NavRoutes.Home) {
+                                                popUpTo(NavRoutes.Home) { inclusive = false }
+                                                launchSingleTop = true
+                                            }
+                                        },
+                                        onNavigateToHistory = {
+                                            navController.navigate(NavRoutes.History) {
+                                                launchSingleTop = true
+                                            }
+                                        },
+                                        onNavigateToLanguage = {
+                                            navController.navigate(NavRoutes.Language)
                                         }
-                                    },
-                                    onNavigateToHistory = {
-                                        navController.navigate(NavRoutes.History) {
-                                            launchSingleTop = true
-                                        }
+                                    )
+                                }
+                                composable(NavRoutes.Language) {
+                                    val currentLang = remember {
+                                        mutableStateOf(LocaleUtils.getSavedLanguage(applicationContext).ifEmpty { "en" })
                                     }
-                                )
+                                    LanguageScreen(
+                                        currentLanguageCode = currentLang.value,
+                                        onLanguageSelected = { lang ->
+                                            LocaleUtils.saveLanguage(applicationContext, lang.code)
+                                            currentLang.value = lang.code
+                                            recreate()
+                                        },
+                                        onBack = {
+                                            navController.popBackStack()
+                                        }
+                                    )
+                                }
+                            } catch (e: Exception) {
+                                throw e
+                            } finally {
                             }
                         }
                     }

@@ -23,6 +23,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.res.stringResource
+import com.example.netpulse.R
 import com.example.netpulse.ui.components.*
 import com.example.netpulse.ui.theme.*
 import com.example.netpulse.ui.viewmodel.*
@@ -90,16 +92,16 @@ fun MainScreen(
                             }
                             
                             val statusLabel = when (val state = uiState.testState) {
-                                is SpeedTestState.Idle -> "READY"
+                                is SpeedTestState.Idle -> stringResource(R.string.status_ready)
                                 is SpeedTestState.Running -> {
                                     when (state.phase) {
-                                        TestPhase.PING -> "PINGING..."
-                                        TestPhase.JITTER -> "JITTER..."
-                                        TestPhase.DOWNLOAD -> "DOWNLOADING..."
-                                        TestPhase.UPLOAD -> "UPLOADING..."
+                                        TestPhase.PING -> stringResource(R.string.status_testing_ping)
+                                        TestPhase.JITTER -> stringResource(R.string.status_testing_ping) // No jitter string?
+                                        TestPhase.DOWNLOAD -> stringResource(R.string.status_downloading)
+                                        TestPhase.UPLOAD -> stringResource(R.string.status_uploading)
                                     }
                                 }
-                                is SpeedTestState.Complete -> "COMPLETE"
+                                is SpeedTestState.Complete -> stringResource(R.string.status_complete)
                             }
 
                             SpeedGauge(
@@ -119,9 +121,9 @@ fun MainScreen(
                             ) {
                                 ResponsiveMetricCard(
                                     icon = Icons.Outlined.ArrowDownward,
-                                    label = "Download",
+                                    label = stringResource(R.string.label_download),
                                     value = uiState.download,
-                                    unit = "Mbps",
+                                    unit = stringResource(R.string.label_mbps),
                                     accentColor = BlueAccentIcon,
                                     iconBgColor = BlueAccentBg,
                                     isActive = (uiState.testState as? SpeedTestState.Running)?.phase == TestPhase.DOWNLOAD,
@@ -129,9 +131,9 @@ fun MainScreen(
                                 )
                                 ResponsiveMetricCard(
                                     icon = Icons.Outlined.ArrowUpward,
-                                    label = "Upload",
+                                    label = stringResource(R.string.label_upload),
                                     value = uiState.upload,
-                                    unit = "Mbps",
+                                    unit = stringResource(R.string.label_mbps),
                                     accentColor = CyanAccentIcon,
                                     iconBgColor = CyanAccentBg,
                                     isActive = (uiState.testState as? SpeedTestState.Running)?.phase == TestPhase.UPLOAD,
@@ -144,9 +146,9 @@ fun MainScreen(
                             ) {
                                 ResponsiveMetricCard(
                                     icon = Icons.Outlined.Timeline,
-                                    label = "Ping",
+                                    label = stringResource(R.string.label_ping),
                                     value = uiState.ping,
-                                    unit = "ms",
+                                    unit = stringResource(R.string.label_ms),
                                     accentColor = GreenAccentIcon,
                                     iconBgColor = GreenAccentBg,
                                     isActive = (uiState.testState as? SpeedTestState.Running)?.phase == TestPhase.PING,
@@ -154,9 +156,9 @@ fun MainScreen(
                                 )
                                 ResponsiveMetricCard(
                                     icon = Icons.Outlined.Waves,
-                                    label = "Jitter",
+                                    label = stringResource(R.string.label_jitter),
                                     value = uiState.jitter,
-                                    unit = "ms",
+                                    unit = stringResource(R.string.label_ms),
                                     accentColor = AmberAccentIcon,
                                     iconBgColor = AmberAccentBg,
                                     isActive = (uiState.testState as? SpeedTestState.Running)?.phase == TestPhase.JITTER,
@@ -181,7 +183,7 @@ fun MainScreen(
 
                 // 5. Server Info
                 Text(
-                    text = "Server: Mumbai · 3 connections",
+                    text = stringResource(R.string.server_info, "Mumbai", 3),
                     color = TextSecondary,
                     style = MaterialTheme.typography.labelSmall
                 )
@@ -356,7 +358,9 @@ fun ResponsiveActionButton(
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
-                    text = if (isRunning) "STOP TEST" else if (isComplete) "TEST AGAIN" else "START TEST",
+                    text = if (isRunning) stringResource(R.string.btn_stop_test).uppercase() 
+                           else if (isComplete) stringResource(R.string.btn_test_again).uppercase() 
+                           else stringResource(R.string.btn_start_test).uppercase(),
                     color = Color.White,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.ExtraBold,
@@ -392,7 +396,7 @@ fun BottomNavigationBar(onNavigateToHistory: () -> Unit, onNavigateToSettings: (
             selected = selectedItem == 1,
             onClick = onNavigateToHistory,
             icon = { Icon(Icons.Default.History, contentDescription = "History") },
-            label = { Text("History") },
+            label = { Text(stringResource(R.string.screen_history)) },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = PrimaryAccent,
                 selectedTextColor = PrimaryAccent,
@@ -404,7 +408,7 @@ fun BottomNavigationBar(onNavigateToHistory: () -> Unit, onNavigateToSettings: (
             selected = selectedItem == 2,
             onClick = onNavigateToSettings,
             icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
-            label = { Text("Settings") },
+            label = { Text(stringResource(R.string.screen_settings)) },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = PrimaryAccent,
                 selectedTextColor = PrimaryAccent,

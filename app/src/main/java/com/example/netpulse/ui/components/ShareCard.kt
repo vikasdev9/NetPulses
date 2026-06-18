@@ -71,7 +71,7 @@ fun ShareCard(
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "SpeedCheck Pro",
+                        text = "NetPulse",
                         color = Color.White,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold
@@ -160,7 +160,7 @@ fun ShareCard(
                 Spacer(modifier = Modifier.height(16.dp))
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     Text(
-                        text = "SPEEDCHECKPRO.APP",
+                        text = "NETPULSE.APP",
                         color = Color(0xFF2E3A50),
                         fontSize = 10.sp,
                         letterSpacing = 2.sp,

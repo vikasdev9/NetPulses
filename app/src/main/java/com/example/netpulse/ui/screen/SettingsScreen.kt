@@ -23,6 +23,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.res.stringResource
+import com.example.netpulse.R
 import com.example.netpulse.ui.components.ProUpgradeCard
 import com.example.netpulse.ui.components.SegmentedControl
 import com.example.netpulse.ui.components.SettingsRow
@@ -34,6 +36,7 @@ import com.example.netpulse.ui.viewmodel.SettingsViewModel
 fun SettingsScreen(
     onNavigateToHome: () -> Unit,
     onNavigateToHistory: () -> Unit,
+    onNavigateToLanguage: () -> Unit,
     viewModel: SettingsViewModel = viewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -56,7 +59,7 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(20.dp))
             
             Text(
-                text = "Settings",
+                text = stringResource(R.string.screen_settings),
                 color = Color.White,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
@@ -65,7 +68,7 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(16.dp))
             
             // GENERAL SECTION
-            SectionLabel("GENERAL")
+            SectionLabel(stringResource(R.string.settings_section_general))
             Card(
                 colors = CardDefaults.cardColors(containerColor = CardSurface),
                 shape = RoundedCornerShape(16.dp),
@@ -74,7 +77,7 @@ fun SettingsScreen(
                 Column {
                     SettingsRow(
                         icon = Icons.Outlined.Shield,
-                        title = "Dark Mode",
+                        title = stringResource(R.string.settings_dark_mode),
                         trailing = {
                             Switch(
                                 checked = state.isDarkMode,
@@ -84,8 +87,29 @@ fun SettingsScreen(
                         }
                     )
                     SettingsRow(
+                        icon = Icons.Outlined.Language,
+                        title = stringResource(R.string.settings_language),
+                        trailing = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = state.currentLanguage,
+                                    color = TextSecondary,
+                                    fontSize = 13.sp
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                    contentDescription = null,
+                                    tint = TextSecondary,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                            }
+                        },
+                        onClick = onNavigateToLanguage
+                    )
+                    SettingsRow(
                         icon = Icons.Outlined.Notifications,
-                        title = "Notifications",
+                        title = stringResource(R.string.settings_notifications),
                         trailing = {
                             Switch(
                                 checked = state.notificationsEnabled,
@@ -96,7 +120,7 @@ fun SettingsScreen(
                     )
                     SettingsRow(
                         icon = Icons.Outlined.Storage,
-                        title = "Default Server",
+                        title = stringResource(R.string.settings_default_server),
                         trailing = {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
@@ -122,7 +146,7 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(24.dp))
             
             // TEST SETTINGS SECTION
-            SectionLabel("TEST SETTINGS")
+            SectionLabel(stringResource(R.string.settings_section_test))
             Card(
                 colors = CardDefaults.cardColors(containerColor = CardSurface),
                 shape = RoundedCornerShape(16.dp),
@@ -131,7 +155,7 @@ fun SettingsScreen(
                 Column {
                     SettingsRow(
                         icon = Icons.Outlined.Timeline,
-                        title = "Parallel Connections",
+                        title = stringResource(R.string.settings_parallel_connections),
                         trailing = {
                             SegmentedControl(
                                 options = listOf("1", "2", "4"),
@@ -152,7 +176,7 @@ fun SettingsScreen(
                     )
                     SettingsRow(
                         icon = Icons.Outlined.Timer,
-                        title = "Test Duration",
+                        title = stringResource(R.string.settings_test_duration),
                         trailing = {
                             SegmentedControl(
                                 options = listOf("10s", "20s", "30s"),
@@ -173,7 +197,7 @@ fun SettingsScreen(
                     )
                     SettingsRow(
                         icon = Icons.Outlined.Wifi,
-                        title = "Auto-run on WiFi",
+                        title = stringResource(R.string.settings_auto_run_wifi),
                         trailing = {
                             Switch(
                                 checked = state.autoRunOnWifi,
@@ -198,7 +222,7 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(24.dp))
             
             // ABOUT SECTION
-            SectionLabel("ABOUT")
+            SectionLabel(stringResource(R.string.settings_section_about))
             Card(
                 colors = CardDefaults.cardColors(containerColor = CardSurface),
                 shape = RoundedCornerShape(16.dp),
@@ -207,19 +231,19 @@ fun SettingsScreen(
                 Column {
                     SettingsRow(
                         icon = Icons.Outlined.StarOutline,
-                        title = "Rate the App",
+                        title = stringResource(R.string.settings_rate_app),
                         trailing = { ChevronIcon() },
                         onClick = { viewModel.onRateApp(context) }
                     )
                     SettingsRow(
                         icon = Icons.Outlined.Share,
-                        title = "Share App",
+                        title = stringResource(R.string.settings_share_app),
                         trailing = { ChevronIcon() },
                         onClick = { viewModel.onShareApp(context) }
                     )
                     SettingsRow(
                         icon = Icons.Outlined.Shield,
-                        title = "Privacy Policy",
+                        title = stringResource(R.string.settings_privacy_policy),
                         trailing = { ChevronIcon() },
                         onClick = { viewModel.onPrivacyPolicy(context) },
                         showDivider = false
@@ -230,7 +254,7 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(24.dp))
             
             Text(
-                text = "Version ${state.appVersion}",
+                text = stringResource(R.string.settings_version, state.appVersion),
                 color = TextSecondary,
                 fontSize = 12.sp,
                 modifier = Modifier.fillMaxWidth(),
@@ -304,7 +328,7 @@ fun SettingsBottomNavigationBar(onNavigateToHome: () -> Unit, onNavigateToHistor
             selected = true,
             onClick = { },
             icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
-            label = { Text("Settings") },
+            label = { Text(stringResource(R.string.screen_settings)) },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = PrimaryAccent,
                 selectedTextColor = PrimaryAccent,

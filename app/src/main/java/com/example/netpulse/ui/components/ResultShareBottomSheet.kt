@@ -10,6 +10,7 @@ import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -17,12 +18,11 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.example.netpulse.R
 import com.example.netpulse.data.SpeedResult
 import com.example.netpulse.ui.theme.Background
 import com.example.netpulse.ui.theme.CardSurface
@@ -38,6 +38,7 @@ fun ResultShareBottomSheet(
 ) {
     val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val compositionContext = rememberCompositionContext()
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -73,7 +74,7 @@ fun ResultShareBottomSheet(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Your Results",
+                    text = stringResource(R.string.share_title),
                     color = Color.White,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold
@@ -98,7 +99,7 @@ fun ResultShareBottomSheet(
                 Button(
                     onClick = { 
                         // Implementation for capturing and sharing image
-                        ShareUtils.shareResultAsImage(context, result, isPro)
+                        ShareUtils.shareResultAsImage(context, result, isPro, compositionContext)
                     },
                     modifier = Modifier
                         .weight(1f)
@@ -125,7 +126,7 @@ fun ResultShareBottomSheet(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Outlined.Share, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Share Image", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                            Text(stringResource(R.string.share_btn_image), color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                         }
                     }
                 }
@@ -145,7 +146,7 @@ fun ResultShareBottomSheet(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Outlined.Share, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Share Text", color = Color.White, fontSize = 14.sp)
+                        Text(stringResource(R.string.share_btn_text), color = Color.White, fontSize = 14.sp)
                     }
                 }
             }
@@ -154,12 +155,7 @@ fun ResultShareBottomSheet(
 
             // PRO UPSELL
             Text(
-                text = buildAnnotatedString {
-                    append("Remove watermark with ")
-                    withStyle(style = SpanStyle(color = PrimaryAccent, fontWeight = FontWeight.Bold)) {
-                        append("Pro")
-                    }
-                },
+                text = stringResource(R.string.share_pro_upsell),
                 color = Color.White.copy(alpha = 0.7f),
                 fontSize = 12.sp,
                 modifier = Modifier.clickable { /* Handle Pro Click */ }
