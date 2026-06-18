@@ -4,14 +4,11 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -19,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,13 +26,15 @@ fun PremiumGradientButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    containerColor: List<Color> = listOf(Color(0xFF3B8BFF), Color(0xFF00D4FF))
+    containerColor: List<Color> = listOf(Color(0xFF3B8BFF), Color(0xFF00D4FF)),
+    enabled: Boolean = true
 ) {
     Button(
         onClick = onClick,
         modifier = modifier
             .height(56.dp)
             .fillMaxWidth(),
+        enabled = enabled,
         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
         contentPadding = PaddingValues(0.dp),
         shape = RoundedCornerShape(28.dp)
@@ -42,7 +42,10 @@ fun PremiumGradientButton(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Brush.horizontalGradient(containerColor)),
+                .background(
+                    if (enabled) Brush.horizontalGradient(containerColor)
+                    else Brush.horizontalGradient(listOf(Color.Gray, Color.DarkGray))
+                ),
             contentAlignment = Alignment.Center
         ) {
             Text(
@@ -85,6 +88,39 @@ fun AnimatedPageIndicator(
                     .width(width)
                     .clip(CircleShape)
                     .background(if (isSelected) activeColor else inactiveColor)
+            )
+        }
+    }
+}
+
+@Composable
+fun TrustBadgeItem(
+    badge: TrustBadge,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier,
+        color = Color.White.copy(alpha = 0.05f),
+        shape = RoundedCornerShape(12.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.1f))
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = badge.icon,
+                contentDescription = null,
+                tint = Color(0xFF00D4FF),
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = badge.label,
+                color = Color.White,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium
             )
         }
     }

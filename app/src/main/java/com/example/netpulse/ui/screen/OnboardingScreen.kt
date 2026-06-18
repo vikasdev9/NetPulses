@@ -1,37 +1,23 @@
 package com.example.netpulse.ui.screen
 
-import androidx.compose.animation.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.Analytics
-import androidx.compose.material.icons.outlined.History
-import androidx.compose.material.icons.outlined.RocketLaunch
-import androidx.compose.material.icons.outlined.Shield
-import androidx.compose.material.icons.outlined.Speed
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.netpulse.ui.screen.onboarding.*
 import com.example.netpulse.ui.theme.DarkGradient
+import com.example.netpulse.ui.theme.NetPulseTheme
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -46,12 +32,12 @@ fun OnboardingScreen(
     val scope = rememberCoroutineScope()
     val currentPage by viewModel.currentPage.collectAsState()
 
-    // Sync ViewModel state with PagerState
+    // Sync ViewModel with PagerState
     LaunchedEffect(pagerState.currentPage) {
         viewModel.onPageChanged(pagerState.currentPage)
     }
 
-    // Handle navigation effects
+    // Handle Effects
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collectLatest { effect ->
             when (effect) {
@@ -60,173 +46,86 @@ fun OnboardingScreen(
         }
     }
 
-    BoxWithConstraints(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(DarkGradient)
-    ) {
-        val isTablet = maxWidth > 600.dp
-        val horizontalPadding = if (isTablet) 80.dp else 24.dp
-
-        Column(
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        containerColor = Color.Transparent
+    ) { padding ->
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
-                .statusBarsPadding()
-                .navigationBarsPadding()
+                .background(DarkGradient)
+                .padding(padding)
         ) {
-            // TOP AREA: Skip Button
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 8.dp),
-                contentAlignment = Alignment.CenterEnd
-            ) {
-                if (currentPage < items.size - 1) {
-                    TextButton(onClick = { viewModel.onSkip() }) {
-                        Text(
-                            "Skip",
-                            color = Color.White.copy(alpha = 0.6f),
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-                }
-            }
+            val isTablet = maxWidth > 600.dp
+            val contentPadding = if (isTablet) 64.dp else 24.dp
 
-            // CENTER AREA: Horizontal Pager
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) { pageIndex ->
-                OnboardingPageContent(
-                    item = items[pageIndex],
-                    isTablet = isTablet,
-                    modifier = Modifier.padding(horizontal = horizontalPadding)
-                )
-            }
-
-            // BOTTOM AREA: Controls
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = horizontalPadding, vertical = 32.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                    .fillMaxSize()
+                    .statusBarsPadding()
+                    .navigationBarsPadding()
             ) {
-                // Page Indicator
-                AnimatedPageIndicator(
-                    pageSize = items.size,
-                    currentPage = currentPage
-                )
-
-                // Navigation Buttons
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                // TOP: Skip Button
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = contentPadding, vertical = 8.dp),
+                    contentAlignment = Alignment.CenterEnd
                 ) {
                     if (currentPage < items.size - 1) {
-                        PremiumGradientButton(
-                            text = "Next",
-                            onClick = { 
-                                viewModel.onNext(items.size)
-                                // We don't animate pager here manually because LaunchedEffect syncs it if we change VM state,
-                                // but for immediate feedback:
-                                scope.launch { pagerState.animateScrollToPage(currentPage + 1) }
-                            }
-                        )
-                    } else {
-                        PremiumGradientButton(
-                            text = "Get Started",
-                            onClick = { viewModel.onNext(items.size) }
-                        )
+                        TextButton(onClick = { viewModel.onSkip() }) {
+                            Text(
+                                "Skip",
+                                color = Color.White.copy(alpha = 0.6f),
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
                     }
                 }
-            }
-        }
-    }
-}
 
-@Composable
-fun OnboardingPageContent(
-    item: OnboardingItem,
-    isTablet: Boolean,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        // GLASSMORPHISM ILLUSTRATION BOX
-        Box(
-            modifier = Modifier
-                .size(if (isTablet) 320.dp else 240.dp)
-                .clip(CircleShape)
-                .background(item.highlightColor.copy(alpha = 0.1f))
-                .border(1.dp, item.highlightColor.copy(alpha = 0.2f), CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            // Subtle glow
-            Box(
-                modifier = Modifier
-                    .size(120.dp)
-                    .blur(60.dp)
-                    .background(item.highlightColor.copy(alpha = 0.3f))
-            )
+                // CENTER: Illustration and Content
+                OnboardingPager(
+                    state = pagerState,
+                    items = items,
+                    isTablet = isTablet,
+                    modifier = Modifier.weight(1f)
+                )
 
-            Icon(
-                imageVector = item.icon,
-                contentDescription = null,
-                modifier = Modifier.size(if (isTablet) 120.dp else 80.dp),
-                tint = item.highlightColor
-            )
-        }
+                // BOTTOM: Indicator and Buttons
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = contentPadding, vertical = 32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                ) {
+                    // Page Indicator
+                    AnimatedPageIndicator(
+                        pageSize = items.size,
+                        currentPage = currentPage
+                    )
 
-        Spacer(modifier = Modifier.height(if (isTablet) 60.dp else 40.dp))
-
-        // TEXT CONTENT
-        Text(
-            text = item.title,
-            style = MaterialTheme.typography.headlineLarge,
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = item.subtitle,
-            style = MaterialTheme.typography.bodyLarge,
-            color = Color.White.copy(alpha = 0.7f),
-            textAlign = TextAlign.Center,
-            lineHeight = 24.sp,
-            modifier = Modifier.padding(horizontal = 16.dp)
-        )
-
-        if (item.features.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(24.dp))
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalAlignment = Alignment.Start
-            ) {
-                item.features.forEach { feature ->
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = null,
-                            tint = item.highlightColor,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Text(
-                            text = feature,
-                            color = Color.White.copy(alpha = 0.9f),
-                            fontSize = 15.sp
-                        )
+                    // Navigation Buttons
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        if (currentPage < items.size - 1) {
+                            PremiumGradientButton(
+                                text = "Next",
+                                onClick = {
+                                    scope.launch {
+                                        pagerState.animateScrollToPage(currentPage + 1)
+                                    }
+                                }
+                            )
+                        } else {
+                            PremiumGradientButton(
+                                text = "Start Testing",
+                                onClick = { viewModel.onNext(items.size) }
+                            )
+                        }
                     }
                 }
             }
@@ -244,29 +143,39 @@ private fun getOnboardingItems(): List<OnboardingItem> = listOf(
     ),
     OnboardingItem(
         title = "Understand Your Network",
-        subtitle = "Get deep insights into your network quality, Wi-Fi info, ISP details, and signal strength.",
-        features = listOf("Live Network Quality", "Wi-Fi & ISP Details", "Signal Strength"),
+        description = "Live network quality • Wi-Fi information • ISP details • Public IP • DNS • Signal Strength • Device Information",
         icon = Icons.Outlined.Analytics,
         highlightColor = Color(0xFF00D4FF)
     ),
     OnboardingItem(
-        title = "Track Performance",
-        subtitle = "Monitor performance over time with charts, trends, and previous test comparisons.",
-        features = listOf("Speed History", "Network Trends", "Export Reports"),
+        title = "Track Performance Over Time",
+        description = "Speed history • Performance charts • Network trends • Compare previous tests • Export reports",
         icon = Icons.Outlined.History,
         highlightColor = Color(0xFF00E676)
     ),
     OnboardingItem(
         title = "Privacy First",
-        subtitle = "We never sell your personal data. Only information required for network tests is collected.",
-        features = listOf("Secure & Encrypted", "No Tracking", "Ad-Free Premium"),
+        description = "We never sell your personal data. Only the information required to perform network tests is collected.",
+        trustBadges = listOf(
+            TrustBadge("Secure", Icons.Outlined.Security),
+            TrustBadge("No Tracking", Icons.Outlined.VisibilityOff),
+            TrustBadge("Ad-Free", Icons.Outlined.AdsClick)
+        ),
         icon = Icons.Outlined.Shield,
         highlightColor = Color(0xFFFFB300)
     ),
     OnboardingItem(
         title = "You're Ready!",
-        subtitle = "Let's test your connection and discover your true internet performance.",
+        subtitle = "Let's test your connection and discover your internet performance.",
         icon = Icons.Outlined.RocketLaunch,
         highlightColor = Color(0xFF3B8BFF)
     )
 )
+
+@Preview(showBackground = true)
+@Composable
+fun OnboardingPreview() {
+    NetPulseTheme {
+        OnboardingScreen(onFinished = {})
+    }
+}
