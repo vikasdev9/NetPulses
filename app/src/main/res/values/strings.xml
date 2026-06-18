@@ -46,16 +46,12 @@
     <string name="filter_this_week">This Week</string>
     <string name="filter_this_month">This Month</string>
     <string name="history_empty_title">No tests yet</string>
-    <string name="history_empty_subtitle">
-        Run your first speed test to see results here
-    </string>
+    <string name="history_empty_subtitle">Run your first speed test to see results here</string>
     <string name="history_time_today">Today, %1$s</string>
     <string name="history_time_yesterday">Yesterday, %1$s</string>
     <string name="ping_label">%1$d ms ping</string>
     <string name="confirm_clear_title">Clear all history?</string>
-    <string name="confirm_clear_message">
-        This will delete all %1$d test results permanently.
-    </string>
+    <string name="confirm_clear_message">This will delete all %1$d test results permanently.</string>
     <string name="confirm_delete">Delete</string>
     <string name="confirm_cancel">Cancel</string>
     <string name="swipe_to_delete">Swipe to delete</string>
@@ -66,18 +62,8 @@
     <string name="share_btn_text">Share Text</string>
     <string name="share_report">REPORT</string>
     <string name="share_watermark">speedcheckpro.app</string>
-    <string name="share_pro_upsell">
-        Remove watermark with Pro
-    </string>
-    <string name="share_text_template">
-        📶 NetPulse Speed Results\n
-        ⬇ Download: %1$.1f Mbps\n
-        ⬆ Upload: %2$.1f Mbps\n
-        📡 Ping: %3$d ms\n
-        🌐 Network: %4$s · %5$s\n
-        📍 %6$s · %7$s\n
-        🔗 netpulse.app
-    </string>
+    <string name="share_pro_upsell">Remove watermark with Pro</string>
+    <string name="share_text_template">📶 NetPulse Speed Results\n⬇ Download: %1$.1f Mbps\n⬆ Upload: %2$.1f Mbps\n📡 Ping: %3$d ms\n🌐 Network: %4$s · %5$s\n📍 %6$s · %7$s\n🔗 netpulse.app</string>
     <string name="share_chooser_title">Share Result</string>
 
     <!-- Settings Screen -->
@@ -89,9 +75,7 @@
     <string name="settings_notifications">Notifications</string>
     <string name="settings_default_server">Default Server</string>
     <string name="settings_server_auto">Auto (%1$s)</string>
-    <string name="settings_parallel_connections">
-        Parallel Connections
-    </string>
+    <string name="settings_parallel_connections">Parallel Connections</string>
     <string name="settings_test_duration">Test Duration</string>
     <string name="settings_duration_format">%1$ds</string>
     <string name="settings_auto_run_wifi">Auto-run on WiFi</string>
@@ -104,18 +88,14 @@
 
     <!-- Pro / Upgrade -->
     <string name="pro_title">NetPulse Pro</string>
-    <string name="pro_description">
-        Remove ads, export history, widget support.
-    </string>
+    <string name="pro_description">Remove ads, export history, widget support.</string>
     <string name="pro_upgrade_btn">Upgrade for %1$s</string>
     <string name="pro_restore">Restore Purchase</string>
     <string name="pro_active">Pro Active ✓</string>
     <string name="pro_badge">PRO</string>
 
     <!-- Widget -->
-    <string name="widget_description">
-        NetPulse speed badge for your home screen
-    </string>
+    <string name="widget_description">NetPulse speed badge for your home screen</string>
     <string name="widget_tap_to_test">Tap to test</string>
     <string name="widget_tap_to_test_again">Tap to test again</string>
     <string name="widget_no_data">No data yet</string>
@@ -126,38 +106,26 @@
     <!-- Notifications -->
     <string name="notif_channel_widget">Widget Speed Test</string>
     <string name="notif_testing_title">Testing speed…</string>
-    <string name="notif_testing_body">
-        NetPulse is measuring your connection
-    </string>
+    <string name="notif_testing_body">NetPulse is measuring your connection</string>
     <string name="notif_complete_title">Speed test complete</string>
-    <string name="notif_complete_body">
-        ↓ %1$.1f Mbps  ↑ %2$.1f Mbps  Ping %3$d ms
-    </string>
+    <string name="notif_complete_body">↓ %1$.1f Mbps  ↑ %2$.1f Mbps  Ping %3$d ms</string>
 
     <!-- Errors -->
     <string name="error_no_internet">No internet connection</string>
     <string name="error_test_failed">Test failed. Tap to retry.</string>
-    <string name="error_server_unreachable">
-        Cannot reach test server
-    </string>
+    <string name="error_server_unreachable">Cannot reach test server</string>
     <string name="error_timeout">Connection timed out</string>
     <string name="error_unknown">Something went wrong</string>
     <string name="btn_retry">Retry</string>
 
     <!-- Accessibility -->
     <string name="cd_app_icon">NetPulse app icon</string>
-    <string name="cd_speedometer">
-        Speedometer showing %1$.1f Mbps
-    </string>
+    <string name="cd_speedometer">Speedometer showing %1$.1f Mbps</string>
     <string name="cd_start_test">Start speed test</string>
     <string name="cd_history_icon">View test history</string>
     <string name="cd_settings_icon">Open settings</string>
-    <string name="cd_download_card">
-        Download speed: %1$.1f Mbps
-    </string>
-    <string name="cd_upload_card">
-        Upload speed: %1$.1f Mbps
-    </string>
+    <string name="cd_download_card">Download speed: %1$.1f Mbps</string>
+    <string name="cd_upload_card">Upload speed: %1$.1f Mbps</string>
     <string name="cd_ping_card">Ping: %1$d milliseconds</string>
     <string name="cd_jitter_card">Jitter: %1$d milliseconds</string>
 

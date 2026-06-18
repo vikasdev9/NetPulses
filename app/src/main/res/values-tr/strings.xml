@@ -4,7 +4,7 @@
     <string name="app_tagline">İnternet Hız Testi</string>
     <string name="btn_start_test">Testi Başlat</string>
     <string name="btn_stop_test">Testi Durdur</string>
-    <string name="btn_test_again">Yeniden Test Et</string>
+    <string name="btn_test_again">Tekrar Test Et</string>
     <string name="status_ready">HAZIR</string>
     <string name="status_downloading">İNDİRİLİYOR…</string>
     <string name="status_uploading">YÜKLENİYOR…</string>
@@ -30,9 +30,9 @@
     <string name="network_unknown">Bilinmiyor</string>
     <string name="network_connected">Bağlı</string>
     <string name="network_disconnected">Bağlantı Kesildi</string>
-    <string name="label_isp">İSS</string>
+    <string name="label_isp">ISP</string>
     <string name="label_ip">IP</string>
-    <string name="screen_history">Geçmiş</string>
+    <string name="screen_history">Test Geçmişi</string>
     <string name="btn_clear_all">Tümünü Temizle</string>
     <string name="filter_all">Tümü</string>
     <string name="filter_this_week">Bu Hafta</string>
@@ -42,7 +42,7 @@
     <string name="history_time_today">Bugün, %1$s</string>
     <string name="history_time_yesterday">Dün, %1$s</string>
     <string name="ping_label">%1$d ms ping</string>
-    <string name="confirm_clear_title">Geçmişi temizle?</string>
+    <string name="confirm_clear_title">Tüm geçmişi temizle?</string>
     <string name="confirm_clear_message">Bu işlem tüm %1$d test sonucunu kalıcı olarak silecektir.</string>
     <string name="confirm_delete">Sil</string>
     <string name="confirm_cancel">İptal</string>
@@ -66,7 +66,7 @@
     <string name="settings_parallel_connections">Paralel Bağlantılar</string>
     <string name="settings_test_duration">Test Süresi</string>
     <string name="settings_duration_format">%1$ds</string>
-    <string name="settings_auto_run_wifi">WiFi\'de otomatik çalıştır</string>
+    <string name="settings_auto_run_wifi">WiFi\'da otomatik çalıştır</string>
     <string name="settings_rate_app">Uygulamayı Puanla</string>
     <string name="settings_share_app">Uygulamayı Paylaş</string>
     <string name="settings_privacy_policy">Gizlilik Politikası</string>
@@ -74,14 +74,14 @@
     <string name="settings_language">Dil</string>
     <string name="settings_language_system">Sistem Varsayılanı</string>
     <string name="pro_title">NetPulse Pro</string>
-    <string name="pro_description">Reklamları kaldırın, geçmişi dışa aktarın.</string>
+    <string name="pro_description">Reklamları kaldırın, geçmişi dışa aktarın, widget desteği.</string>
     <string name="pro_upgrade_btn">%1$s karşılığında yükselt</string>
-    <string name="pro_restore">Satın Alımları Geri Yükle</string>
+    <string name="pro_restore">Satın Alımı Geri Yükle</string>
     <string name="pro_active">Pro Aktif ✓</string>
     <string name="pro_badge">PRO</string>
     <string name="widget_description">Ana ekranınız için NetPulse hız rozeti</string>
     <string name="widget_tap_to_test">Test etmek için dokunun</string>
-    <string name="widget_tap_to_test_again">Yeniden test etmek için dokunun</string>
+    <string name="widget_tap_to_test_again">Tekrar test etmek için dokunun</string>
     <string name="widget_no_data">Henüz veri yok</string>
     <string name="widget_testing">Test ediliyor…</string>
     <string name="widget_last_tested">%1$s</string>

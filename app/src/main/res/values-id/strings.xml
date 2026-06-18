@@ -19,7 +19,7 @@
     <string name="label_ms">ms</string>
     <string name="label_server">Server</string>
     <string name="label_connections">koneksi</string>
-    <string name="label_live">LANGSUNG</string>
+    <string name="label_live">LIVE</string>
     <string name="server_info">Server: %1$s · %2$d koneksi</string>
     <string name="network_wifi">WiFi</string>
     <string name="network_5g">5G</string>
@@ -32,7 +32,7 @@
     <string name="network_disconnected">Terputus</string>
     <string name="label_isp">ISP</string>
     <string name="label_ip">IP</string>
-    <string name="screen_history">Riwayat</string>
+    <string name="screen_history">Riwayat Uji</string>
     <string name="btn_clear_all">Hapus Semua</string>
     <string name="filter_all">Semua</string>
     <string name="filter_this_week">Minggu Ini</string>
@@ -41,7 +41,7 @@
     <string name="history_empty_subtitle">Jalankan uji kecepatan pertama Anda untuk melihat hasil di sini</string>
     <string name="history_time_today">Hari ini, %1$s</string>
     <string name="history_time_yesterday">Kemarin, %1$s</string>
-    <string name="ping_label">ping %1$d ms</string>
+    <string name="ping_label">%1$d ms ping</string>
     <string name="confirm_clear_title">Hapus semua riwayat?</string>
     <string name="confirm_clear_message">Ini akan menghapus semua %1$d hasil uji secara permanen.</string>
     <string name="confirm_delete">Hapus</string>
@@ -65,7 +65,7 @@
     <string name="settings_server_auto">Otomatis (%1$s)</string>
     <string name="settings_parallel_connections">Koneksi Paralel</string>
     <string name="settings_test_duration">Durasi Uji</string>
-    <string name="settings_duration_format">%1$dd</string>
+    <string name="settings_duration_format">%1$ds</string>
     <string name="settings_auto_run_wifi">Jalankan otomatis di WiFi</string>
     <string name="settings_rate_app">Beri Nilai Aplikasi</string>
     <string name="settings_share_app">Bagikan Aplikasi</string>
@@ -94,7 +94,7 @@
     <string name="error_no_internet">Tidak ada koneksi internet</string>
     <string name="error_test_failed">Uji gagal. Ketuk untuk mencoba lagi.</string>
     <string name="error_server_unreachable">Tidak dapat menjangkau server uji</string>
-    <string name="error_timeout">Koneksi berakhir</string>
+    <string name="error_timeout">Waktu koneksi habis</string>
     <string name="error_unknown">Terjadi kesalahan</string>
     <string name="btn_retry">Coba Lagi</string>
     <string name="cd_app_icon">Ikon aplikasi NetPulse</string>
