@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">NetPulse</string>
+    <string name="widget_description">NetPulse Speed Test Widget</string>
 </resources>
