@@ -1,6 +1,5 @@
 package com.example.netpulse.ui.screen.onboarding
 
-import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -20,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun OnboardingPage(
+fun OnboardingPageContent(
     item: OnboardingItem,
     isTablet: Boolean,
     modifier: Modifier = Modifier
@@ -30,27 +29,27 @@ fun OnboardingPage(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // ILLUSTRATION AREA
+        // PREMIUM GLASSMORPHISM ILLUSTRATION AREA
         Box(
             modifier = Modifier
                 .size(if (isTablet) 320.dp else 240.dp)
                 .clip(CircleShape)
-                .background(item.highlightColor.copy(alpha = 0.1f))
-                .border(1.dp, item.highlightColor.copy(alpha = 0.2f), CircleShape),
+                .background(item.highlightColor.copy(alpha = 0.05f))
+                .border(1.dp, item.highlightColor.copy(alpha = 0.15f), CircleShape),
             contentAlignment = Alignment.Center
         ) {
-            // Background Blur Glow
+            // Animated background glow
             Box(
                 modifier = Modifier
-                    .size(if (isTablet) 180.dp else 120.dp)
+                    .size(if (isTablet) 200.dp else 140.dp)
                     .blur(60.dp)
-                    .background(item.highlightColor.copy(alpha = 0.3f))
+                    .background(item.highlightColor.copy(alpha = 0.25f))
             )
 
             Icon(
                 imageVector = item.icon,
                 contentDescription = null,
-                modifier = Modifier.size(if (isTablet) 140.dp else 100.dp),
+                modifier = Modifier.size(if (isTablet) 140.dp else 90.dp),
                 tint = item.highlightColor
             )
         }
@@ -62,8 +61,9 @@ fun OnboardingPage(
             text = item.title,
             style = MaterialTheme.typography.headlineLarge,
             color = Color.White,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
+            fontWeight = FontWeight.ExtraBold,
+            textAlign = TextAlign.Center,
+            letterSpacing = (-0.5).sp
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -71,31 +71,34 @@ fun OnboardingPage(
         if (item.subtitle.isNotEmpty()) {
             Text(
                 text = item.subtitle,
-                style = MaterialTheme.typography.bodyLarge,
-                color = Color.White.copy(alpha = 0.7f),
+                style = MaterialTheme.typography.titleMedium,
+                color = Color.White.copy(alpha = 0.75f),
                 textAlign = TextAlign.Center,
-                lineHeight = 24.sp,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-        }
-
-        if (item.description.isNotEmpty()) {
-            Text(
-                text = item.description,
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.White.copy(alpha = 0.6f),
-                textAlign = TextAlign.Center,
-                lineHeight = 22.sp,
+                lineHeight = 26.sp,
                 modifier = Modifier.padding(horizontal = 24.dp)
             )
         }
 
-        // HIGHLIGHTS / FEATURES
+        if (item.description.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = item.description,
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White.copy(alpha = 0.6f),
+                textAlign = if (item.description.startsWith("•")) TextAlign.Start else TextAlign.Center,
+                lineHeight = 24.sp,
+                modifier = Modifier
+                    .padding(horizontal = 32.dp)
+                    .fillMaxWidth(if (isTablet) 0.6f else 0.85f)
+            )
+        }
+
+        // HIGHLIGHTS / FEATURES (Page 1 Style)
         if (item.features.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(28.dp))
             Column(
-                modifier = Modifier.fillMaxWidth(if (isTablet) 0.6f else 0.8f),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
+                modifier = Modifier.fillMaxWidth(if (isTablet) 0.5f else 0.8f),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalAlignment = Alignment.Start
             ) {
                 item.features.forEach { feature ->
@@ -103,25 +106,31 @@ fun OnboardingPage(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(horizontal = 16.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = null,
-                            tint = item.highlightColor,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(12.dp))
+                        Surface(
+                            modifier = Modifier.size(24.dp),
+                            shape = CircleShape,
+                            color = item.highlightColor.copy(alpha = 0.2f)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = null,
+                                tint = item.highlightColor,
+                                modifier = Modifier.padding(4.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(16.dp))
                         Text(
                             text = feature,
-                            color = Color.White.copy(alpha = 0.9f),
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Medium
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold
                         )
                     }
                 }
             }
         }
 
-        // TRUST BADGES
+        // TRUST BADGES (Page 4 Style)
         if (item.trustBadges.isNotEmpty()) {
             Spacer(modifier = Modifier.height(32.dp))
             Row(

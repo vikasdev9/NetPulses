@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.netpulse.ui.screen.onboarding.*
 import com.example.netpulse.ui.theme.DarkGradient
@@ -57,6 +58,7 @@ fun OnboardingScreen(
                 .padding(padding)
         ) {
             val isTablet = maxWidth > 600.dp
+            val isLandscape = maxWidth > maxHeight
             val contentPadding = if (isTablet) 64.dp else 24.dp
 
             Column(
@@ -65,7 +67,7 @@ fun OnboardingScreen(
                     .statusBarsPadding()
                     .navigationBarsPadding()
             ) {
-                // TOP: Skip Button
+                // TOP BAR: Navigation
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -73,17 +75,21 @@ fun OnboardingScreen(
                     contentAlignment = Alignment.CenterEnd
                 ) {
                     if (currentPage < items.size - 1) {
-                        TextButton(onClick = { viewModel.onSkip() }) {
+                        TextButton(
+                            onClick = { viewModel.onSkip() },
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                        ) {
                             Text(
                                 "Skip",
-                                color = Color.White.copy(alpha = 0.6f),
-                                fontWeight = FontWeight.Medium
+                                color = Color.White.copy(alpha = 0.5f),
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.SemiBold
                             )
                         }
                     }
                 }
 
-                // CENTER: Illustration and Content
+                // CENTER: Pager Content
                 OnboardingPager(
                     state = pagerState,
                     items = items,
@@ -91,13 +97,14 @@ fun OnboardingScreen(
                     modifier = Modifier.weight(1f)
                 )
 
-                // BOTTOM: Indicator and Buttons
+                // BOTTOM AREA: Indicator & Main Action
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = contentPadding, vertical = 32.dp),
+                        .padding(horizontal = contentPadding)
+                        .padding(bottom = if (isLandscape && !isTablet) 16.dp else 40.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                    verticalArrangement = Arrangement.spacedBy(32.dp)
                 ) {
                     // Page Indicator
                     AnimatedPageIndicator(
@@ -105,7 +112,7 @@ fun OnboardingScreen(
                         currentPage = currentPage
                     )
 
-                    // Navigation Buttons
+                    // Navigation Actions
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
@@ -123,7 +130,8 @@ fun OnboardingScreen(
                         } else {
                             PremiumGradientButton(
                                 text = "Start Testing",
-                                onClick = { viewModel.onNext(items.size) }
+                                onClick = { viewModel.onNext(items.size) },
+                                colors = listOf(Color(0xFF00D4FF), Color(0xFF3B8BFF))
                             )
                         }
                     }
@@ -143,19 +151,19 @@ private fun getOnboardingItems(): List<OnboardingItem> = listOf(
     ),
     OnboardingItem(
         title = "Understand Your Network",
-        description = "Live network quality • Wi-Fi information • ISP details • Public IP • DNS • Signal Strength • Device Information",
+        description = "• Live network quality\n• Wi-Fi information\n• ISP details\n• Public IP\n• DNS\n• Signal Strength\n• Device Information",
         icon = Icons.Outlined.Analytics,
         highlightColor = Color(0xFF00D4FF)
     ),
     OnboardingItem(
         title = "Track Performance Over Time",
-        description = "Speed history • Performance charts • Network trends • Compare previous tests • Export reports",
+        description = "• Speed history\n• Performance charts\n• Network trends\n• Compare previous tests\n• Export reports",
         icon = Icons.Outlined.History,
         highlightColor = Color(0xFF00E676)
     ),
     OnboardingItem(
         title = "Privacy First",
-        description = "We never sell your personal data. Only the information required to perform network tests is collected.",
+        subtitle = "We never sell your personal data. Only the information required to perform network tests is collected.",
         trustBadges = listOf(
             TrustBadge("Secure", Icons.Outlined.Security),
             TrustBadge("No Tracking", Icons.Outlined.VisibilityOff),

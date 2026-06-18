@@ -4,7 +4,6 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,9 +13,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,24 +25,23 @@ fun PremiumGradientButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    containerColor: List<Color> = listOf(Color(0xFF3B8BFF), Color(0xFF00D4FF)),
+    colors: List<Color> = listOf(Color(0xFF3B8BFF), Color(0xFF00D4FF)),
     enabled: Boolean = true
 ) {
-    Button(
+    Surface(
         onClick = onClick,
+        enabled = enabled,
         modifier = modifier
             .height(56.dp)
-            .fillMaxWidth(),
-        enabled = enabled,
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-        contentPadding = PaddingValues(0.dp),
-        shape = RoundedCornerShape(28.dp)
+            .shadow(8.dp, RoundedCornerShape(28.dp), ambientColor = colors[0], spotColor = colors[0]),
+        shape = RoundedCornerShape(28.dp),
+        color = Color.Transparent
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
-                    if (enabled) Brush.horizontalGradient(containerColor)
+                    if (enabled) Brush.horizontalGradient(colors)
                     else Brush.horizontalGradient(listOf(Color.Gray, Color.DarkGray))
                 ),
             contentAlignment = Alignment.Center
@@ -52,7 +50,8 @@ fun PremiumGradientButton(
                 text = text,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = Color.White,
+                letterSpacing = 0.5.sp
             )
         }
     }
