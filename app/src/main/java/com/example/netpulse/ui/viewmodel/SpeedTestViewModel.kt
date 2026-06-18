@@ -1,12 +1,18 @@
 package com.example.netpulse.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.netpulse.data.HistoryRepository
+import com.example.netpulse.data.SpeedResult
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlin.random.Random
 
 enum class TestPhase {
@@ -43,7 +49,7 @@ data class SpeedTestUiState(
     val errorMessage: String? = null
 )
 
-class SpeedTestViewModel : ViewModel() {
+class SpeedTestViewModel(private val repository: HistoryRepository) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SpeedTestUiState())
     val uiState = _uiState.asStateFlow()
@@ -135,7 +141,30 @@ class SpeedTestViewModel : ViewModel() {
                 currentTest = "COMPLETED",
                 packetLoss = 0.1f
             )
+
+            // Save to history
+            saveToHistory(finalDownload, finalUpload, finalPing, finalJitter)
         }
+    }
+
+    private suspend fun saveToHistory(download: Float, upload: Float, ping: Int, jitter: Float) {
+        val now = Date()
+        val timestampFormat = SimpleDateFormat("dd MMM yyyy · h:mm a", Locale.getDefault())
+        val dateLabelFormat = SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())
+        
+        val result = SpeedResult(
+            timestamp = timestampFormat.format(now),
+            dateLabel = dateLabelFormat.format(now),
+            downloadMbps = download.toDouble(),
+            uploadMbps = upload.toDouble(),
+            pingMs = ping,
+            jitterMs = jitter.toInt(),
+            networkType = _uiState.value.networkType,
+            isp = "ISP", // In a real app, fetch this
+            location = "Local", // In a real app, fetch this
+            ipAddress = "0.0.0.0" // In a real app, fetch this
+        )
+        repository.insert(result)
     }
 
     fun stopTest() {
@@ -146,4 +175,14 @@ class SpeedTestViewModel : ViewModel() {
     // Aliases for compatibility
     fun startSpeedTest() = startTest()
     fun resetTest() = stopTest()
+
+    class Factory(private val repository: HistoryRepository) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(SpeedTestViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return SpeedTestViewModel(repository) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
+        }
+    }
 }

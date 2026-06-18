@@ -32,13 +32,18 @@ import com.example.netpulse.ui.components.ResultShareBottomSheet
 import com.example.netpulse.ui.theme.*
 import com.example.netpulse.ui.viewmodel.HistoryViewModel
 
+import androidx.compose.ui.platform.LocalContext
+import com.example.netpulse.NetPulseApplication
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryScreen(
-    viewModel: HistoryViewModel = viewModel(),
     onNavigateToHome: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {}
 ) {
+    val context = LocalContext.current
+    val repository = (context.applicationContext as NetPulseApplication).historyRepository
+    val viewModel: HistoryViewModel = viewModel(factory = HistoryViewModel.Factory(repository))
     val historyItems by viewModel.historyItems.collectAsState()
     val selectedFilter by viewModel.selectedFilter.collectAsState()
 

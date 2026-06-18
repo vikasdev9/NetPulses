@@ -42,12 +42,15 @@ import com.example.netpulse.ui.viewmodel.SpeedTestUiState
 import com.example.netpulse.ui.viewmodel.SpeedTestViewModel
 import kotlinx.coroutines.launch
 
+import com.example.netpulse.NetPulseApplication
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SpeedTestScreen() {
-    val viewModel: SpeedTestViewModel = viewModel()
-    val uiState by viewModel.uiState.collectAsState(SpeedTestUiState())
     val context = LocalContext.current
+    val repository = (context.applicationContext as NetPulseApplication).historyRepository
+    val viewModel: SpeedTestViewModel = viewModel(factory = SpeedTestViewModel.Factory(repository))
+    val uiState by viewModel.uiState.collectAsState(SpeedTestUiState())
     val prefs = remember { Prefs(context.applicationContext) }
     var darkMode by remember { mutableStateOf(true) }
     LaunchedEffect(Unit) {

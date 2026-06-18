@@ -1,6 +1,11 @@
 package com.example.netpulse.data
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "speed_results")
 data class SpeedResult(
+    @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val timestamp: String,        // "17 Jun 2026 · 2:34 PM"
     val dateLabel: String,        // "Today, 2:34 PM"

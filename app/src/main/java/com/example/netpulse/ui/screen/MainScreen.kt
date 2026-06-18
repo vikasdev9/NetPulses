@@ -30,14 +30,19 @@ import com.example.netpulse.ui.theme.*
 import com.example.netpulse.ui.viewmodel.*
 import kotlin.math.min
 
+import androidx.compose.ui.platform.LocalContext
+import com.example.netpulse.NetPulseApplication
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
-    viewModel: SpeedTestViewModel = viewModel(),
     onNavigateToHistory: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
     onNavigateToAnalytics: () -> Unit = {}
 ) {
+    val context = LocalContext.current
+    val repository = (context.applicationContext as NetPulseApplication).historyRepository
+    val viewModel: SpeedTestViewModel = viewModel(factory = SpeedTestViewModel.Factory(repository))
     val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
