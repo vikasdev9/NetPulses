@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- App -->
     <string name="app_name">NetPulse</string>
-    <string name="app_tagline">Probador de velocidad de Internet</string>
-    <string name="btn_start_test">Iniciar prueba</string>
-    <string name="btn_stop_test">Detener prueba</string>
-    <string name="btn_test_again">Probar de nuevo</string>
+    <string name="app_tagline">Probador de Velocidad de Internet</string>
+
+    <!-- Main Screen -->
+    <string name="btn_start_test">Iniciar Prueba</string>
+    <string name="btn_stop_test">Detener Prueba</string>
+    <string name="btn_test_again">Probar de Nuevo</string>
     <string name="status_ready">LISTO</string>
     <string name="status_downloading">DESCARGANDO…</string>
     <string name="status_uploading">SUBIENDO…</string>
     <string name="status_testing_ping">PROBANDO PING…</string>
     <string name="status_complete">PRUEBA COMPLETADA</string>
     <string name="status_failed">PRUEBA FALLIDA</string>
+    <string name="label_home">Inicio</string>
     <string name="label_download">Descarga</string>
     <string name="label_upload">Subida</string>
     <string name="label_ping">Ping</string>
@@ -21,6 +25,8 @@
     <string name="label_connections">conexiones</string>
     <string name="label_live">EN VIVO</string>
     <string name="server_info">Servidor: %1$s · %2$d conexiones</string>
+
+    <!-- Network types -->
     <string name="network_wifi">WiFi</string>
     <string name="network_5g">5G</string>
     <string name="network_4g">4G</string>
@@ -32,11 +38,13 @@
     <string name="network_disconnected">Desconectado</string>
     <string name="label_isp">ISP</string>
     <string name="label_ip">IP</string>
-    <string name="screen_history">Historial de pruebas</string>
-    <string name="btn_clear_all">Borrar todo</string>
-    <string name="filter_all">Todos</string>
-    <string name="filter_this_week">Esta semana</string>
-    <string name="filter_this_month">Este mes</string>
+
+    <!-- History Screen -->
+    <string name="screen_history">Historial de Pruebas</string>
+    <string name="btn_clear_all">Borrar Todo</string>
+    <string name="filter_all">Todo</string>
+    <string name="filter_this_week">Esta Semana</string>
+    <string name="filter_this_month">Este Mes</string>
     <string name="history_empty_title">Sin pruebas aún</string>
     <string name="history_empty_subtitle">Realiza tu primera prueba de velocidad para ver los resultados aquí</string>
     <string name="history_time_today">Hoy, %1$s</string>
@@ -47,57 +55,71 @@
     <string name="confirm_delete">Eliminar</string>
     <string name="confirm_cancel">Cancelar</string>
     <string name="swipe_to_delete">Desliza para eliminar</string>
-    <string name="share_title">Tus resultados</string>
-    <string name="share_btn_image">Compartir imagen</string>
-    <string name="share_btn_text">Compartir texto</string>
-    <string name="share_report">INFORME</string>
+
+    <!-- Result Share Screen -->
+    <string name="share_title">Tus Resultados</string>
+    <string name="share_btn_image">Compartir Imagen</string>
+    <string name="share_btn_text">Compartir Texto</string>
+    <string name="share_report">REPORTE</string>
     <string name="share_watermark">speedcheckpro.app</string>
-    <string name="share_pro_upsell">Eliminar marca de agua con Pro</string>
-    <string name="share_text_template">📶 Resultados de velocidad NetPulse\n⬇ Descarga: %1$.1f Mbps\n⬆ Subida: %2$.1f Mbps\n📡 Ping: %3$d ms\n🌐 Red: %4$s · %5$s\n📍 %6$s · %7$s\n🔗 netpulse.app</string>
-    <string name="share_chooser_title">Compartir resultado</string>
+    <string name="share_pro_upsell">Quitar marca de agua con Pro</string>
+    <string name="share_text_template">📶 Resultados de Velocidad NetPulse\n\n⬇ Descarga: %1$.1f Mbps\n\n⬆ Subida: %2$.1f Mbps\n\n📡 Ping: %3$d ms\n\n🌐 Red: %4$s · %5$s\n\n📍 %6$s · %7$s\n\n🔗 netpulse.app</string>
+    <string name="share_chooser_title">Compartir Resultado</string>
+
+    <!-- Settings Screen -->
     <string name="screen_settings">Ajustes</string>
     <string name="settings_section_general">General</string>
-    <string name="settings_section_test">Ajustes de prueba</string>
+    <string name="settings_section_test">Ajustes de Prueba</string>
     <string name="settings_section_about">Acerca de</string>
-    <string name="settings_dark_mode">Modo oscuro</string>
+    <string name="settings_dark_mode">Modo Oscuro</string>
     <string name="settings_notifications">Notificaciones</string>
-    <string name="settings_default_server">Servidor predeterminado</string>
+    <string name="settings_default_server">Servidor Predeterminado</string>
     <string name="settings_server_auto">Auto (%1$s)</string>
-    <string name="settings_parallel_connections">Conexiones paralelas</string>
-    <string name="settings_test_duration">Duración de la prueba</string>
+    <string name="settings_parallel_connections">Conexiones Paralelas</string>
+    <string name="settings_test_duration">Duración de la Prueba</string>
     <string name="settings_duration_format">%1$ds</string>
     <string name="settings_auto_run_wifi">Auto-ejecutar en WiFi</string>
-    <string name="settings_rate_app">Calificar la aplicación</string>
-    <string name="settings_share_app">Compartir aplicación</string>
-    <string name="settings_privacy_policy">Política de privacidad</string>
+    <string name="settings_rate_app">Calificar la App</string>
+    <string name="settings_share_app">Compartir App</string>
+    <string name="settings_privacy_policy">Política de Privacidad</string>
     <string name="settings_version">Versión %1$s</string>
     <string name="settings_language">Idioma</string>
-    <string name="settings_language_system">Predeterminado del sistema</string>
+    <string name="settings_language_system">Predeterminado del Sistema</string>
+
+    <!-- Pro / Upgrade -->
     <string name="pro_title">NetPulse Pro</string>
-    <string name="pro_description">Eliminar anuncios, exportar historial, soporte para widgets.</string>
-    <string name="pro_upgrade_btn">Actualizar por %1$s</string>
-    <string name="pro_restore">Restaurar compra</string>
-    <string name="pro_active">Pro activo ✓</string>
+    <string name="pro_description">Quitar anuncios, exportar historial, soporte para widgets.</string>
+    <string name="pro_upgrade_btn">Mejorar por %1$s</string>
+    <string name="pro_restore">Restaurar Compra</string>
+    <string name="pro_active">Pro Activo ✓</string>
     <string name="pro_badge">PRO</string>
+
+    <!-- Widget -->
     <string name="widget_description">Distintivo de velocidad NetPulse para tu pantalla de inicio</string>
     <string name="widget_tap_to_test">Toca para probar</string>
     <string name="widget_tap_to_test_again">Toca para probar de nuevo</string>
     <string name="widget_no_data">Sin datos aún</string>
     <string name="widget_testing">Probando…</string>
     <string name="widget_last_tested">%1$s</string>
-    <string name="widget_run_test">Ejecutar prueba</string>
-    <string name="notif_channel_widget">Prueba de velocidad del widget</string>
+    <string name="widget_run_test">Ejecutar Prueba</string>
+
+    <!-- Notifications -->
+    <string name="notif_channel_widget">Prueba de Velocidad del Widget</string>
     <string name="notif_testing_title">Probando velocidad…</string>
     <string name="notif_testing_body">NetPulse está midiendo tu conexión</string>
     <string name="notif_complete_title">Prueba de velocidad completada</string>
     <string name="notif_complete_body">↓ %1$.1f Mbps  ↑ %2$.1f Mbps  Ping %3$d ms</string>
-    <string name="error_no_internet">Sin conexión a Internet</string>
-    <string name="error_test_failed">Prueba fallida. Toca para reintentar.</string>
-    <string name="error_server_unreachable">No se puede acceder al servidor de prueba</string>
-    <string name="error_timeout">Se agotó el tiempo de conexión</string>
+
+    <!-- Errors -->
+    <string name="error_no_internet">Sin conexión a internet</string>
+    <string name="error_test_failed">Error en la prueba. Toca para reintentar.</string>
+    <string name="error_server_unreachable">No se puede conectar al servidor de prueba</string>
+    <string name="error_timeout">Tiempo de conexión agotado</string>
     <string name="error_unknown">Algo salió mal</string>
     <string name="btn_retry">Reintentar</string>
-    <string name="cd_app_icon">Icono de la aplicación NetPulse</string>
+
+    <!-- Accessibility -->
+    <string name="cd_app_icon">Icono de la app NetPulse</string>
     <string name="cd_speedometer">Velocímetro mostrando %1$.1f Mbps</string>
     <string name="cd_start_test">Iniciar prueba de velocidad</string>
     <string name="cd_history_icon">Ver historial de pruebas</string>

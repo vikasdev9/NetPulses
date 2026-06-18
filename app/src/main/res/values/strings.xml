@@ -15,6 +15,7 @@
     <string name="status_testing_ping">TESTING PING…</string>
     <string name="status_complete">TEST COMPLETE</string>
     <string name="status_failed">TEST FAILED</string>
+    <string name="label_home">Home</string>
     <string name="label_download">Download</string>
     <string name="label_upload">Upload</string>
     <string name="label_ping">Ping</string>
@@ -63,7 +64,7 @@
     <string name="share_report">REPORT</string>
     <string name="share_watermark">speedcheckpro.app</string>
     <string name="share_pro_upsell">Remove watermark with Pro</string>
-    <string name="share_text_template">📶 NetPulse Speed Results\n⬇ Download: %1$.1f Mbps\n⬆ Upload: %2$.1f Mbps\n📡 Ping: %3$d ms\n🌐 Network: %4$s · %5$s\n📍 %6$s · %7$s\n🔗 netpulse.app</string>
+    <string name="share_text_template">📶 NetPulse Speed Results\n\n⬇ Download: %1$.1f Mbps\n\n⬆ Upload: %2$.1f Mbps\n\n📡 Ping: %3$d ms\n\n🌐 Network: %4$s · %5$s\n\n📍 %6$s · %7$s\n\n🔗 netpulse.app</string>
     <string name="share_chooser_title">Share Result</string>
 
     <!-- Settings Screen -->

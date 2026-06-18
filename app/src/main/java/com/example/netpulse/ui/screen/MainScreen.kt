@@ -384,7 +384,7 @@ fun BottomNavigationBar(onNavigateToHistory: () -> Unit, onNavigateToSettings: (
             selected = selectedItem == 0,
             onClick = { selectedItem = 0 },
             icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-            label = { Text("Home") },
+            label = { Text(stringResource(R.string.label_home)) },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = PrimaryAccent,
                 selectedTextColor = PrimaryAccent,

@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- App -->
     <string name="app_name">NetPulse</string>
     <string name="app_tagline">İnternet Hız Testi</string>
+
+    <!-- Main Screen -->
     <string name="btn_start_test">Testi Başlat</string>
     <string name="btn_stop_test">Testi Durdur</string>
     <string name="btn_test_again">Tekrar Test Et</string>
     <string name="status_ready">HAZIR</string>
     <string name="status_downloading">İNDİRİLİYOR…</string>
     <string name="status_uploading">YÜKLENİYOR…</string>
-    <string name="status_testing_ping">PING TEST EDİLİYOR…</string>
+    <string name="status_testing_ping">PİNG TEST EDİLİYOR…</string>
     <string name="status_complete">TEST TAMAMLANDI</string>
     <string name="status_failed">TEST BAŞARISIZ</string>
+    <string name="label_home">Ana Sayfa</string>
     <string name="label_download">İndirme</string>
     <string name="label_upload">Yükleme</string>
     <string name="label_ping">Ping</string>
@@ -21,6 +25,8 @@
     <string name="label_connections">bağlantı</string>
     <string name="label_live">CANLI</string>
     <string name="server_info">Sunucu: %1$s · %2$d bağlantı</string>
+
+    <!-- Network types -->
     <string name="network_wifi">WiFi</string>
     <string name="network_5g">5G</string>
     <string name="network_4g">4G</string>
@@ -29,9 +35,11 @@
     <string name="network_ethernet">Ethernet</string>
     <string name="network_unknown">Bilinmiyor</string>
     <string name="network_connected">Bağlı</string>
-    <string name="network_disconnected">Bağlantı Kesildi</string>
-    <string name="label_isp">ISP</string>
+    <string name="network_disconnected">Bağlı Değil</string>
+    <string name="label_isp">İSS</string>
     <string name="label_ip">IP</string>
+
+    <!-- History Screen -->
     <string name="screen_history">Test Geçmişi</string>
     <string name="btn_clear_all">Tümünü Temizle</string>
     <string name="filter_all">Tümü</string>
@@ -42,19 +50,23 @@
     <string name="history_time_today">Bugün, %1$s</string>
     <string name="history_time_yesterday">Dün, %1$s</string>
     <string name="ping_label">%1$d ms ping</string>
-    <string name="confirm_clear_title">Tüm geçmişi temizle?</string>
-    <string name="confirm_clear_message">Bu işlem tüm %1$d test sonucunu kalıcı olarak silecektir.</string>
+    <string name="confirm_clear_title">Tüm geçmiş temizlensin mi?</string>
+    <string name="confirm_clear_message">Bu işlem %1$d test sonucunu kalıcı olarak silecektir.</string>
     <string name="confirm_delete">Sil</string>
     <string name="confirm_cancel">İptal</string>
     <string name="swipe_to_delete">Silmek için kaydırın</string>
+
+    <!-- Result Share Screen -->
     <string name="share_title">Sonuçlarınız</string>
     <string name="share_btn_image">Görsel Paylaş</string>
     <string name="share_btn_text">Metin Paylaş</string>
     <string name="share_report">RAPOR</string>
     <string name="share_watermark">speedcheckpro.app</string>
     <string name="share_pro_upsell">Pro ile filigranı kaldırın</string>
-    <string name="share_text_template">📶 NetPulse Hız Sonuçları\n⬇ İndirme: %1$.1f Mbps\n⬆ Yükleme: %2$.1f Mbps\n📡 Ping: %3$d ms\n🌐 Ağ: %4$s · %5$s\n📍 %6$s · %7$s\n🔗 netpulse.app</string>
+    <string name="share_text_template">📶 NetPulse Hız Sonuçları\n\n⬇ İndirme: %1$.1f Mbps\n\n⬆ Yükleme: %2$.1f Mbps\n\n📡 Ping: %3$d ms\n\n🌐 Ağ: %4$s · %5$s\n\n📍 %6$s · %7$s\n\n🔗 netpulse.app</string>
     <string name="share_chooser_title">Sonucu Paylaş</string>
+
+    <!-- Settings Screen -->
     <string name="screen_settings">Ayarlar</string>
     <string name="settings_section_general">Genel</string>
     <string name="settings_section_test">Test Ayarları</string>
@@ -66,19 +78,23 @@
     <string name="settings_parallel_connections">Paralel Bağlantılar</string>
     <string name="settings_test_duration">Test Süresi</string>
     <string name="settings_duration_format">%1$ds</string>
-    <string name="settings_auto_run_wifi">WiFi\'da otomatik çalıştır</string>
-    <string name="settings_rate_app">Uygulamayı Puanla</string>
+    <string name="settings_auto_run_wifi">WiFi\'de otomatik çalıştır</string>
+    <string name="settings_rate_app">Uygulamayı Oyla</string>
     <string name="settings_share_app">Uygulamayı Paylaş</string>
     <string name="settings_privacy_policy">Gizlilik Politikası</string>
     <string name="settings_version">Sürüm %1$s</string>
     <string name="settings_language">Dil</string>
     <string name="settings_language_system">Sistem Varsayılanı</string>
+
+    <!-- Pro / Upgrade -->
     <string name="pro_title">NetPulse Pro</string>
     <string name="pro_description">Reklamları kaldırın, geçmişi dışa aktarın, widget desteği.</string>
-    <string name="pro_upgrade_btn">%1$s karşılığında yükselt</string>
+    <string name="pro_upgrade_btn">%1$s karşılığında yükseltin</string>
     <string name="pro_restore">Satın Alımı Geri Yükle</string>
     <string name="pro_active">Pro Aktif ✓</string>
     <string name="pro_badge">PRO</string>
+
+    <!-- Widget -->
     <string name="widget_description">Ana ekranınız için NetPulse hız rozeti</string>
     <string name="widget_tap_to_test">Test etmek için dokunun</string>
     <string name="widget_tap_to_test_again">Tekrar test etmek için dokunun</string>
@@ -86,17 +102,23 @@
     <string name="widget_testing">Test ediliyor…</string>
     <string name="widget_last_tested">%1$s</string>
     <string name="widget_run_test">Testi Çalıştır</string>
+
+    <!-- Notifications -->
     <string name="notif_channel_widget">Widget Hız Testi</string>
     <string name="notif_testing_title">Hız test ediliyor…</string>
     <string name="notif_testing_body">NetPulse bağlantınızı ölçüyor</string>
     <string name="notif_complete_title">Hız testi tamamlandı</string>
     <string name="notif_complete_body">↓ %1$.1f Mbps  ↑ %2$.1f Mbps  Ping %3$d ms</string>
+
+    <!-- Errors -->
     <string name="error_no_internet">İnternet bağlantısı yok</string>
     <string name="error_test_failed">Test başarısız. Tekrar denemek için dokunun.</string>
     <string name="error_server_unreachable">Test sunucusuna ulaşılamıyor</string>
     <string name="error_timeout">Bağlantı zaman aşımına uğradı</string>
     <string name="error_unknown">Bir şeyler yanlış gitti</string>
     <string name="btn_retry">Tekrar Dene</string>
+
+    <!-- Accessibility -->
     <string name="cd_app_icon">NetPulse uygulama simgesi</string>
     <string name="cd_speedometer">Hız göstergesi %1$.1f Mbps gösteriyor</string>
     <string name="cd_start_test">Hız testini başlat</string>

@@ -15,6 +15,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.example.netpulse.R
 import com.example.netpulse.ui.theme.DarkColor
 import com.example.netpulse.ui.theme.Teal200
 
@@ -61,7 +63,7 @@ fun LanguageScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Select Language", color = Color.White) },
+                title = { Text(stringResource(R.string.settings_language), color = Color.White) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
@@ -126,6 +128,7 @@ fun LanguageItem(
                 containerColor = when (language.cpmTier) {
                     "High CPM" -> Color(0xFF4CAF50)
                     "Medium CPM" -> Color(0xFFFF9800)
+                    "High Volume" -> Color(0xFF2196F3)
                     else -> Color(0xFF9E9E9E)
                 },
                 contentColor = Color.White,

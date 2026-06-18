@@ -1,5 +1,7 @@
 package com.example.netpulse.ui.components
 
+import androidx.compose.ui.res.stringResource
+import com.example.netpulse.R
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -56,7 +58,7 @@ fun NetworkBadge(
             modifier = Modifier.size(16.dp)
         )
         Text(
-            text = "$networkType · ${if (isConnected) "Connected" else "Disconnected"}",
+            text = "$networkType · ${if (isConnected) stringResource(R.string.network_connected) else stringResource(R.string.network_disconnected)}",
             color = TextPrimary,
             fontSize = 13.sp
         )

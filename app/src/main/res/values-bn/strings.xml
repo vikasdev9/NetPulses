@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- App -->
     <string name="app_name">NetPulse</string>
-    <string name="app_tagline">ইন্টারনেট গতি পরীক্ষক</string>
+    <string name="app_tagline">ইন্টারনেট স্পিড টেস্টার</string>
+
+    <!-- Main Screen -->
     <string name="btn_start_test">টেস্ট শুরু করুন</string>
     <string name="btn_stop_test">টেস্ট বন্ধ করুন</string>
     <string name="btn_test_again">আবার টেস্ট করুন</string>
     <string name="status_ready">প্রস্তুত</string>
     <string name="status_downloading">ডাউনলোড হচ্ছে…</string>
     <string name="status_uploading">আপলোড হচ্ছে…</string>
-    <string name="status_testing_ping">পিং টেস্ট করা হচ্ছে…</string>
+    <string name="status_testing_ping">পিং টেস্ট হচ্ছে…</string>
     <string name="status_complete">টেস্ট সম্পন্ন</string>
-    <string name="status_failed">টেস্ট ব্যর্থ হয়েছে</string>
+    <string name="status_failed">টেস্ট ব্যর্থ হয়েছে</string>
+    <string name="label_home">হোম</string>
     <string name="label_download">ডাউনলোড</string>
     <string name="label_upload">আপলোড</string>
     <string name="label_ping">পিং</string>
@@ -18,92 +22,110 @@
     <string name="label_mbps">Mbps</string>
     <string name="label_ms">ms</string>
     <string name="label_server">সার্ভার</string>
-    <string name="label_connections">সংযোগ</string>
+    <string name="label_connections">কানেকশন</string>
     <string name="label_live">লাইভ</string>
-    <string name="server_info">সার্ভার: %1$s · %2$d সংযোগ</string>
+    <string name="server_info">সার্ভার: %1$s · %2$d কানেকশন</string>
+
+    <!-- Network types -->
     <string name="network_wifi">WiFi</string>
     <string name="network_5g">5G</string>
     <string name="network_4g">4G</string>
     <string name="network_3g">3G</string>
     <string name="network_2g">2G</string>
-    <string name="network_ethernet">Ethernet</string>
+    <string name="network_ethernet">ইথারনেট</string>
     <string name="network_unknown">অজানা</string>
     <string name="network_connected">সংযুক্ত</string>
     <string name="network_disconnected">বিচ্ছিন্ন</string>
     <string name="label_isp">ISP</string>
     <string name="label_ip">IP</string>
+
+    <!-- History Screen -->
     <string name="screen_history">টেস্ট ইতিহাস</string>
     <string name="btn_clear_all">সব মুছুন</string>
     <string name="filter_all">সব</string>
     <string name="filter_this_week">এই সপ্তাহ</string>
     <string name="filter_this_month">এই মাস</string>
     <string name="history_empty_title">এখনও কোনো টেস্ট নেই</string>
-    <string name="history_empty_subtitle">ফলাফল দেখতে আপনার প্রথম গতি পরীক্ষা চালান</string>
+    <string name="history_empty_subtitle">ফলাফল দেখতে আপনার প্রথম স্পিড টেস্ট করুন</string>
     <string name="history_time_today">আজ, %1$s</string>
     <string name="history_time_yesterday">গতকাল, %1$s</string>
     <string name="ping_label">%1$d ms পিং</string>
     <string name="confirm_clear_title">সব ইতিহাস মুছবেন?</string>
-    <string name="confirm_clear_message">এটি স্থায়ীভাবে সমস্ত %1$d টেস্ট ফলাফল মুছে ফেলবে।</string>
+    <string name="confirm_clear_message">এটি স্থায়ীভাবে সব %1$d টেস্ট ফলাফল মুছে ফেলবে।</string>
     <string name="confirm_delete">মুছুন</string>
-    <string name="confirm_cancel">বাতিল</string>
+    <string name="confirm_cancel">বাতিল করুন</string>
     <string name="swipe_to_delete">মুছতে সোয়াইপ করুন</string>
+
+    <!-- Result Share Screen -->
     <string name="share_title">আপনার ফলাফল</string>
     <string name="share_btn_image">ছবি শেয়ার করুন</string>
     <string name="share_btn_text">টেক্সট শেয়ার করুন</string>
     <string name="share_report">রিপোর্ট</string>
     <string name="share_watermark">speedcheckpro.app</string>
-    <string name="share_pro_upsell">Pro এর মাধ্যমে ওয়াটারমার্ক সরান</string>
-    <string name="share_text_template">📶 NetPulse গতির ফলাফল\n⬇ ডাউনলোড: %1$.1f Mbps\n⬆ আপলোড: %2$.1f Mbps\n📡 পিং: %3$d ms\n🌐 নেটওয়ার্ক: %4$s · %5$s\n📍 %6$s · %7$s\n🔗 netpulse.app</string>
+    <string name="share_pro_upsell">প্রো-এর মাধ্যমে ওয়াটারমার্ক সরান</string>
+    <string name="share_text_template">📶 NetPulse স্পিড ফলাফল\n\n⬇ ডাউনলোড: %1$.1f Mbps\n\n⬆ আপলোড: %2$.1f Mbps\n\n📡 পিং: %3$d ms\n\n🌐 নেটওয়ার্ক: %4$s · %5$s\n\n📍 %6$s · %7$s\n\n🔗 netpulse.app</string>
     <string name="share_chooser_title">ফলাফল শেয়ার করুন</string>
+
+    <!-- Settings Screen -->
     <string name="screen_settings">সেটিংস</string>
     <string name="settings_section_general">সাধারণ</string>
     <string name="settings_section_test">টেস্ট সেটিংস</string>
     <string name="settings_section_about">সম্পর্কে</string>
     <string name="settings_dark_mode">ডার্ক মোড</string>
-    <string name="settings_notifications">বিজ্ঞপ্তি</string>
+    <string name="settings_notifications">নোটিফিকেশন</string>
     <string name="settings_default_server">ডিফল্ট সার্ভার</string>
     <string name="settings_server_auto">অটো (%1$s)</string>
-    <string name="settings_parallel_connections">সমান্তরাল সংযোগ</string>
-    <string name="settings_test_duration">টেস্ট সময়কাল</string>
+    <string name="settings_parallel_connections">প্যারালাল কানেকশন</string>
+    <string name="settings_test_duration">টেস্টের সময়কাল</string>
     <string name="settings_duration_format">%1$ds</string>
-    <string name="settings_auto_run_wifi">WiFi-তে অটো-রান</string>
+    <string name="settings_auto_run_wifi">WiFi-এ অটো-রান</string>
     <string name="settings_rate_app">অ্যাপ রেট করুন</string>
     <string name="settings_share_app">অ্যাপ শেয়ার করুন</string>
-    <string name="settings_privacy_policy">গোপনীয়তা নীতি</string>
+    <string name="settings_privacy_policy">প্রাইভেসি পলিসি</string>
     <string name="settings_version">ভার্সন %1$s</string>
     <string name="settings_language">ভাষা</string>
     <string name="settings_language_system">সিস্টেম ডিফল্ট</string>
-    <string name="pro_title">NetPulse Pro</string>
-    <string name="pro_description">বিজ্ঞাপন সরান, ইতিহাস এক্সপোর্ট করুন, উইজেট সমর্থন।</string>
-    <string name="pro_upgrade_btn">%1$s এর জন্য আপগ্রেড করুন</string>
-    <string name="pro_restore">ক্রয় পুনরুদ্ধার করুন</string>
-    <string name="pro_active">Pro সক্রিয় ✓</string>
+
+    <!-- Pro / Upgrade -->
+    <string name="pro_title">NetPulse প্রো</string>
+    <string name="pro_description">বিজ্ঞাপন সরান, ইতিহাস এক্সপোর্ট করুন, উইজেট সাপোর্ট।</string>
+    <string name="pro_upgrade_btn">%1$s দিয়ে আপগ্রেড করুন</string>
+    <string name="pro_restore">ক্রয় পুনরুদ্ধার করুন</string>
+    <string name="pro_active">প্রো সক্রিয় ✓</string>
     <string name="pro_badge">PRO</string>
-    <string name="widget_description">আপনার হোম স্ক্রিনের জন্য NetPulse গতি ব্যাজ</string>
-    <string name="widget_tap_to_test">টেস্ট করতে ট্যাপ করুন</string>
-    <string name="widget_tap_to_test_again">আবার টেস্ট করতে ট্যাপ করুন</string>
-    <string name="widget_no_data">এখনও কোনো ডেটা নেই</string>
-    <string name="widget_testing">টেস্ট হচ্ছে…</string>
+
+    <!-- Widget -->
+    <string name="widget_description">হোম স্ক্রিনের জন্য NetPulse স্পিড ব্যাজ</string>
+    <string name="widget_tap_to_test">টেস্টের জন্য ট্যাপ করুন</string>
+    <string name="widget_tap_to_test_again">আবার টেস্টের জন্য ট্যাপ করুন</string>
+    <string name="widget_no_data">এখনও কোনো ডাটা নেই</string>
+    <string name="widget_testing">টেস্টিং…</string>
     <string name="widget_last_tested">%1$s</string>
-    <string name="widget_run_test">টেস্ট চালান</string>
-    <string name="notif_channel_widget">উইজেট গতি পরীক্ষা</string>
-    <string name="notif_testing_title">গতি পরীক্ষা করা হচ্ছে…</string>
-    <string name="notif_testing_body">NetPulse আপনার সংযোগ পরিমাপ করছে</string>
-    <string name="notif_complete_title">গতি পরীক্ষা সম্পন্ন</string>
+    <string name="widget_run_test">টেস্ট শুরু করুন</string>
+
+    <!-- Notifications -->
+    <string name="notif_channel_widget">উইজেট স্পিড টেস্ট</string>
+    <string name="notif_testing_title">স্পিড টেস্ট হচ্ছে…</string>
+    <string name="notif_testing_body">NetPulse আপনার কানেকশন মাপছে</string>
+    <string name="notif_complete_title">স্পিড টেস্ট সম্পন্ন</string>
     <string name="notif_complete_body">↓ %1$.1f Mbps  ↑ %2$.1f Mbps  পিং %3$d ms</string>
-    <string name="error_no_internet">কোনো ইন্টারনেট সংযোগ নেই</string>
+
+    <!-- Errors -->
+    <string name="error_no_internet">কোনো ইন্টারনেট কানেকশন নেই</string>
     <string name="error_test_failed">টেস্ট ব্যর্থ হয়েছে। পুনরায় চেষ্টা করতে ট্যাপ করুন।</string>
     <string name="error_server_unreachable">টেস্ট সার্ভারে পৌঁছানো যাচ্ছে না</string>
-    <string name="error_timeout">সংযোগের সময় শেষ</string>
+    <string name="error_timeout">কানেকশন টাইম আউট</string>
     <string name="error_unknown">কিছু ভুল হয়েছে</string>
     <string name="btn_retry">পুনরায় চেষ্টা করুন</string>
+
+    <!-- Accessibility -->
     <string name="cd_app_icon">NetPulse অ্যাপ আইকন</string>
     <string name="cd_speedometer">স্পিডোমিটার %1$.1f Mbps দেখাচ্ছে</string>
-    <string name="cd_start_test">গতি পরীক্ষা শুরু করুন</string>
+    <string name="cd_start_test">স্পিড টেস্ট শুরু করুন</string>
     <string name="cd_history_icon">টেস্ট ইতিহাস দেখুন</string>
     <string name="cd_settings_icon">সেটিংস খুলুন</string>
-    <string name="cd_download_card">ডাউনলোড গতি: %1$.1f Mbps</string>
-    <string name="cd_upload_card">আপলোড গতি: %1$.1f Mbps</string>
+    <string name="cd_download_card">ডাউনলোড স্পিড: %1$.1f Mbps</string>
+    <string name="cd_upload_card">আপলোড স্পিড: %1$.1f Mbps</string>
     <string name="cd_ping_card">পিং: %1$d মিলিসেকেন্ড</string>
     <string name="cd_jitter_card">জিটার: %1$d মিলিসেকেন্ড</string>
 </resources>
