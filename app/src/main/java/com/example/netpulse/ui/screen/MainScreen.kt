@@ -122,7 +122,8 @@ fun MainScreen(
                             SpeedGauge(
                                 speedMbps = currentSpeed,
                                 statusLabel = statusLabel,
-                                statusColor = statusColor
+                                statusColor = statusColor,
+                                isRunning = uiState.isTestRunning
                             )
                         }
 

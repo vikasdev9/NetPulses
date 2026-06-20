@@ -181,6 +181,13 @@ class SpeedTestViewModel(application: Application) : AndroidViewModel(applicatio
             WidgetDataStore.saveWidgetData(getApplication(), result)
             NetPulseWidget().updateAll(getApplication())
 
+            // Overshoot and Settle effect for Gauge
+            val overshootValue = (download * 1.12).toFloat().coerceAtMost(100f)
+            _uiState.value = _uiState.value.copy(
+                testState = SpeedTestState.Running(TestPhase.DOWNLOAD, overshootValue, ping.toFloat(), jitter.toFloat())
+            )
+            delay(300)
+
             _uiState.value = _uiState.value.copy(
                 upload = "%.1f".format(upload),
                 uploadSpeed = upload.toFloat(),
