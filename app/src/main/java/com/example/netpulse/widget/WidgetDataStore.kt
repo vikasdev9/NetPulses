@@ -1,59 +1,80 @@
 package com.example.netpulse.widget
 
 import android.content.Context
-import androidx.datastore.core.CorruptionException
-import androidx.datastore.core.DataStore
-import androidx.datastore.core.Serializer
-import androidx.datastore.dataStore
-import androidx.glance.state.GlanceStateDefinition
-import kotlinx.serialization.SerializationException
-import kotlinx.serialization.json.Json
+import androidx.datastore.preferences.core.*
+import androidx.datastore.preferences.preferencesDataStore
+import com.example.netpulse.data.SpeedResult
 import kotlinx.coroutines.flow.first
-import java.io.File
-import java.io.InputStream
-import java.io.OutputStream
+import kotlinx.coroutines.flow.map
 
-object WidgetDataStore {
+val Context.dataStore by preferencesDataStore(name = "widget_prefs")
 
-    val definition = object : GlanceStateDefinition<WidgetData> {
-        override suspend fun getDataStore(context: Context, fileKey: String): DataStore<WidgetData> {
-            return context.widgetDataStore
-        }
-
-        override fun getLocation(context: Context, fileKey: String): File {
-            return File(context.filesDir, "datastore/$fileKey")
-        }
-    }
-
-    suspend fun updateData(context: Context, data: WidgetData) {
-        context.widgetDataStore.updateData { data }
-    }
-
-    suspend fun getData(context: Context): WidgetData {
-        return context.widgetDataStore.data.first()
-    }
-
-    private val Context.widgetDataStore: DataStore<WidgetData> by dataStore(
-        fileName = "widget_data.json",
-        serializer = WidgetDataSerializer
-    )
+enum class WidgetState {
+    NO_DATA, HAS_DATA, LOADING, ERROR
 }
 
-object WidgetDataSerializer : Serializer<WidgetData> {
-    override val defaultValue: WidgetData = WidgetData()
+data class WidgetData(
+    val downloadMbps: Double = 0.0,
+    val uploadMbps: Double = 0.0,
+    val pingMs: Int = 0,
+    val jitterMs: Int = 0,
+    val networkType: String = "—",
+    val isp: String = "—",
+    val lastTestedLabel: String = "—",
+    val state: WidgetState = WidgetState.NO_DATA
+)
 
-    override suspend fun readFrom(input: InputStream): WidgetData {
-        try {
-            return Json.decodeFromString(
-                WidgetData.serializer(),
-                input.readBytes().decodeToString()
-            )
-        } catch (serialization: SerializationException) {
-            throw CorruptionException("Unable to read WidgetData", serialization)
+object WidgetDataStore {
+    private val DOWNLOAD = doublePreferencesKey("download")
+    private val UPLOAD = doublePreferencesKey("upload")
+    private val PING = intPreferencesKey("ping")
+    private val JITTER = intPreferencesKey("jitter")
+    private val NETWORK = stringPreferencesKey("network")
+    private val ISP = stringPreferencesKey("isp")
+    private val LABEL = stringPreferencesKey("label")
+    private val STATE = stringPreferencesKey("state")
+
+    suspend fun saveWidgetData(context: Context, result: SpeedResult) {
+        context.dataStore.edit { prefs ->
+            prefs[DOWNLOAD] = result.downloadMbps
+            prefs[UPLOAD] = result.uploadMbps
+            prefs[PING] = result.pingMs
+            prefs[JITTER] = result.jitterMs
+            prefs[NETWORK] = result.networkType
+            prefs[ISP] = result.isp
+            prefs[LABEL] = java.text.SimpleDateFormat("h:mm a", java.util.Locale.US).format(java.util.Date(result.timestamp))
+            prefs[STATE] = WidgetState.HAS_DATA.name
         }
     }
 
-    override suspend fun writeTo(t: WidgetData, output: OutputStream) {
-        output.write(Json.encodeToString(WidgetData.serializer(), t).toByteArray())
+    suspend fun loadWidgetData(context: Context): WidgetData {
+        return context.dataStore.data.map { prefs ->
+            WidgetData(
+                downloadMbps = prefs[DOWNLOAD] ?: 0.0,
+                uploadMbps = prefs[UPLOAD] ?: 0.0,
+                pingMs = prefs[PING] ?: 0,
+                jitterMs = prefs[JITTER] ?: 0,
+                networkType = prefs[NETWORK] ?: "—",
+                isp = prefs[ISP] ?: "—",
+                lastTestedLabel = prefs[LABEL] ?: "—",
+                state = WidgetState.valueOf(prefs[STATE] ?: WidgetState.NO_DATA.name)
+            )
+        }.first()
     }
+
+    // Support existing updateData if needed, but saveWidgetData is preferred
+    suspend fun updateData(context: Context, data: WidgetData) {
+        context.dataStore.edit { prefs ->
+            prefs[DOWNLOAD] = data.downloadMbps
+            prefs[UPLOAD] = data.uploadMbps
+            prefs[PING] = data.pingMs
+            prefs[JITTER] = data.jitterMs
+            prefs[NETWORK] = data.networkType
+            prefs[ISP] = data.isp
+            prefs[LABEL] = data.lastTestedLabel
+            prefs[STATE] = data.state.name
+        }
+    }
+
+    suspend fun getData(context: Context): WidgetData = loadWidgetData(context)
 }

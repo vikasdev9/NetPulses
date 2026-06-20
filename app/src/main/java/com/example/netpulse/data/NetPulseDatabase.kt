@@ -4,10 +4,11 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.netpulse.data.db.SpeedResultDao
 
-@Database(entities = [SpeedResult::class], version = 1, exportSchema = false)
+@Database(entities = [SpeedResult::class], version = 2, exportSchema = false)
 abstract class NetPulseDatabase : RoomDatabase() {
-    abstract fun historyDao(): HistoryDao
+    abstract fun speedResultDao(): SpeedResultDao
 
     companion object {
         @Volatile
@@ -19,7 +20,9 @@ abstract class NetPulseDatabase : RoomDatabase() {
                     context.applicationContext,
                     NetPulseDatabase::class.java,
                     "netpulse_database"
-                ).build()
+                )
+                .fallbackToDestructiveMigration()
+                .build()
                 INSTANCE = instance
                 instance
             }

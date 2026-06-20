@@ -1,44 +1,133 @@
 package com.example.netpulse.data.repository
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.net.wifi.WifiManager
+import android.os.Build
+import android.text.format.Formatter
+import com.example.netpulse.NetPulseApplication
+import com.example.netpulse.data.SpeedResult
 import com.example.netpulse.ui.viewmodel.*
-import kotlinx.coroutines.delay
+import com.example.netpulse.utils.IspInfoHelper
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import java.net.InetAddress
+import java.net.NetworkInterface
+import java.text.SimpleDateFormat
+import java.util.*
 
-class NetworkRepository {
-    
+class NetworkRepository(private val context: Context) {
+
+    private val dao = (context.applicationContext as NetPulseApplication).database.speedResultDao()
+
     fun getNetworkStatus(): Flow<NetworkStatus> = flow {
-        // Mocking real-time network data
-        emit(NetworkStatus())
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val wifi = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        
+        val activeNetwork = cm.activeNetwork
+        val caps = cm.getNetworkCapabilities(activeNetwork)
+        
+        val wifiInfo = try {
+            wifi.connectionInfo
+        } catch (e: SecurityException) {
+            null
+        }
+
+        val isConnected = caps?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
+        val type = when {
+            caps?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true -> "WiFi"
+            caps?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true -> "Mobile"
+            caps?.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) == true -> "Ethernet"
+            else -> "None"
+        }
+
+        emit(NetworkStatus(
+            isConnected = isConnected,
+            type = type,
+            ssid = if (type == "WiFi" && wifiInfo != null) wifiInfo.ssid.removeSurrounding("\"") else "—",
+            signalStrength = if (type == "WiFi" && wifiInfo != null) WifiManager.calculateSignalLevel(wifiInfo.rssi, 100) else 0,
+            rssi = wifiInfo?.rssi ?: 0,
+            frequency = if (type == "WiFi" && wifiInfo != null) "${wifiInfo.frequency} MHz" else "—",
+            linkSpeed = wifiInfo?.linkSpeed ?: 0,
+            txSpeed = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) wifiInfo?.txLinkSpeedMbps ?: 0 else 0,
+            rxSpeed = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) wifiInfo?.rxLinkSpeedMbps ?: 0 else 0
+        ))
     }
 
     fun getInternetDetails(): Flow<InternetDetails> = flow {
-        emit(InternetDetails())
+        val ispDetailed = IspInfoHelper.fetchDetailedIspInfo()
+        val localIp = getLocalIpAddress()
+        
+        emit(InternetDetails(
+            publicIp = ispDetailed.ip,
+            localIp = localIp ?: "—",
+            interfaceName = "wlan0" // Simplified
+        ))
     }
 
     fun getIspInfo(): Flow<IspInfo> = flow {
-        emit(IspInfo())
+        val detailed = IspInfoHelper.fetchDetailedIspInfo()
+        emit(IspInfo(
+            name = detailed.name,
+            asn = detailed.asn,
+            org = detailed.org,
+            country = detailed.country,
+            region = detailed.region,
+            city = detailed.city,
+            timezone = detailed.timezone
+        ))
     }
 
     fun getSpeedSummary(): Flow<SpeedSummary> = flow {
-        emit(SpeedSummary())
+        val latest = dao.getAll().first().firstOrNull()
+        if (latest != null) {
+            emit(SpeedSummary(
+                download = latest.downloadMbps.toFloat(),
+                upload = latest.uploadMbps.toFloat(),
+                ping = latest.pingMs,
+                jitter = latest.jitterMs,
+                testTime = SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date(latest.timestamp)),
+                server = latest.serverUsed
+            ))
+        } else {
+            emit(SpeedSummary())
+        }
     }
 
     fun getDataUsage(): Flow<DataUsage> = flow {
+        // Real data usage requires NetworkStatsManager and special permissions.
+        // For now, we return empty usage or mocked zeros.
         emit(DataUsage())
     }
 
     fun getDeviceInfo(): Flow<DeviceInfo> = flow {
-        emit(DeviceInfo())
+        val displayMetrics = context.resources.displayMetrics
+        val totalStorage = context.filesDir.totalSpace / (1024 * 1024 * 1024)
+        
+        emit(DeviceInfo(
+            androidVersion = "Android ${Build.VERSION.RELEASE}",
+            sdk = Build.VERSION.SDK_INT,
+            manufacturer = Build.MANUFACTURER,
+            model = Build.MODEL,
+            resolution = "${displayMetrics.widthPixels} x ${displayMetrics.heightPixels}",
+            cpuAbi = Build.SUPPORTED_ABIS.firstOrNull() ?: "—",
+            storage = "${totalStorage} GB"
+        ))
     }
 
     fun getTimeline(): Flow<List<TimelineEvent>> = flow {
-        emit(listOf(
-            TimelineEvent("14:20", "Test Finished", "Download: 452 Mbps, Upload: 180 Mbps", TimelineType.TEST_FINISHED),
-            TimelineEvent("14:18", "Test Started", "Manual speed test execution", TimelineType.TEST_STARTED),
-            TimelineEvent("12:05", "IP Changed", "Public IP updated by ISP", TimelineType.IP_CHANGED),
-            TimelineEvent("09:00", "Connected", "WiFi connection established", TimelineType.CONNECTED)
-        ))
+        val results = dao.getAll().first().take(5)
+        val events = results.map {
+            TimelineEvent(
+                time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(it.timestamp)),
+                title = "Test Finished",
+                description = "Download: ${"%.1f".format(it.downloadMbps)} Mbps",
+                type = TimelineType.TEST_FINISHED
+            )
+        }
+        emit(events)
     }
 
     fun getDiagnostics(): Flow<AdvancedDiagnostics> = flow {
@@ -46,15 +135,47 @@ class NetworkRepository {
     }
 
     fun getSecurityStatus(): Flow<SecurityStatus> = flow {
-        emit(SecurityStatus())
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork = cm.activeNetwork
+        val caps = cm.getNetworkCapabilities(activeNetwork)
+
+        emit(SecurityStatus(
+            vpnActive = caps?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) == true,
+            metered = cm.isActiveNetworkMetered,
+            roaming = caps?.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_ROAMING) == false,
+            validated = caps?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) == true
+        ))
     }
 
     fun getRecommendations(): Flow<List<String>> = flow {
-        emit(listOf(
-            "Move closer to router for better signal.",
-            "Switch to 5GHz for lower latency.",
-            "Network performing normally.",
-            "Disable VPN for better speed."
-        ))
+        val latest = dao.getAll().first().firstOrNull()
+        val recs = mutableListOf<String>()
+        
+        if (latest != null) {
+            if (latest.downloadMbps < 25) recs.add("Download speed is low for 4K streaming.")
+            if (latest.pingMs > 50) recs.add("High latency detected. Gaming might be affected.")
+        } else {
+            recs.add("Perform a speed test to get recommendations.")
+        }
+        
+        recs.add("Network performing normally.")
+        emit(recs)
+    }
+
+    private fun getLocalIpAddress(): String? {
+        try {
+            val interfaces = NetworkInterface.getNetworkInterfaces()
+            while (interfaces.hasMoreElements()) {
+                val networkInterface = interfaces.nextElement()
+                val addresses = networkInterface.inetAddresses
+                while (addresses.hasMoreElements()) {
+                    val address = addresses.nextElement()
+                    if (!address.isLoopbackAddress && address is java.net.Inet4Address) {
+                        return address.hostAddress
+                    }
+                }
+            }
+        } catch (e: Exception) { }
+        return null
     }
 }

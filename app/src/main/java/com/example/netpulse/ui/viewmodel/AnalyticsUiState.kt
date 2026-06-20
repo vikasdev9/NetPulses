@@ -7,7 +7,7 @@ data class AnalyticsUiState(
     val internetDetails: InternetDetails = InternetDetails(),
     val ispInfo: IspInfo = IspInfo(),
     val speedSummary: SpeedSummary = SpeedSummary(),
-    val networkQuality: NetworkQuality = NetworkQuality.EXCELLENT,
+    val networkQuality: NetworkQuality = NetworkQuality.FAIR,
     val dataUsage: DataUsage = DataUsage(),
     val deviceInfo: DeviceInfo = DeviceInfo(),
     val timeline: List<TimelineEvent> = emptyList(),
@@ -18,47 +18,47 @@ data class AnalyticsUiState(
 )
 
 data class NetworkStatus(
-    val isConnected: Boolean = true,
-    val type: String = "WiFi",
-    val ssid: String = "NetPulse_5G_Home",
-    val security: String = "WPA3-SAE",
-    val signalStrength: Int = 92,
-    val rssi: Int = -42,
-    val frequency: String = "5 GHz",
-    val linkSpeed: Int = 866,
-    val txSpeed: Int = 780,
-    val rxSpeed: Int = 820
+    val isConnected: Boolean = false,
+    val type: String = "—",
+    val ssid: String = "—",
+    val security: String = "—",
+    val signalStrength: Int = 0,
+    val rssi: Int = 0,
+    val frequency: String = "—",
+    val linkSpeed: Int = 0,
+    val txSpeed: Int = 0,
+    val rxSpeed: Int = 0
 )
 
 data class InternetDetails(
-    val publicIp: String = "103.24.122.85",
-    val localIp: String = "192.168.1.15",
-    val ipv6: String = "2405:201:200b:40b6:...",
-    val gateway: String = "192.168.1.1",
-    val dns: String = "8.8.8.8, 1.1.1.1",
-    val mac: String = "00:0a:95:9d:68:16",
-    val subnet: String = "255.255.255.0",
-    val interfaceName: String = "wlan0"
+    val publicIp: String = "—",
+    val localIp: String = "—",
+    val ipv6: String = "—",
+    val gateway: String = "—",
+    val dns: String = "—",
+    val mac: String = "—",
+    val subnet: String = "—",
+    val interfaceName: String = "—"
 )
 
 data class IspInfo(
-    val name: String = "Reliance Jio Infocomm",
-    val asn: String = "AS55836",
-    val org: String = "Jio Networks",
-    val country: String = "India",
-    val region: String = "Maharashtra",
-    val city: String = "Mumbai",
-    val timezone: String = "Asia/Kolkata"
+    val name: String = "—",
+    val asn: String = "—",
+    val org: String = "—",
+    val country: String = "—",
+    val region: String = "—",
+    val city: String = "—",
+    val timezone: String = "—"
 )
 
 data class SpeedSummary(
-    val download: Float = 452.5f,
-    val upload: Float = 180.2f,
-    val ping: Int = 12,
-    val jitter: Int = 3,
+    val download: Float = 0f,
+    val upload: Float = 0f,
+    val ping: Int = 0,
+    val jitter: Int = 0,
     val packetLoss: Float = 0.0f,
-    val testTime: String = "2 mins ago",
-    val server: String = "Mumbai - Tata Comm"
+    val testTime: String = "—",
+    val server: String = "—"
 )
 
 enum class NetworkQuality(val label: String) {
@@ -66,21 +66,21 @@ enum class NetworkQuality(val label: String) {
 }
 
 data class DataUsage(
-    val today: String = "1.2 GB",
-    val weekly: String = "8.5 GB",
-    val monthly: String = "42.1 GB",
-    val history: List<Float> = listOf(0.4f, 0.8f, 1.2f, 0.9f, 1.5f, 1.1f, 1.2f) // Last 7 days
+    val today: String = "0 MB",
+    val weekly: String = "0 MB",
+    val monthly: String = "0 MB",
+    val history: List<Float> = emptyList()
 )
 
 data class DeviceInfo(
-    val androidVersion: String = "Android 14",
-    val sdk: Int = 34,
-    val manufacturer: String = "Google",
-    val model: String = "Pixel 8 Pro",
-    val resolution: String = "1344 x 2992",
-    val cpuAbi: String = "arm64-v8a",
-    val ram: String = "12 GB",
-    val storage: String = "256 GB"
+    val androidVersion: String = "—",
+    val sdk: Int = 0,
+    val manufacturer: String = "—",
+    val model: String = "—",
+    val resolution: String = "—",
+    val cpuAbi: String = "—",
+    val ram: String = "—",
+    val storage: String = "—"
 )
 
 data class TimelineEvent(
@@ -96,17 +96,17 @@ enum class TimelineType {
 
 data class AdvancedDiagnostics(
     val mtu: Int = 1500,
-    val tcpLatency: Int = 24,
-    val dnsLookup: Int = 18,
-    val handshake: Int = 45,
-    val hops: Int = 8
+    val tcpLatency: Int = 0,
+    val dnsLookup: Int = 0,
+    val handshake: Int = 0,
+    val hops: Int = 0
 )
 
 data class SecurityStatus(
     val vpnActive: Boolean = false,
-    val privateDns: Boolean = true,
+    val privateDns: Boolean = false,
     val captivePortal: Boolean = false,
     val metered: Boolean = false,
     val roaming: Boolean = false,
-    val validated: Boolean = true
+    val validated: Boolean = false
 )

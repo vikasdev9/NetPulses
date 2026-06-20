@@ -1,5 +1,6 @@
 package com.example.netpulse.ui.screen
 
+import android.app.Application
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -41,9 +42,10 @@ fun MainScreen(
     onNavigateToAnalytics: () -> Unit = {}
 ) {
     val context = LocalContext.current
-    val repository = (context.applicationContext as NetPulseApplication).historyRepository
-    val viewModel: SpeedTestViewModel = viewModel(factory = SpeedTestViewModel.Factory(repository))
+    val application = context.applicationContext as Application
+    val viewModel: SpeedTestViewModel = viewModel(factory = SpeedTestViewModel.Factory(application))
     val uiState by viewModel.uiState.collectAsState()
+    val ispInfo by viewModel.ispInfo.collectAsState()
 
     Scaffold(
         topBar = {
@@ -92,7 +94,7 @@ fun MainScreen(
                         ) {
                             val currentSpeed = when (val state = uiState.testState) {
                                 is SpeedTestState.Running -> state.currentSpeed
-                                is SpeedTestState.Complete -> state.download
+                                is SpeedTestState.Complete -> state.result.downloadMbps.toFloat()
                                 else -> 0f
                             }
                             
@@ -101,18 +103,20 @@ fun MainScreen(
                                 is SpeedTestState.Running -> {
                                     when (state.phase) {
                                         TestPhase.PING -> stringResource(R.string.status_testing_ping)
-                                        TestPhase.JITTER -> stringResource(R.string.status_testing_ping) // No jitter string?
+                                        TestPhase.JITTER -> "MEASURING JITTER…"
                                         TestPhase.DOWNLOAD -> stringResource(R.string.status_downloading)
                                         TestPhase.UPLOAD -> stringResource(R.string.status_uploading)
                                     }
                                 }
                                 is SpeedTestState.Complete -> stringResource(R.string.status_complete)
+                                is SpeedTestState.Error -> "ERROR"
                             }
 
                             val statusColor = when (uiState.testState) {
                                 is SpeedTestState.Idle -> TextSecondary
                                 is SpeedTestState.Running -> PrimaryAccent
                                 is SpeedTestState.Complete -> GreenAccentIcon
+                                is SpeedTestState.Error -> Color.Red
                             }
 
                             SpeedGauge(

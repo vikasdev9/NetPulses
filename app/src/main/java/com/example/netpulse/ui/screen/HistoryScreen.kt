@@ -1,271 +1,131 @@
 package com.example.netpulse.ui.screen
 
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.ui.res.stringResource
-import com.example.netpulse.R
 import com.example.netpulse.data.SpeedResult
 import com.example.netpulse.ui.components.HistoryCard
-import com.example.netpulse.ui.components.ResultShareBottomSheet
-import com.example.netpulse.ui.theme.*
+import com.example.netpulse.ui.theme.DarkColor
+import com.example.netpulse.ui.theme.DarkGradient
+import com.example.netpulse.ui.theme.Teal200
 import com.example.netpulse.ui.viewmodel.HistoryViewModel
-
-import androidx.compose.ui.platform.LocalContext
-import com.example.netpulse.NetPulseApplication
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryScreen(
+    viewModel: HistoryViewModel = viewModel(),
     onNavigateToHome: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {}
 ) {
-    val context = LocalContext.current
-    val repository = (context.applicationContext as NetPulseApplication).historyRepository
-    val viewModel: HistoryViewModel = viewModel(factory = HistoryViewModel.Factory(repository))
-    val historyItems by viewModel.historyItems.collectAsState()
-    val selectedFilter by viewModel.selectedFilter.collectAsState()
+    val results by viewModel.allResults.collectAsState()
+    var selectedFilter by remember { mutableStateOf("All") }
 
-    var selectedItemForShare by remember { mutableStateOf<SpeedResult?>(null) }
-
-    val filteredItems = remember(historyItems, selectedFilter) {
-        if (selectedFilter == "All") historyItems
-        else historyItems.filter { it.networkType == selectedFilter }
+    val filteredResults = if (selectedFilter == "All") {
+        results
+    } else {
+        results.filter { it.networkType == selectedFilter }
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Text(
-                        stringResource(R.string.screen_history),
-                        color = Color.White,
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                },
+                title = { Text("History", color = Color.White) },
                 actions = {
-                    TextButton(onClick = { viewModel.clearAll() }) {
-                        Text(
-                            stringResource(R.string.btn_clear_all),
-                            color = PrimaryAccent,
-                            fontSize = 14.sp
-                        )
+                    IconButton(onClick = { viewModel.clearAll() }) {
+                        Icon(Icons.Default.DeleteSweep, contentDescription = "Clear All", tint = Color.White)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Background,
-                    titleContentColor = Color.White
-                )
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkColor)
             )
         },
-        bottomBar = {
-            HistoryBottomNavigationBar(onNavigateToHome, onNavigateToSettings)
-        },
-        containerColor = Background
-    ) { paddingValues ->
+        containerColor = DarkColor
+    ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(padding)
+                .background(DarkGradient)
         ) {
-            FilterChipsRow(
-                selectedFilter = selectedFilter,
-                onFilterSelected = { viewModel.setFilter(it) }
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                listOf("All", "WiFi", "5G", "4G").forEach { filter ->
+                    FilterChip(
+                        selected = selectedFilter == filter,
+                        onClick = { selectedFilter = filter },
+                        label = { Text(filter) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = Teal200,
+                            selectedLabelColor = Color.Black,
+                            labelColor = Color.White
+                        )
+                    )
+                }
+            }
 
-            if (filteredItems.isEmpty()) {
-                EmptyHistoryState()
+            if (filteredResults.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("No results found", color = Color.White.copy(alpha = 0.6f))
+                }
             } else {
                 LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(bottom = 16.dp)
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(filteredItems, key = { it.id }) { item ->
-                        val dismissState = rememberSwipeToDismissBoxState(
-                            confirmValueChange = {
-                                if (it == SwipeToDismissBoxValue.EndToStart) {
-                                    viewModel.deleteItem(item)
-                                    true
-                                } else false
-                            }
-                        )
-
-                        SwipeToDismissBox(
-                            state = dismissState,
-                            backgroundContent = {
-                                val color by animateColorAsState(
-                                    when (dismissState.targetValue) {
-                                        SwipeToDismissBoxValue.EndToStart -> Color.Red
-                                        else -> Color.Transparent
-                                    }, label = "deleteBackground"
-                                )
-                                Box(
-                                    Modifier
-                                        .fillMaxSize()
-                                        .clip(RoundedCornerShape(14.dp))
-                                        .background(color)
-                                        .padding(horizontal = 20.dp),
-                                    contentAlignment = Alignment.CenterEnd
-                                ) {
-                                    Icon(
-                                        Icons.Default.Delete,
-                                        contentDescription = "Delete",
-                                        tint = Color.White
-                                    )
-                                }
-                            },
-                            enableDismissFromStartToEnd = false,
-                            content = {
-                                HistoryCard(
-                                    result = item,
-                                    onDelete = { viewModel.deleteItem(item) },
-                                    onShare = { selectedItemForShare = item }
-                                )
-                            }
+                    items(filteredResults, key = { it.id }) { result ->
+                        HistoryCard(
+                            result = result,
+                            dateLabel = formatDateLabel(result.timestamp),
+                            onDelete = { viewModel.deleteResult(result.id) },
+                            onShare = { /* TODO */ }
                         )
                     }
                 }
             }
         }
-
-        selectedItemForShare?.let { item ->
-            ResultShareBottomSheet(
-                result = item,
-                onDismiss = { selectedItemForShare = null },
-                isPro = false // Default to false, can be connected to actual pro status
-            )
-        }
     }
 }
 
-@Composable
-fun FilterChipsRow(
-    selectedFilter: String,
-    onFilterSelected: (String) -> Unit
-) {
-    val filters = listOf(
-        stringResource(R.string.filter_all),
-        "WiFi", "5G", "4G",
-        stringResource(R.string.filter_this_week),
-        stringResource(R.string.filter_this_month)
-    )
-    LazyRow(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = PaddingValues(horizontal = 16.dp)
-    ) {
-        items(filters) { filter ->
-            val isActive = selectedFilter == filter
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(99.dp))
-                    .background(if (isActive) PrimaryAccent else CardSurface)
-                    .then(
-                        if (!isActive) Modifier.border(1.dp, CardBorder, RoundedCornerShape(99.dp))
-                        else Modifier
-                    )
-                    .clickable { onFilterSelected(filter) }
-                    .padding(horizontal = 14.dp, vertical = 8.dp)
-            ) {
-                Text(
-                    text = filter,
-                    color = if (isActive) Color.White else TextSecondary,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-        }
+fun formatDateLabel(timestamp: Long): String {
+    val now = Calendar.getInstance()
+    val resultCal = Calendar.getInstance().apply { timeInMillis = timestamp }
+
+    return when {
+        isSameDay(now, resultCal) -> "Today, " + formatTime(timestamp)
+        isYesterday(now, resultCal) -> "Yesterday, " + formatTime(timestamp)
+        else -> java.text.SimpleDateFormat("EEE, h:mm a", Locale.getDefault()).format(Date(timestamp))
     }
 }
 
-@Composable
-fun EmptyHistoryState() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                stringResource(R.string.history_empty_title),
-                color = Color.White,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(Modifier.height(8.dp))
-            Text(
-                stringResource(R.string.history_empty_subtitle),
-                color = TextSecondary,
-                fontSize = 14.sp
-            )
-        }
-    }
+fun isSameDay(cal1: Calendar, cal2: Calendar): Boolean {
+    return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+            cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
 }
 
-@Composable
-fun HistoryBottomNavigationBar(onNavigateToHome: () -> Unit, onNavigateToSettings: () -> Unit) {
-    NavigationBar(
-        containerColor = Background,
-        tonalElevation = 0.dp,
-        modifier = Modifier.border(0.5.dp, CardBorder, RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp))
-    ) {
-        NavigationBarItem(
-            selected = false,
-            onClick = onNavigateToHome,
-            icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = PrimaryAccent,
-                unselectedIconColor = TextSecondary,
-                indicatorColor = Color.Transparent
-            )
-        )
-        NavigationBarItem(
-            selected = true,
-            onClick = { },
-            icon = { Icon(Icons.Default.History, contentDescription = "History") },
-            label = { Text(stringResource(R.string.screen_history)) },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = PrimaryAccent,
-                selectedTextColor = PrimaryAccent,
-                unselectedIconColor = TextSecondary,
-                indicatorColor = Color.Transparent
-            )
-        )
-        NavigationBarItem(
-            selected = false,
-            onClick = onNavigateToSettings,
-            icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = PrimaryAccent,
-                unselectedIconColor = TextSecondary,
-                indicatorColor = Color.Transparent
-            )
-        )
+fun isYesterday(now: Calendar, then: Calendar): Boolean {
+    val yesterday = Calendar.getInstance().apply {
+        add(Calendar.DAY_OF_YEAR, -1)
     }
+    return yesterday.get(Calendar.YEAR) == then.get(Calendar.YEAR) &&
+            yesterday.get(Calendar.DAY_OF_YEAR) == then.get(Calendar.DAY_OF_YEAR)
+}
+
+fun formatTime(timestamp: Long): String {
+    return java.text.SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date(timestamp))
 }

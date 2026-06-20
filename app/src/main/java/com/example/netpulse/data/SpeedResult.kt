@@ -7,14 +7,14 @@ import androidx.room.PrimaryKey
 data class SpeedResult(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val timestamp: String,        // "17 Jun 2026 · 2:34 PM"
-    val dateLabel: String,        // "Today, 2:34 PM"
+    val timestamp: Long,
     val downloadMbps: Double,
     val uploadMbps: Double,
     val pingMs: Int,
     val jitterMs: Int,
-    val networkType: String,      // "WiFi", "5G", "4G"
-    val isp: String,              // "Jio"
-    val location: String,         // "Mumbai"
-    val ipAddress: String
+    val networkType: String,
+    val isp: String,
+    val ipAddress: String,
+    val location: String,
+    val serverUsed: String = "Cloudflare"
 )

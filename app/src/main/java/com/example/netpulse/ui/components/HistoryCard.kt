@@ -23,6 +23,7 @@ import com.example.netpulse.ui.theme.*
 @Composable
 fun HistoryCard(
     result: SpeedResult,
+    dateLabel: String,
     onDelete: () -> Unit,
     onShare: () -> Unit
 ) {
@@ -48,7 +49,7 @@ fun HistoryCard(
             .border(0.5.dp, CardBorder, RoundedCornerShape(14.dp))
             .clickable { onShare() }
     ) {
-        // Left colored border (4dp wide)
+        // Left colored border
         Box(
             modifier = Modifier
                 .width(4.dp)
@@ -60,25 +61,23 @@ fun HistoryCard(
         Row(
             modifier = Modifier
                 .padding(14.dp)
-                .padding(start = 4.dp), // Space for the colored border
+                .padding(start = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Left Column: Date and Badge
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = result.dateLabel,
+                    text = dateLabel,
                     color = Color.White,
                     fontSize = 13.sp
                 )
                 Spacer(modifier = Modifier.height(6.dp))
-                NetworkBadge(
+                HistoryBadge(
                     text = result.networkType,
                     textColor = networkColor,
                     bgColor = badgeBg
                 )
             }
 
-            // Right Column: Metrics
             Column(
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.spacedBy(3.dp)
@@ -87,21 +86,19 @@ fun HistoryCard(
                     Text("↓", color = Color(0xFF3B8BFF), fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "${result.downloadMbps} Mbps",
+                        text = "%.1f Mbps".format(result.downloadMbps),
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
-                        fontFamily = MonospaceFontFamily
+                        fontSize = 14.sp
                     )
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("↑", color = Color(0xFF00D4FF), fontSize = 13.sp)
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "${result.uploadMbps} Mbps",
+                        text = "%.1f Mbps".format(result.uploadMbps),
                         color = TextSecondary,
-                        fontSize = 13.sp,
-                        fontFamily = MonospaceFontFamily
+                        fontSize = 13.sp
                     )
                 }
                 Text(
@@ -113,7 +110,6 @@ fun HistoryCard(
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            // Chevron
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = null,
@@ -125,7 +121,7 @@ fun HistoryCard(
 }
 
 @Composable
-fun NetworkBadge(
+fun HistoryBadge(
     text: String,
     textColor: Color,
     bgColor: Color

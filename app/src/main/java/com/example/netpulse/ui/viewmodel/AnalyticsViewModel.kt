@@ -1,6 +1,7 @@
 package com.example.netpulse.ui.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.netpulse.data.repository.NetworkRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,9 +11,10 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
-class AnalyticsViewModel(
-    private val repository: NetworkRepository = NetworkRepository()
-) : ViewModel() {
+class AnalyticsViewModel(application: Application) : AndroidViewModel(application) {
+    
+    private val repository = NetworkRepository(application)
+    
     private val _uiState = MutableStateFlow(AnalyticsUiState())
     val uiState: StateFlow<AnalyticsUiState> = _uiState.asStateFlow()
 
@@ -36,7 +38,7 @@ class AnalyticsViewModel(
                 repository.getSecurityStatus(),
                 repository.getRecommendations()
             ) { results ->
-                _uiState.value = _uiState.value.copy(
+                AnalyticsUiState(
                     networkStatus = results[0] as NetworkStatus,
                     internetDetails = results[1] as InternetDetails,
                     ispInfo = results[2] as IspInfo,
@@ -49,7 +51,9 @@ class AnalyticsViewModel(
                     recommendations = results[9] as List<String>,
                     isLoading = false
                 )
-            }.collect()
+            }.collect { state ->
+                _uiState.value = state
+            }
         }
     }
 

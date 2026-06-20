@@ -1,19 +1,26 @@
 package com.example.netpulse.ui.viewmodel
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.netpulse.data.HistoryRepository
+import com.example.netpulse.NetPulseApplication
 import com.example.netpulse.data.SpeedResult
+import com.example.netpulse.data.network.SpeedTestEngine
+import com.example.netpulse.utils.IspInfo
+import com.example.netpulse.utils.IspInfoHelper
+import com.example.netpulse.widget.NetPulseWidget
+import com.example.netpulse.widget.WidgetDataStore
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import kotlin.random.Random
+import kotlinx.coroutines.withContext
+import androidx.glance.appwidget.updateAll
 
 enum class TestPhase {
     PING, JITTER, DOWNLOAD, UPLOAD
@@ -21,8 +28,15 @@ enum class TestPhase {
 
 sealed class SpeedTestState {
     object Idle : SpeedTestState()
-    data class Running(val phase: TestPhase, val currentSpeed: Float = 0f) : SpeedTestState()
-    data class Complete(val download: Float, val upload: Float, val ping: Float, val jitter: Float) : SpeedTestState()
+    data class Running(
+        val phase: TestPhase,
+        val currentSpeed: Float = 0f,
+        val ping: Float? = null,
+        val jitter: Float? = null,
+        val download: Float? = null
+    ) : SpeedTestState()
+    data class Complete(val result: SpeedResult) : SpeedTestState()
+    data class Error(val message: String) : SpeedTestState()
 }
 
 data class SpeedTestUiState(
@@ -31,156 +45,166 @@ data class SpeedTestUiState(
     val upload: String = "—",
     val ping: String = "—",
     val jitter: String = "—",
-    
-    // Compatibility fields for other screens if needed
     val isTestRunning: Boolean = false,
     val instantSamples: List<Float> = emptyList(),
     val hasResults: Boolean = false,
+    val progress: Float = 0f,
+    val currentTest: String = "",
+    val networkType: String = "WiFi",
     val downloadSpeed: Float = 0f,
     val uploadSpeed: Float = 0f,
     val jitterValue: Float = 0f,
-    val progress: Float = 0f,
-    val currentTest: String = "",
     val minSpeed: Float = 0f,
     val avgSpeed: Float = 0f,
     val maxSpeed: Float = 0f,
     val packetLoss: Float = 0f,
-    val networkType: String = "WiFi",
     val errorMessage: String? = null
 )
 
-class SpeedTestViewModel(private val repository: HistoryRepository) : ViewModel() {
+class SpeedTestViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val dao = (application as NetPulseApplication).database.speedResultDao()
 
     private val _uiState = MutableStateFlow(SpeedTestUiState())
-    val uiState = _uiState.asStateFlow()
+    val uiState: StateFlow<SpeedTestUiState> = _uiState.asStateFlow()
+
+    private val _ispInfo = MutableStateFlow(IspInfo())
+    val ispInfo: StateFlow<IspInfo> = _ispInfo.asStateFlow()
 
     private var testJob: Job? = null
 
+    init {
+        viewModelScope.launch {
+            _ispInfo.value = IspInfoHelper.fetchIspInfo(application)
+        }
+    }
+
     fun startTest() {
+        startSpeedTest()
+    }
+
+    fun startSpeedTest() {
         testJob?.cancel()
         testJob = viewModelScope.launch {
-            // Reset
             _uiState.value = SpeedTestUiState(
                 testState = SpeedTestState.Running(TestPhase.PING),
                 isTestRunning = true,
                 currentTest = "PING"
             )
-            
-            // 1. Ping
-            delay(1000)
-            val finalPing = 12 + Random.nextInt(10)
-            _uiState.value = _uiState.value.copy(
-                ping = "$finalPing",
-                testState = SpeedTestState.Running(TestPhase.JITTER),
-                currentTest = "JITTER",
-                progress = 0.2f
-            )
 
-            // 2. Jitter
-            delay(1000)
-            val finalJitter = 1.5f + Random.nextFloat() * 2f
+            val (ping, jitter) = SpeedTestEngine.measurePing()
+            if (ping < 0) {
+                _uiState.value = _uiState.value.copy(
+                    testState = SpeedTestState.Error("Ping failed"),
+                    errorMessage = "Ping failed"
+                )
+                return@launch
+            }
+
             _uiState.value = _uiState.value.copy(
-                jitter = "%.1f".format(finalJitter),
-                jitterValue = finalJitter,
-                testState = SpeedTestState.Running(TestPhase.DOWNLOAD),
+                ping = "%.0f".format(ping),
+                jitter = "%.1f".format(jitter),
+                jitterValue = jitter.toFloat(),
+                testState = SpeedTestState.Running(TestPhase.DOWNLOAD, ping = ping.toFloat(), jitter = jitter.toFloat()),
                 currentTest = "DOWNLOAD",
-                progress = 0.4f
+                progress = 0.33f
             )
 
-            // 3. Download
-            val samples = mutableListOf<Float>()
-            for (i in 1..20) {
-                val currentSample = 90f + Random.nextFloat() * 20f
-                samples.add(currentSample)
+            val downloadSamples = mutableListOf<Float>()
+            val download = SpeedTestEngine.measureDownload { speed ->
+                val floatSpeed = speed.toFloat()
+                downloadSamples.add(floatSpeed)
                 _uiState.value = _uiState.value.copy(
-                    download = "%.1f".format(currentSample),
-                    testState = SpeedTestState.Running(TestPhase.DOWNLOAD, currentSample),
-                    progress = 0.4f + (i / 20f) * 0.3f,
-                    instantSamples = samples.toList(),
-                    minSpeed = samples.minOrNull() ?: 0f,
-                    maxSpeed = samples.maxOrNull() ?: 0f,
-                    avgSpeed = samples.average().toFloat()
+                    download = "%.1f".format(floatSpeed),
+                    testState = SpeedTestState.Running(TestPhase.DOWNLOAD, floatSpeed, ping.toFloat(), jitter.toFloat()),
+                    instantSamples = downloadSamples.toList(),
+                    minSpeed = downloadSamples.minOrNull() ?: 0f,
+                    maxSpeed = downloadSamples.maxOrNull() ?: 0f,
+                    avgSpeed = downloadSamples.average().toFloat(),
+                    progress = 0.33f + (0.33f * (downloadSamples.size / 50f).coerceAtMost(1f))
                 )
-                delay(100)
             }
-            val finalDownload = samples.average().toFloat()
+
+            if (download < 0) {
+                _uiState.value = _uiState.value.copy(
+                    testState = SpeedTestState.Error("Download failed"),
+                    errorMessage = "Download failed"
+                )
+                return@launch
+            }
+
             _uiState.value = _uiState.value.copy(
-                download = "%.1f".format(finalDownload),
-                downloadSpeed = finalDownload,
-                testState = SpeedTestState.Running(TestPhase.UPLOAD),
-                currentTest = "UPLOAD"
+                download = "%.1f".format(download),
+                downloadSpeed = download.toFloat(),
+                testState = SpeedTestState.Running(TestPhase.UPLOAD, ping = ping.toFloat(), jitter = jitter.toFloat(), download = download.toFloat()),
+                currentTest = "UPLOAD",
+                progress = 0.66f,
+                instantSamples = emptyList()
             )
 
-            // 4. Upload
             val uploadSamples = mutableListOf<Float>()
-            for (i in 1..20) {
-                val currentSample = 40f + Random.nextFloat() * 10f
-                uploadSamples.add(currentSample)
+            val upload = SpeedTestEngine.measureUpload { speed ->
+                val floatSpeed = speed.toFloat()
+                uploadSamples.add(floatSpeed)
                 _uiState.value = _uiState.value.copy(
-                    upload = "%.1f".format(currentSample),
-                    testState = SpeedTestState.Running(TestPhase.UPLOAD, currentSample),
-                    progress = 0.7f + (i / 20f) * 0.3f
+                    upload = "%.1f".format(floatSpeed),
+                    testState = SpeedTestState.Running(TestPhase.UPLOAD, floatSpeed, ping.toFloat(), jitter.toFloat(), download.toFloat()),
+                    instantSamples = uploadSamples.toList(),
+                    progress = 0.66f + (0.34f * (uploadSamples.size / 50f).coerceAtMost(1f))
                 )
-                delay(100)
             }
-            val finalUpload = uploadSamples.average().toFloat()
 
-            // Complete
+            if (upload < 0) {
+                _uiState.value = _uiState.value.copy(
+                    testState = SpeedTestState.Error("Upload failed"),
+                    errorMessage = "Upload failed"
+                )
+                return@launch
+            }
+
+            val result = SpeedResult(
+                timestamp = System.currentTimeMillis(),
+                downloadMbps = download,
+                uploadMbps = upload,
+                pingMs = ping.toInt(),
+                jitterMs = jitter.toInt(),
+                networkType = _uiState.value.networkType,
+                isp = _ispInfo.value.isp,
+                ipAddress = _ispInfo.value.ip,
+                location = "Closest Edge"
+            )
+
+            withContext(Dispatchers.IO) {
+                dao.insert(result)
+            }
+
+            WidgetDataStore.saveWidgetData(getApplication(), result)
+            NetPulseWidget().updateAll(getApplication())
+
             _uiState.value = _uiState.value.copy(
-                upload = "%.1f".format(finalUpload),
-                uploadSpeed = finalUpload,
-                testState = SpeedTestState.Complete(
-                    download = finalDownload,
-                    upload = finalUpload,
-                    ping = finalPing.toFloat(),
-                    jitter = finalJitter
-                ),
+                upload = "%.1f".format(upload),
+                uploadSpeed = upload.toFloat(),
+                testState = SpeedTestState.Complete(result),
                 isTestRunning = false,
                 hasResults = true,
                 progress = 1f,
-                currentTest = "COMPLETED",
-                packetLoss = 0.1f
+                currentTest = "COMPLETED"
             )
-
-            // Save to history
-            saveToHistory(finalDownload, finalUpload, finalPing, finalJitter)
         }
-    }
-
-    private suspend fun saveToHistory(download: Float, upload: Float, ping: Int, jitter: Float) {
-        val now = Date()
-        val timestampFormat = SimpleDateFormat("dd MMM yyyy · h:mm a", Locale.getDefault())
-        val dateLabelFormat = SimpleDateFormat("MMM d, h:mm a", Locale.getDefault())
-        
-        val result = SpeedResult(
-            timestamp = timestampFormat.format(now),
-            dateLabel = dateLabelFormat.format(now),
-            downloadMbps = download.toDouble(),
-            uploadMbps = upload.toDouble(),
-            pingMs = ping,
-            jitterMs = jitter.toInt(),
-            networkType = _uiState.value.networkType,
-            isp = "ISP", // In a real app, fetch this
-            location = "Local", // In a real app, fetch this
-            ipAddress = "0.0.0.0" // In a real app, fetch this
-        )
-        repository.insert(result)
     }
 
     fun stopTest() {
         testJob?.cancel()
         _uiState.value = SpeedTestUiState()
     }
-
-    // Aliases for compatibility
-    fun startSpeedTest() = startTest()
+    
     fun resetTest() = stopTest()
 
-    class Factory(private val repository: HistoryRepository) : ViewModelProvider.Factory {
+    class Factory(private val application: Application) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(SpeedTestViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return SpeedTestViewModel(repository) as T
+                return SpeedTestViewModel(application) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }

@@ -48,8 +48,8 @@ import com.example.netpulse.NetPulseApplication
 @Composable
 fun SpeedTestScreen() {
     val context = LocalContext.current
-    val repository = (context.applicationContext as NetPulseApplication).historyRepository
-    val viewModel: SpeedTestViewModel = viewModel(factory = SpeedTestViewModel.Factory(repository))
+    val application = context.applicationContext as android.app.Application
+    val viewModel: SpeedTestViewModel = viewModel(factory = SpeedTestViewModel.Factory(application))
     val uiState by viewModel.uiState.collectAsState(SpeedTestUiState())
     val prefs = remember { Prefs(context.applicationContext) }
     var darkMode by remember { mutableStateOf(true) }
@@ -405,6 +405,10 @@ fun SpeedTestScreenContent(
 
         if (uiState.isTestRunning) {
             TestProgressCard(uiState)
+        }
+
+        if (uiState.ping == "Err" || uiState.download == "Err" || uiState.upload == "Err") {
+            ErrorMessage("Measurement failed. Please check your connection.")
         }
 
         if (uiState.errorMessage != null) {

@@ -1,52 +1,36 @@
 package com.example.netpulse.ui.viewmodel
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.netpulse.data.HistoryRepository
+import com.example.netpulse.NetPulseApplication
 import com.example.netpulse.data.SpeedResult
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class HistoryViewModel(private val repository: HistoryRepository) : ViewModel() {
-    
-    val historyItems: StateFlow<List<SpeedResult>> = repository.allHistory
+class HistoryViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val dao = (application as NetPulseApplication).database.speedResultDao()
+
+    val allResults: StateFlow<List<SpeedResult>> = dao.getAll()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
 
-    private val _selectedFilter = MutableStateFlow("All")
-    val selectedFilter = _selectedFilter.asStateFlow()
-
-    fun setFilter(filter: String) {
-        _selectedFilter.value = filter
-    }
-
-    fun deleteItem(item: SpeedResult) {
-        viewModelScope.launch {
-            repository.delete(item)
+    fun deleteResult(id: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            dao.deleteById(id)
         }
     }
 
     fun clearAll() {
-        viewModelScope.launch {
-            repository.clearAll()
-        }
-    }
-
-    class Factory(private val repository: HistoryRepository) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(HistoryViewModel::class.java)) {
-                @Suppress("UNCHECKED_CAST")
-                return HistoryViewModel(repository) as T
-            }
-            throw IllegalArgumentException("Unknown ViewModel class")
+        viewModelScope.launch(Dispatchers.IO) {
+            dao.deleteAll()
         }
     }
 }

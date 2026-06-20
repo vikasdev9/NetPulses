@@ -41,7 +41,7 @@ object ShareUtils {
         scope.launch {
             // Capture bitmap on Main thread because it involves UI/ComposeView
             val bitmap = captureComposableAsBitmap(context, parentContext) {
-                ShareCard(result = result, isPro = isPro)
+                ShareCard(result = result)
             }
             // Share bitmap (this will handle file IO on IO dispatcher)
             shareBitmap(context, bitmap)
