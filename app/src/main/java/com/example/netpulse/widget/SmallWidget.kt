@@ -1,6 +1,7 @@
 package com.example.netpulse.widget
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceModifier
@@ -21,11 +22,12 @@ import java.util.Locale
 
 @Composable
 fun SmallWidget(data: WidgetData) {
-    val backgroundColor = ColorProvider(R.color.widget_background)
-    val accentColor = ColorProvider(R.color.widget_blue)
-    val textPrimary = ColorProvider(R.color.white)
-    val textSecondary = ColorProvider(R.color.widget_text_secondary)
-    val borderStrokeColor = ColorProvider(R.color.widget_border)
+    // Using fully qualified factory functions to avoid restricted API issues in Glance 1.0.0
+    val backgroundColor = androidx.glance.color.ColorProvider(day = Color(0xFF0A0E1A), night = Color(0xFF0A0E1A))
+    val accentColor = androidx.glance.color.ColorProvider(day = Color(0xFF3B8BFF), night = Color(0xFF3B8BFF))
+    val textPrimary = androidx.glance.color.ColorProvider(day = Color.White, night = Color.White)
+    val textSecondary = androidx.glance.color.ColorProvider(day = Color(0xFF8892A4), night = Color(0xFF8892A4))
+    val dividerColor = androidx.glance.color.ColorProvider(day = Color(0xFF2E3A50), night = Color(0xFF2E3A50))
 
     Box(
         modifier = GlanceModifier
@@ -72,7 +74,7 @@ fun SmallWidget(data: WidgetData) {
                 modifier = GlanceModifier
                     .width(1.dp)
                     .fillMaxHeight()
-                    .background(borderStrokeColor)
+                    .background(dividerColor)
             ) {}
 
             Spacer(modifier = GlanceModifier.width(8.dp))

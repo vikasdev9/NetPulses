@@ -22,17 +22,16 @@ import java.util.Locale
 
 @Composable
 fun LargeWidget(data: WidgetData) {
-    // In Glance 1.0.0, to avoid restricted API issues with ColorProvider(Color),
-    // we use resource-based ColorProviders defined in res/values/colors.xml
-    val backgroundColor = ColorProvider(R.color.widget_background)
-    val surfaceColor = ColorProvider(R.color.widget_surface)
-    val textPrimary = ColorProvider(R.color.white)
-    val textSecondary = ColorProvider(R.color.widget_text_secondary)
+    // Using fully qualified factory functions to avoid restricted API issues in Glance 1.0.0
+    val backgroundColor = androidx.glance.color.ColorProvider(day = Color(0xFF0A0E1A), night = Color(0xFF0A0E1A))
+    val surfaceColor = androidx.glance.color.ColorProvider(day = Color(0xFF131929), night = Color(0xFF131929))
+    val textPrimary = androidx.glance.color.ColorProvider(day = Color.White, night = Color.White)
+    val textSecondary = androidx.glance.color.ColorProvider(day = Color(0xFF8892A4), night = Color(0xFF8892A4))
     
-    val blueAccent = ColorProvider(R.color.widget_blue)
-    val cyanAccent = ColorProvider(R.color.widget_cyan)
-    val greenAccent = ColorProvider(R.color.widget_green)
-    val amberAccent = ColorProvider(R.color.widget_amber)
+    val blueAccent = androidx.glance.color.ColorProvider(day = Color(0xFF3B8BFF), night = Color(0xFF3B8BFF))
+    val cyanAccent = androidx.glance.color.ColorProvider(day = Color(0xFF00D4FF), night = Color(0xFF00D4FF))
+    val greenAccent = androidx.glance.color.ColorProvider(day = Color(0xFF00E676), night = Color(0xFF00E676))
+    val amberAccent = androidx.glance.color.ColorProvider(day = Color(0xFFFFB300), night = Color(0xFFFFB300))
 
     Column(
         modifier = GlanceModifier
@@ -152,7 +151,7 @@ private fun LargeMetricCell(label: String, value: String, colorProvider: ColorPr
         Text(
             value,
             style = TextStyle(
-                color = ColorProvider(R.color.white),
+                color = androidx.glance.color.ColorProvider(day = Color.White, night = Color.White),
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Bold
             )

@@ -109,9 +109,16 @@ fun MainScreen(
                                 is SpeedTestState.Complete -> stringResource(R.string.status_complete)
                             }
 
+                            val statusColor = when (uiState.testState) {
+                                is SpeedTestState.Idle -> TextSecondary
+                                is SpeedTestState.Running -> PrimaryAccent
+                                is SpeedTestState.Complete -> GreenAccentIcon
+                            }
+
                             SpeedGauge(
                                 speedMbps = currentSpeed,
-                                statusLabel = statusLabel
+                                statusLabel = statusLabel,
+                                statusColor = statusColor
                             )
                         }
 

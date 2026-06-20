@@ -1,6 +1,7 @@
 package com.example.netpulse.widget
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceModifier
@@ -21,12 +22,12 @@ import java.util.Locale
 
 @Composable
 fun MediumWidget(data: WidgetData) {
-    val backgroundColor = ColorProvider(R.color.widget_background)
-    val textPrimary = ColorProvider(R.color.white)
-    val textSecondary = ColorProvider(R.color.widget_text_secondary)
-    val blueAccent = ColorProvider(R.color.widget_blue)
-    val cyanAccent = ColorProvider(R.color.widget_cyan)
-    val greenAccent = ColorProvider(R.color.widget_green)
+    val backgroundColor = androidx.glance.color.ColorProvider(day = Color(0xFF0A0E1A), night = Color(0xFF0A0E1A))
+    val textPrimary = androidx.glance.color.ColorProvider(day = Color.White, night = Color.White)
+    val textSecondary = androidx.glance.color.ColorProvider(day = Color(0xFF8892A4), night = Color(0xFF8892A4))
+    val blueAccent = androidx.glance.color.ColorProvider(day = Color(0xFF3B8BFF), night = Color(0xFF3B8BFF))
+    val cyanAccent = androidx.glance.color.ColorProvider(day = Color(0xFF00D4FF), night = Color(0xFF00D4FF))
+    val greenAccent = androidx.glance.color.ColorProvider(day = Color(0xFF00E676), night = Color(0xFF00E676))
 
     Column(
         modifier = GlanceModifier
@@ -139,7 +140,7 @@ fun MediumWidget(data: WidgetData) {
 private fun MetricChip(text: String, colorProvider: ColorProvider) {
     Box(
         modifier = GlanceModifier
-            .background(ColorProvider(R.color.widget_border))
+            .background(androidx.glance.color.ColorProvider(day = Color(0xFF1E2740), night = Color(0xFF1E2740)))
             .cornerRadius(8.dp)
             .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {

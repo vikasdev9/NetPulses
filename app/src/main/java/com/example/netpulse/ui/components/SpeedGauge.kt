@@ -14,168 +14,196 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.netpulse.ui.theme.*
+import java.util.Locale
 import kotlin.math.cos
 import kotlin.math.sin
 
+private data class GaugeTick(val value: Float, val label: String)
+
+/**
+ * A professional Speedometer Gauge for NetPulse.
+ * 
+ * FIXES APPLIED:
+ * 1. Visual center pushed down (h * 0.52f) to prevent text/arc overlap.
+ * 2. Scale fixed to 0 -> 100 Mbps.
+ * 3. Text moved to Box overlay with Y-offset for perfect centering in the "mouth" of the arc.
+ */
 @Composable
 fun SpeedGauge(
     speedMbps: Float,
-    maxSpeed: Float = 200f,
-    statusLabel: String = "READY",
+    maxSpeed: Float = 100f,
+    statusLabel: String,
+    statusColor: Color,
     modifier: Modifier = Modifier
 ) {
+    // Smooth transition for the speed needle/arc
     val animatedSpeed by animateFloatAsState(
         targetValue = speedMbps,
-        animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
-        label = "gaugeSpeed"
+        animationSpec = tween(300, easing = FastOutSlowInEasing),
+        label = "SpeedAnimation"
     )
 
     Box(
-        modifier = modifier.size(280.dp),
+        modifier = modifier.aspectRatio(1f),
         contentAlignment = Alignment.Center
     ) {
+        // LAYER 1: The Gauge Arc and Ticks
         Canvas(modifier = Modifier.fillMaxSize()) {
-            val center = Offset(size.width / 2, size.height / 2)
-            val radius = size.width / 2 - 20.dp.toPx()
-            val startAngle = 150f
-            val sweepAngle = 240f
-            val strokeWidth = 12.dp.toPx()
+            val w = size.width
+            val h = size.height
+            val cx = w / 2f
+            
+            // KEY FIX 1: cy is NOT h/2 — push center DOWN by 15%
+            // so the visual center sits in the mouth of the gauge
+            val cy = h * 0.52f  
+            
+            val radius = w * 0.38f
+            val strokeWidth = w * 0.045f
 
-            // Track
+            // Geometry: 135° start (bottom-left), 270° sweep (around to bottom-right)
+            val startAngle = 135f
+            val sweepAngle = 270f
+            val ratio = (animatedSpeed / maxSpeed).coerceIn(0f, 1f)
+
+            // 1. Draw Background Track
             drawArc(
-                color = GaugeTrack,
+                color = Color(0xFF1E2D47),
                 startAngle = startAngle,
                 sweepAngle = sweepAngle,
                 useCenter = false,
-                style = Stroke(width = strokeWidth, cap = StrokeCap.Round),
+                topLeft = Offset(cx - radius, cy - radius),
                 size = Size(radius * 2, radius * 2),
-                topLeft = Offset(center.x - radius, center.y - radius)
+                style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
             )
 
-            // Fill
-            val fillSweep = (animatedSpeed / maxSpeed).coerceIn(0f, 1f) * sweepAngle
-            val gradient = Brush.sweepGradient(
-                0.0f to GaugeCyan,
-                0.6f to GaugeBlue,
-                center = center
-            )
-            
-            // We use a simpler gradient for the arc to match spec
-            val linearGradient = Brush.linearGradient(
-                colors = listOf(GaugeCyan, GaugeBlue),
-                start = Offset(center.x - radius, center.y + radius),
-                end = Offset(center.x + radius, center.y - radius)
-            )
-
-            drawArc(
-                brush = linearGradient,
-                startAngle = startAngle,
-                sweepAngle = fillSweep,
-                useCenter = false,
-                style = Stroke(width = strokeWidth, cap = StrokeCap.Round),
-                size = Size(radius * 2, radius * 2),
-                topLeft = Offset(center.x - radius, center.y - radius)
-            )
-
-            // Glow effect (Simplified with multiple arcs)
-            drawArc(
-                brush = linearGradient,
-                startAngle = startAngle,
-                sweepAngle = fillSweep,
-                useCenter = false,
-                style = Stroke(width = strokeWidth + 4.dp.toPx(), cap = StrokeCap.Round),
-                alpha = 0.2f,
-                size = Size(radius * 2, radius * 2),
-                topLeft = Offset(center.x - radius, center.y - radius)
-            )
-
-            // Dot at the tip
-            if (fillSweep > 0) {
-                val endAngleRad = Math.toRadians((startAngle + fillSweep).toDouble())
-                val dotX = center.x + radius * cos(endAngleRad).toFloat()
-                val dotY = center.y + radius * sin(endAngleRad).toFloat()
-                
-                // Glow for dot
-                drawCircle(
-                    color = GaugeBlue.copy(alpha = 0.5f),
-                    radius = 8.dp.toPx(),
-                    center = Offset(dotX, dotY)
+            // 2. Draw Active Speed Gradient Arc
+            if (ratio > 0f) {
+                drawArc(
+                    brush = Brush.sweepGradient(
+                        colors = listOf(
+                            Color(0xFF00D4FF),
+                            Color(0xFF3B8BFF)
+                        ),
+                        center = Offset(cx, cy)
+                    ),
+                    startAngle = startAngle,
+                    sweepAngle = sweepAngle * ratio,
+                    useCenter = false,
+                    topLeft = Offset(cx - radius, cy - radius),
+                    size = Size(radius * 2, radius * 2),
+                    style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
                 )
+
+                // 3. Glowing tip dot at the end of the current speed
+                val tipAngle = Math.toRadians((startAngle + sweepAngle * ratio).toDouble())
+                val tipX = cx + radius * cos(tipAngle).toFloat()
+                val tipY = cy + radius * sin(tipAngle).toFloat()
                 drawCircle(
                     color = Color.White,
-                    radius = 5.dp.toPx(),
-                    center = Offset(dotX, dotY)
+                    radius = strokeWidth * 0.45f,
+                    center = Offset(tipX, tipY)
                 )
             }
 
-            // Ticks and Labels
-            val tickSteps = listOf(0, 50, 100, 150, 200)
-            tickSteps.forEach { tick ->
-                val tickAngle = startAngle + (tick.toFloat() / maxSpeed) * sweepAngle
-                val angleRad = Math.toRadians(tickAngle.toDouble())
-                
-                val innerX = center.x + (radius + 10.dp.toPx()) * cos(angleRad).toFloat()
-                val innerY = center.y + (radius + 10.dp.toPx()) * sin(angleRad).toFloat()
-                val outerX = center.x + (radius + 18.dp.toPx()) * cos(angleRad).toFloat()
-                val outerY = center.y + (radius + 18.dp.toPx()) * sin(angleRad).toFloat()
+            // 4. Tick Marks and Scale Labels (0, 25, 50, 75, 100)
+            val ticks = listOf(
+                GaugeTick(0f, "0"),
+                GaugeTick(25f, "25"),
+                GaugeTick(50f, "50"),
+                GaugeTick(75f, "75"),
+                GaugeTick(100f, "100")
+            )
 
+            ticks.forEach { tick ->
+                val tickRatio = tick.value / maxSpeed
+                val tickAngle = Math.toRadians((startAngle + sweepAngle * tickRatio).toDouble())
+                
+                // Draw tick line
+                val outerR = radius + strokeWidth * 0.3f
+                val innerR = radius - strokeWidth * 0.3f
                 drawLine(
-                    color = TextSecondary.copy(alpha = 0.5f),
-                    start = Offset(innerX, innerY),
-                    end = Offset(outerX, outerY),
-                    strokeWidth = 2.dp.toPx()
+                    color = Color(0xFF334155),
+                    start = Offset(
+                        cx + innerR * cos(tickAngle).toFloat(),
+                        cy + innerR * sin(tickAngle).toFloat()
+                    ),
+                    end = Offset(
+                        cx + outerR * cos(tickAngle).toFloat(),
+                        cy + outerR * sin(tickAngle).toFloat()
+                    ),
+                    strokeWidth = 1.5.dp.toPx()
                 )
+
+                // Draw Scale Label
+                val labelR = radius - strokeWidth * 1.8f
+                val labelX = cx + labelR * cos(tickAngle).toFloat()
+                val labelY = cy + labelR * sin(tickAngle).toFloat()
+
+                drawContext.canvas.nativeCanvas.apply {
+                    val paint = android.graphics.Paint().apply {
+                        color = android.graphics.Color.parseColor("#475569")
+                        textSize = (w * 0.035f) // Scale text size with gauge
+                        textAlign = android.graphics.Paint.Align.CENTER
+                        isAntiAlias = true
+                        typeface = android.graphics.Typeface.MONOSPACE
+                    }
+                    drawText(
+                        tick.label,
+                        labelX,
+                        labelY + paint.textSize / 3f,
+                        paint
+                    )
+                }
             }
         }
 
-        // Center Content
+        // LAYER 2: Text Overlay (Centered in the Gauge Mouth)
         Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.Center)
+                .offset(y = 24.dp), // KEY FIX 1: Push text DOWN into the open area
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Speed number (Monospace prevents shifting)
             Text(
-                text = String.format("%.1f", animatedSpeed),
-                style = SpeedTypography,
-                color = TextPrimary
+                text = String.format(Locale.US, "%.1f", speedMbps),
+                style = TextStyle(
+                    fontSize = 52.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.Monospace,
+                    color = Color.White,
+                    letterSpacing = (-1).sp
+                )
             )
+
+            Spacer(modifier = Modifier.height(2.dp))
+
+            // Unit Label
             Text(
                 text = "Mbps",
-                color = TextSecondary,
-                fontSize = 14.sp
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    color = Color(0xFF64748B)
+                )
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = statusLabel,
-                color = StatusCyan,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-        
-        // Tick Labels
-        val tickSteps = listOf(0, 50, 100, 150, 200)
-        tickSteps.forEach { tick ->
-            val startAngle = 150f
-            val sweepAngle = 240f
-            val maxSpeed = 200f
-            val tickAngle = startAngle + (tick.toFloat() / maxSpeed) * sweepAngle
-            val angleRad = Math.toRadians(tickAngle.toDouble())
-            
-            // Adjust distance for labels
-            val labelRadius = 120.dp
-            
-            val offsetX = (labelRadius.value * cos(angleRad)).toFloat()
-            val offsetY = (labelRadius.value * sin(angleRad)).toFloat()
 
+            Spacer(modifier = Modifier.height(8.dp)) // Premium spacing for status
+
+            // Current Test Status
             Text(
-                text = tick.toString(),
-                color = TextSecondary,
-                fontSize = 10.sp,
-                modifier = Modifier
-                    .offset(x = offsetX.dp, y = offsetY.dp)
+                text = statusLabel.uppercase(),
+                style = TextStyle(
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Medium,
+                    letterSpacing = 2.sp,
+                    color = statusColor
+                )
             )
         }
     }
