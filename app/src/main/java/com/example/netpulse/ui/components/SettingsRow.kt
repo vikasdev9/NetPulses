@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -13,8 +14,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.netpulse.ui.theme.CardBorder
-import com.example.netpulse.ui.theme.TextPrimary
 
 @Composable
 fun SettingsRow(
@@ -46,13 +45,13 @@ fun SettingsRow(
                     modifier = Modifier
                         .size(36.dp)
                         .clip(CircleShape)
-                        .background(CardBorder),
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = icon,
                         contentDescription = null,
-                        tint = com.example.netpulse.ui.theme.TextSecondary,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(18.dp)
                     )
                 }
@@ -61,7 +60,7 @@ fun SettingsRow(
                 
                 Text(
                     text = title,
-                    color = TextPrimary,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 15.sp
                 )
             }
@@ -77,7 +76,7 @@ fun SettingsRow(
                     .padding(start = 64.dp)
                     .fillMaxWidth()
                     .height(0.5.dp)
-                    .background(CardBorder)
+                    .background(MaterialTheme.colorScheme.outline)
             )
         }
     }

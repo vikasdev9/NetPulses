@@ -1,25 +1,13 @@
 package com.example.netpulse.ui.components
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Bolt
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -33,29 +21,23 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.netpulse.R
 
-
 @Composable
 fun RippleEffect() {
-
     Box(
         modifier = Modifier.size(260.dp),
         contentAlignment = Alignment.Center
     ) {
-
         Ripple(delay = 0)
-
         Ripple(delay = 700)
-
         Ripple(delay = 1400)
-
         Ripple(delay = 2100)
     }
 }
 
 @Composable
 fun Ripple(delay: Int) {
-
-    val transition = rememberInfiniteTransition()
+    val transition = rememberInfiniteTransition(label = "ripple")
+    val secondaryColor = MaterialTheme.colorScheme.secondary
 
     val radius by transition.animateFloat(
         initialValue = .45f,
@@ -66,7 +48,8 @@ fun Ripple(delay: Int) {
                 delayMillis = delay,
                 easing = LinearEasing
             )
-        )
+        ),
+        label = "radius"
     )
 
     val alpha by transition.animateFloat(
@@ -78,20 +61,18 @@ fun Ripple(delay: Int) {
                 delayMillis = delay,
                 easing = LinearEasing
             )
-        )
+        ),
+        label = "alpha"
     )
 
     Canvas(
         Modifier.fillMaxSize()
     ) {
-
         val r = size.minDimension / 5 * radius
-
         drawCircle(
-
             brush = Brush.radialGradient(
                 colors = listOf(
-                    Color(0x3300D9FF),
+                    secondaryColor.copy(alpha = 0.2f),
                     Color.Transparent
                 ),
                 radius = r + 40f
@@ -100,7 +81,7 @@ fun Ripple(delay: Int) {
         )
 
         drawCircle(
-            color = Color(0xFF00D9FF).copy(alpha),
+            color = secondaryColor.copy(alpha),
             radius = r,
             style = Stroke(2.dp.toPx())
         )
@@ -109,8 +90,8 @@ fun Ripple(delay: Int) {
 
 @Composable
 fun GlowingIcon() {
-
-    val transition = rememberInfiniteTransition()
+    val transition = rememberInfiniteTransition(label = "glow")
+    val secondaryColor = MaterialTheme.colorScheme.secondary
 
     val scale by transition.animateFloat(
         initialValue = .98f,
@@ -121,21 +102,20 @@ fun GlowingIcon() {
                 easing = FastOutSlowInEasing
             ),
             repeatMode = RepeatMode.Reverse
-        )
+        ),
+        label = "scale"
     )
 
     Box(
         contentAlignment = Alignment.Center
     ) {
-
         Canvas(
             Modifier.size(160.dp)
         ) {
-
             drawCircle(
                 brush = Brush.radialGradient(
                     listOf(
-                        Color(0x3300D9FF),
+                        secondaryColor.copy(alpha = 0.2f),
                         Color.Transparent
                     )
                 )
@@ -161,8 +141,9 @@ fun GlowingIcon() {
 
 @Composable
 fun AnimatedProgressBar() {
-
-    val transition = rememberInfiniteTransition()
+    val transition = rememberInfiniteTransition(label = "progress")
+    val secondaryColor = MaterialTheme.colorScheme.secondary
+    val outlineColor = MaterialTheme.colorScheme.outline
 
     val progress by transition.animateFloat(
         initialValue = 0f,
@@ -170,7 +151,8 @@ fun AnimatedProgressBar() {
         animationSpec = infiniteRepeatable(
             animation = tween(1800),
             repeatMode = RepeatMode.Restart
-        )
+        ),
+        label = "progressValue"
     )
 
     LinearProgressIndicator(
@@ -179,7 +161,7 @@ fun AnimatedProgressBar() {
             .fillMaxWidth(.72f)
             .height(4.dp)
             .clip(RoundedCornerShape(50)),
-        color = Color(0xFF00D9FF),
-        trackColor = Color(0xFF15263A)
+        color = secondaryColor,
+        trackColor = outlineColor.copy(alpha = 0.2f)
     )
 }

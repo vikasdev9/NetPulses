@@ -23,10 +23,10 @@ import java.util.Locale
 @Composable
 fun LargeWidget(data: WidgetData) {
     // Using fully qualified factory functions to avoid restricted API issues in Glance 1.0.0
-    val backgroundColor = androidx.glance.color.ColorProvider(day = Color(0xFF0A0E1A), night = Color(0xFF0A0E1A))
-    val surfaceColor = androidx.glance.color.ColorProvider(day = Color(0xFF131929), night = Color(0xFF131929))
-    val textPrimary = androidx.glance.color.ColorProvider(day = Color.White, night = Color.White)
-    val textSecondary = androidx.glance.color.ColorProvider(day = Color(0xFF8892A4), night = Color(0xFF8892A4))
+    val backgroundColor = androidx.glance.color.ColorProvider(day = Color(0xFFF0F4FF), night = Color(0xFF0A0E1A))
+    val surfaceColor = androidx.glance.color.ColorProvider(day = Color(0xFFFFFFFF), night = Color(0xFF131929))
+    val textPrimary = androidx.glance.color.ColorProvider(day = Color(0xFF0A0E1A), night = Color.White)
+    val textSecondary = androidx.glance.color.ColorProvider(day = Color(0xFF475569), night = Color(0xFF8892A4))
     
     val blueAccent = androidx.glance.color.ColorProvider(day = Color(0xFF3B8BFF), night = Color(0xFF3B8BFF))
     val cyanAccent = androidx.glance.color.ColorProvider(day = Color(0xFF00D4FF), night = Color(0xFF00D4FF))
@@ -139,6 +139,7 @@ fun LargeWidget(data: WidgetData) {
 
 @Composable
 private fun LargeMetricCell(label: String, value: String, colorProvider: ColorProvider, modifier: GlanceModifier) {
+    val textPrimary = androidx.glance.color.ColorProvider(day = Color(0xFF0A0E1A), night = Color.White)
     Column(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         Text(
             label,
@@ -151,7 +152,7 @@ private fun LargeMetricCell(label: String, value: String, colorProvider: ColorPr
         Text(
             value,
             style = TextStyle(
-                color = androidx.glance.color.ColorProvider(day = Color.White, night = Color.White),
+                color = textPrimary,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Bold
             )

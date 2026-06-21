@@ -7,6 +7,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,19 +18,17 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.netpulse.data.analytics.DailyUsage
-import com.example.netpulse.ui.theme.TextSecondary
 
 @Composable
 fun DataBarChart(
     weeklyUsage: List<DailyUsage>,
     modifier: Modifier = Modifier
 ) {
-    val mobileColor = Color(0xFF3B8BFF)
-    val wifiColor = Color(0xFF00D4FF).copy(alpha = 0.6f)
+    val mobileColor = MaterialTheme.colorScheme.primary
+    val wifiColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.6f)
     
     val animationProgress = remember { Animatable(0f) }
     
@@ -86,7 +85,7 @@ fun DataBarChart(
             weeklyUsage.forEach { daily ->
                 Text(
                     text = daily.dayLabel.take(3),
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 10.sp,
                     modifier = Modifier.width(32.dp),
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -119,7 +118,7 @@ fun LegendItem(color: Color, label: String) {
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = label,
-            color = TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 11.sp
         )
     }

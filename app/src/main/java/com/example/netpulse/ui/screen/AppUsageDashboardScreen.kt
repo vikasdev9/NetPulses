@@ -47,14 +47,14 @@ fun AppUsageDashboardScreen(
                 title = {
                     Text(
                         "App Usage",
-                        color = TextPrimary,
+                        color = MaterialTheme.colorScheme.onBackground,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = TextPrimary)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = MaterialTheme.colorScheme.onBackground)
                     }
                 },
                 actions = {
@@ -63,10 +63,10 @@ fun AppUsageDashboardScreen(
                         onTabSelected = { viewModel.setDashboardTab(it) }
                     )
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Background)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
-        containerColor = Background
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
@@ -83,13 +83,13 @@ fun AppUsageDashboardScreen(
                     MiniStatCard(
                         value = uiState.mobileData.totalFormatted,
                         label = "Total Data",
-                        accentColor = PrimaryAccent,
+                        accentColor = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.weight(1f)
                     )
                     MiniStatCard(
                         value = formatDuration(uiState.totalScreenTimeMs),
                         label = "Screen Time",
-                        accentColor = GreenAccentIcon,
+                        accentColor = MaterialTheme.colorScheme.tertiary,
                         modifier = Modifier.weight(1f)
                     )
                     MiniStatCard(
@@ -106,7 +106,7 @@ fun AppUsageDashboardScreen(
             item {
                 Text(
                     "This Week",
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 11.sp,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
@@ -114,8 +114,8 @@ fun AppUsageDashboardScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp))
-                        .background(CardSurface)
-                        .border(0.5.dp, CardBorder, RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.surface)
+                        .border(0.5.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
                         .padding(16.dp)
                 ) {
                     DataBarChart(weeklyUsage = uiState.weeklyUsage)
@@ -127,7 +127,7 @@ fun AppUsageDashboardScreen(
             item {
                 Text(
                     "ALL APPS",
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 11.sp,
                     letterSpacing = 1.sp,
                     modifier = Modifier.padding(bottom = 12.dp)
@@ -172,7 +172,7 @@ fun DashboardTabSelector(
         modifier = Modifier
             .padding(end = 8.dp)
             .clip(RoundedCornerShape(20.dp))
-            .background(CardSurface)
+            .background(MaterialTheme.colorScheme.surface)
             .padding(2.dp)
     ) {
         DashboardTabChip(
@@ -197,8 +197,8 @@ fun DashboardTabChip(
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(18.dp),
-        color = if (isSelected) PrimaryAccent else Color.Transparent,
-        contentColor = if (isSelected) Color.White else TextSecondary
+        color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
+        contentColor = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
     ) {
         Box(
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
@@ -219,13 +219,13 @@ fun MiniStatCard(
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(10.dp))
-            .background(CardSurface)
-            .border(0.5.dp, CardBorder, RoundedCornerShape(10.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .border(0.5.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(10.dp))
             .padding(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(value, color = accentColor, fontSize = 16.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
-        Text(label, color = TextSecondary, fontSize = 11.sp)
+        Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
     }
 }
 
@@ -247,8 +247,8 @@ fun DetailedAppUsageRow(
             .fillMaxWidth()
             .padding(bottom = 8.dp),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = CardSurface),
-        border = BorderStroke(0.5.dp, CardBorder)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline)
     ) {
         Row(
             modifier = Modifier.padding(14.dp),
@@ -260,13 +260,13 @@ fun DetailedAppUsageRow(
                     modifier = Modifier
                         .fillMaxSize()
                         .clip(CircleShape)
-                        .background(Color.White.copy(alpha = 0.05f)),
+                        .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.05f)),
                     contentAlignment = Alignment.Center
                 ) {
                     if (app.appIcon != null) {
                         Image(rememberDrawablePainter(app.appIcon), null, modifier = Modifier.fillMaxSize())
                     } else {
-                        Text(app.appName.take(1), color = PrimaryAccent, fontWeight = FontWeight.Bold)
+                        Text(app.appName.take(1), color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                     }
                 }
                 
@@ -276,8 +276,8 @@ fun DetailedAppUsageRow(
                             .size(16.dp)
                             .align(Alignment.BottomEnd)
                             .clip(CircleShape)
-                            .background(Background)
-                            .border(1.dp, CardBorder, CircleShape),
+                            .background(MaterialTheme.colorScheme.background)
+                            .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
@@ -296,7 +296,7 @@ fun DetailedAppUsageRow(
                     .weight(1f)
                     .padding(horizontal = 12.dp)
             ) {
-                Text(app.appName, color = TextPrimary, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                Text(app.appName, color = MaterialTheme.colorScheme.onBackground, fontSize = 14.sp, fontWeight = FontWeight.Medium)
                 Spacer(modifier = Modifier.height(6.dp))
                 // Progress Bar
                 Box(
@@ -304,7 +304,7 @@ fun DetailedAppUsageRow(
                         .fillMaxWidth()
                         .height(4.dp)
                         .clip(RoundedCornerShape(2.dp))
-                        .background(CardBorder)
+                        .background(MaterialTheme.colorScheme.outline)
                 ) {
                     Box(
                         modifier = Modifier
@@ -315,24 +315,24 @@ fun DetailedAppUsageRow(
                 }
                 Spacer(modifier = Modifier.height(6.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Outlined.Schedule, null, tint = GreenAccentIcon, modifier = Modifier.size(10.dp))
+                    Icon(Icons.Outlined.Schedule, null, tint = MaterialTheme.colorScheme.tertiary, modifier = Modifier.size(10.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(app.screenTimeFormatted, color = TextSecondary, fontSize = 11.sp)
+                    Text(app.screenTimeFormatted, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
                     Spacer(modifier = Modifier.width(12.dp))
-                    Icon(Icons.Outlined.SwapVert, null, tint = PrimaryAccent, modifier = Modifier.size(10.dp))
+                    Icon(Icons.Outlined.SwapVert, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(10.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(app.totalBytesFormatted, color = TextSecondary, fontSize = 11.sp)
+                    Text(app.totalBytesFormatted, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
                 }
             }
 
             // RIGHT
             Column(horizontalAlignment = Alignment.End) {
                 if (isDataTab) {
-                    Text(app.totalBytesFormatted, color = TextPrimary, fontSize = 14.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
-                    Text("↑${formatBytes(app.txBytes)} ↓${formatBytes(app.rxBytes)}", color = TextSecondary, fontSize = 10.sp)
+                    Text(app.totalBytesFormatted, color = MaterialTheme.colorScheme.onBackground, fontSize = 14.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
+                    Text("↑${formatBytes(app.txBytes)} ↓${formatBytes(app.rxBytes)}", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 10.sp)
                 } else {
-                    Text(app.screenTimeFormatted, color = TextPrimary, fontSize = 14.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
-                    Text("Last: ${app.lastUsedLabel}", color = TextSecondary, fontSize = 10.sp)
+                    Text(app.screenTimeFormatted, color = MaterialTheme.colorScheme.onBackground, fontSize = 14.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
+                    Text("Last: ${app.lastUsedLabel}", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 10.sp)
                 }
             }
         }
@@ -347,9 +347,9 @@ fun EmptyState() {
             .padding(vertical = 48.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Icon(Icons.Outlined.Schedule, null, tint = TextSecondary, modifier = Modifier.size(48.dp))
+        Icon(Icons.Outlined.Schedule, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(48.dp))
         Spacer(modifier = Modifier.height(16.dp))
-        Text("No app data available", color = TextPrimary, fontSize = 14.sp)
-        Text("Run a speed test or use your phone first", color = TextSecondary, fontSize = 12.sp)
+        Text("No app data available", color = MaterialTheme.colorScheme.onBackground, fontSize = 14.sp)
+        Text("Run a speed test or use your phone first", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
     }
 }

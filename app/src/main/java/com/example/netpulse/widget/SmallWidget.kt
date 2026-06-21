@@ -23,10 +23,10 @@ import java.util.Locale
 @Composable
 fun SmallWidget(data: WidgetData) {
     // Using fully qualified factory functions to avoid restricted API issues in Glance 1.0.0
-    val backgroundColor = androidx.glance.color.ColorProvider(day = Color(0xFF0A0E1A), night = Color(0xFF0A0E1A))
-    val textPrimary = androidx.glance.color.ColorProvider(day = Color.White, night = Color.White)
-    val textSecondary = androidx.glance.color.ColorProvider(day = Color(0xFF8892A4), night = Color(0xFF8892A4))
-    val dividerColor = androidx.glance.color.ColorProvider(day = Color(0xFF2E3A50), night = Color(0xFF2E3A50))
+    val backgroundColor = androidx.glance.color.ColorProvider(day = Color(0xFFF0F4FF), night = Color(0xFF0A0E1A))
+    val textPrimary = androidx.glance.color.ColorProvider(day = Color(0xFF0A0E1A), night = Color.White)
+    val textSecondary = androidx.glance.color.ColorProvider(day = Color(0xFF475569), night = Color(0xFF8892A4))
+    val dividerColor = androidx.glance.color.ColorProvider(day = Color(0xFFCBD5E1), night = Color(0xFF2E3A50))
 
     Box(
         modifier = GlanceModifier

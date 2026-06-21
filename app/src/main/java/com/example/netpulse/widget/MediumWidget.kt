@@ -22,9 +22,9 @@ import java.util.Locale
 
 @Composable
 fun MediumWidget(data: WidgetData) {
-    val backgroundColor = androidx.glance.color.ColorProvider(day = Color(0xFF0A0E1A), night = Color(0xFF0A0E1A))
-    val textPrimary = androidx.glance.color.ColorProvider(day = Color.White, night = Color.White)
-    val textSecondary = androidx.glance.color.ColorProvider(day = Color(0xFF8892A4), night = Color(0xFF8892A4))
+    val backgroundColor = androidx.glance.color.ColorProvider(day = Color(0xFFF0F4FF), night = Color(0xFF0A0E1A))
+    val textPrimary = androidx.glance.color.ColorProvider(day = Color(0xFF0A0E1A), night = Color.White)
+    val textSecondary = androidx.glance.color.ColorProvider(day = Color(0xFF475569), night = Color(0xFF8892A4))
     val blueAccent = androidx.glance.color.ColorProvider(day = Color(0xFF3B8BFF), night = Color(0xFF3B8BFF))
     val cyanAccent = androidx.glance.color.ColorProvider(day = Color(0xFF00D4FF), night = Color(0xFF00D4FF))
     val greenAccent = androidx.glance.color.ColorProvider(day = Color(0xFF00E676), night = Color(0xFF00E676))
@@ -140,7 +140,7 @@ fun MediumWidget(data: WidgetData) {
 private fun MetricChip(text: String, colorProvider: ColorProvider) {
     Box(
         modifier = GlanceModifier
-            .background(androidx.glance.color.ColorProvider(day = Color(0xFF1E2740), night = Color(0xFF1E2740)))
+            .background(androidx.glance.color.ColorProvider(day = Color(0xFFE8EDF8), night = Color(0xFF1E2740)))
             .cornerRadius(8.dp)
             .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {

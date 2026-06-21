@@ -60,7 +60,7 @@ fun OnboardingPageContent(
         Text(
             text = item.title,
             style = MaterialTheme.typography.headlineLarge,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onBackground,
             fontWeight = FontWeight.ExtraBold,
             textAlign = TextAlign.Center,
             letterSpacing = (-0.5).sp
@@ -72,7 +72,7 @@ fun OnboardingPageContent(
             Text(
                 text = item.subtitle,
                 style = MaterialTheme.typography.titleMedium,
-                color = Color.White.copy(alpha = 0.75f),
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.75f),
                 textAlign = TextAlign.Center,
                 lineHeight = 26.sp,
                 modifier = Modifier.padding(horizontal = 24.dp)
@@ -84,7 +84,7 @@ fun OnboardingPageContent(
             Text(
                 text = item.description,
                 style = MaterialTheme.typography.bodyLarge,
-                color = Color.White.copy(alpha = 0.6f),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = if (item.description.startsWith("•")) TextAlign.Start else TextAlign.Center,
                 lineHeight = 24.sp,
                 modifier = Modifier
@@ -121,7 +121,7 @@ fun OnboardingPageContent(
                         Spacer(modifier = Modifier.width(16.dp))
                         Text(
                             text = feature,
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onBackground,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold
                         )

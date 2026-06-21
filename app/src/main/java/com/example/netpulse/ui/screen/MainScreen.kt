@@ -15,10 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -33,7 +31,6 @@ import com.example.netpulse.data.datastore.UserPreferences
 import kotlin.math.min
 
 import androidx.compose.ui.platform.LocalContext
-import com.example.netpulse.NetPulseApplication
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,7 +44,6 @@ fun MainScreen(
     val userPreferences = remember { UserPreferences(context) }
     val viewModel: SpeedTestViewModel = viewModel(factory = SpeedTestViewModel.Factory(application, userPreferences))
     val uiState by viewModel.uiState.collectAsState()
-    val ispInfo by viewModel.ispInfo.collectAsState()
 
     Scaffold(
         topBar = {
@@ -56,38 +52,30 @@ fun MainScreen(
         bottomBar = {
             BottomNavigationBar(onNavigateToHistory, onNavigateToSettings)
         },
-        containerColor = Background
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
-        // BoxWithConstraints is the heart of responsive design in Compose.
-        // It allows us to calculate component sizes based on the actual screen dimensions.
         BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp)
         ) {
-            val screenHeight = maxHeight
             val screenWidth = maxWidth
             
-            // Logic to prevent scrolling: We use a nested Column with weight(1f)
-            // for the main content to push the action button towards the bottom.
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Top section (Badge, Gauge, Grid) - Spaced evenly to fill available height
                 Column(
                     modifier = Modifier.weight(1f),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    // 1. Network Status Badge
                     NetworkBadge()
 
-                    // 2. Speedometer Gauge & 3. Statistics Grid Grouped
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(16.dp) // Reduced controlled gap
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         val gaugeSize = min(screenWidth.value * 0.7f, 280f).dp
                         Box(
@@ -115,9 +103,9 @@ fun MainScreen(
                             }
 
                             val statusColor = when (uiState.testState) {
-                                is SpeedTestState.Idle -> TextSecondary
-                                is SpeedTestState.Running -> PrimaryAccent
-                                is SpeedTestState.Complete -> GreenAccentIcon
+                                is SpeedTestState.Idle -> MaterialTheme.colorScheme.onSurfaceVariant
+                                is SpeedTestState.Running -> MaterialTheme.colorScheme.primary
+                                is SpeedTestState.Complete -> MaterialTheme.colorScheme.tertiary
                                 is SpeedTestState.Error -> Color.Red
                             }
 
@@ -129,7 +117,6 @@ fun MainScreen(
                             )
                         }
 
-                        // 3. Statistics Grid (Responsive 2x2)
                         Column(
                             modifier = Modifier.fillMaxWidth(),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -143,8 +130,8 @@ fun MainScreen(
                                     label = stringResource(R.string.label_download),
                                     value = uiState.download,
                                     unit = stringResource(R.string.label_mbps),
-                                    accentColor = BlueAccentIcon,
-                                    iconBgColor = BlueAccentBg,
+                                    accentColor = MaterialTheme.colorScheme.primary,
+                                    iconBgColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
                                     isActive = (uiState.testState as? SpeedTestState.Running)?.phase == TestPhase.DOWNLOAD,
                                     modifier = Modifier.weight(1f)
                                 )
@@ -153,8 +140,8 @@ fun MainScreen(
                                     label = stringResource(R.string.label_upload),
                                     value = uiState.upload,
                                     unit = stringResource(R.string.label_mbps),
-                                    accentColor = CyanAccentIcon,
-                                    iconBgColor = CyanAccentBg,
+                                    accentColor = MaterialTheme.colorScheme.secondary,
+                                    iconBgColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f),
                                     isActive = (uiState.testState as? SpeedTestState.Running)?.phase == TestPhase.UPLOAD,
                                     modifier = Modifier.weight(1f)
                                 )
@@ -168,8 +155,8 @@ fun MainScreen(
                                     label = stringResource(R.string.label_ping),
                                     value = uiState.ping,
                                     unit = stringResource(R.string.label_ms),
-                                    accentColor = GreenAccentIcon,
-                                    iconBgColor = GreenAccentBg,
+                                    accentColor = MaterialTheme.colorScheme.tertiary,
+                                    iconBgColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.1f),
                                     isActive = (uiState.testState as? SpeedTestState.Running)?.phase == TestPhase.PING,
                                     modifier = Modifier.weight(1f)
                                 )
@@ -179,7 +166,7 @@ fun MainScreen(
                                     value = uiState.jitter,
                                     unit = stringResource(R.string.label_ms),
                                     accentColor = AmberAccentIcon,
-                                    iconBgColor = AmberAccentBg,
+                                    iconBgColor = AmberAccentIcon.copy(alpha = 0.1f),
                                     isActive = (uiState.testState as? SpeedTestState.Running)?.phase == TestPhase.JITTER,
                                     modifier = Modifier.weight(1f)
                                 )
@@ -188,7 +175,6 @@ fun MainScreen(
                     }
                 }
 
-                // 4. Start/Stop Button (Pinned to bottom)
                 val isRunning = uiState.testState is SpeedTestState.Running
                 ResponsiveActionButton(
                     isRunning = isRunning,
@@ -200,14 +186,12 @@ fun MainScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // 5. Server Info
                 Text(
                     text = stringResource(R.string.server_info, "Mumbai", 3),
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.labelSmall
                 )
                 
-                // Controlled spacing from the Bottom Navigation Bar
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }
@@ -224,7 +208,7 @@ fun HomeTopBar(onNavigateToAnalytics: () -> Unit) {
                     modifier = Modifier
                         .size(32.dp)
                         .clip(RoundedCornerShape(8.dp))
-                        .background(PrimaryAccent),
+                        .background(MaterialTheme.colorScheme.primary),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -239,7 +223,7 @@ fun HomeTopBar(onNavigateToAnalytics: () -> Unit) {
                     text = "NetPulse",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = TextPrimary
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
         },
@@ -250,20 +234,20 @@ fun HomeTopBar(onNavigateToAnalytics: () -> Unit) {
                     .padding(end = 4.dp)
                     .size(36.dp)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(CardSurface)
-                    .border(1.dp, CardBorder, RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.surface)
+                    .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp))
             ) {
                 Icon(
                     imageVector = Icons.Default.Analytics,
                     contentDescription = "Analytics",
-                    tint = PrimaryAccent,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(20.dp)
                 )
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Background,
-            titleContentColor = TextPrimary
+            containerColor = MaterialTheme.colorScheme.background,
+            titleContentColor = MaterialTheme.colorScheme.onBackground
         )
     )
 }
@@ -283,8 +267,8 @@ fun ResponsiveMetricCard(
         modifier = modifier
             .then(if (isActive) Modifier.border(1.dp, accentColor, RoundedCornerShape(16.dp)) else Modifier),
         shape = RoundedCornerShape(16.dp),
-        color = CardSurface.copy(alpha = 0.6f),
-        border = if (!isActive) BorderStroke(1.dp, CardBorder) else null
+        color = MaterialTheme.colorScheme.surface,
+        border = if (!isActive) BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline) else null
     ) {
         Column(
             modifier = Modifier.padding(12.dp),
@@ -301,20 +285,20 @@ fun ResponsiveMetricCard(
                     Icon(icon, null, tint = accentColor, modifier = Modifier.size(14.dp))
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(label, color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
             }
             Spacer(modifier = Modifier.height(4.dp))
             Row(verticalAlignment = Alignment.Bottom) {
                 Text(
                     text = value,
-                    color = TextPrimary,
+                    color = MaterialTheme.colorScheme.onBackground,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = unit,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.labelSmall
                 )
             }
@@ -328,9 +312,7 @@ fun ResponsiveActionButton(
     isComplete: Boolean,
     onClick: () -> Unit
 ) {
-    // We use a Box with drawBehind to create a soft, premium glow 
-    // instead of a standard harsh shadow.
-    val glowColor = PrimaryAccent.copy(alpha = 0.3f)
+    val glowColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
     
     Button(
         onClick = onClick,
@@ -340,7 +322,6 @@ fun ResponsiveActionButton(
             .then(
                 if (!isRunning) {
                     Modifier.drawBehind {
-                        // Creating a soft blue glow effect without duplicate shapes
                         drawRoundRect(
                             color = glowColor,
                             size = size,
@@ -352,7 +333,7 @@ fun ResponsiveActionButton(
             ),
         shape = RoundedCornerShape(30.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (isRunning) CardBorder else Color.Transparent
+            containerColor = if (isRunning) MaterialTheme.colorScheme.surfaceVariant else Color.Transparent
         ),
         contentPadding = PaddingValues(0.dp)
     ) {
@@ -361,7 +342,7 @@ fun ResponsiveActionButton(
                 .fillMaxSize()
                 .background(
                     if (!isRunning) {
-                        Brush.horizontalGradient(listOf(PrimaryAccent, GaugeCyan))
+                        Brush.horizontalGradient(listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary))
                     } else {
                         Brush.linearGradient(listOf(Color.Transparent, Color.Transparent))
                     }
@@ -395,9 +376,9 @@ fun BottomNavigationBar(onNavigateToHistory: () -> Unit, onNavigateToSettings: (
     var selectedItem by remember { mutableStateOf(0) }
     
     NavigationBar(
-        containerColor = Background,
+        containerColor = MaterialTheme.colorScheme.background,
         tonalElevation = 0.dp,
-        modifier = Modifier.border(0.5.dp, CardBorder, RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp))
+        modifier = Modifier.border(0.5.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp))
     ) {
         NavigationBarItem(
             selected = selectedItem == 0,
@@ -405,9 +386,9 @@ fun BottomNavigationBar(onNavigateToHistory: () -> Unit, onNavigateToSettings: (
             icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
             label = { Text(stringResource(R.string.label_home)) },
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = PrimaryAccent,
-                selectedTextColor = PrimaryAccent,
-                unselectedIconColor = TextSecondary,
+                selectedIconColor = MaterialTheme.colorScheme.primary,
+                selectedTextColor = MaterialTheme.colorScheme.primary,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 indicatorColor = Color.Transparent
             )
         )
@@ -417,9 +398,9 @@ fun BottomNavigationBar(onNavigateToHistory: () -> Unit, onNavigateToSettings: (
             icon = { Icon(Icons.Default.History, contentDescription = "History") },
             label = { Text(stringResource(R.string.screen_history)) },
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = PrimaryAccent,
-                selectedTextColor = PrimaryAccent,
-                unselectedIconColor = TextSecondary,
+                selectedIconColor = MaterialTheme.colorScheme.primary,
+                selectedTextColor = MaterialTheme.colorScheme.primary,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 indicatorColor = Color.Transparent
             )
         )
@@ -429,9 +410,9 @@ fun BottomNavigationBar(onNavigateToHistory: () -> Unit, onNavigateToSettings: (
             icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
             label = { Text(stringResource(R.string.screen_settings)) },
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = PrimaryAccent,
-                selectedTextColor = PrimaryAccent,
-                unselectedIconColor = TextSecondary,
+                selectedIconColor = MaterialTheme.colorScheme.primary,
+                selectedTextColor = MaterialTheme.colorScheme.primary,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 indicatorColor = Color.Transparent
             )
         )

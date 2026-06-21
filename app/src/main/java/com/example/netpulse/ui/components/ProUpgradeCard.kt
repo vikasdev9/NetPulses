@@ -5,11 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,9 +19,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.netpulse.ui.theme.CardSurface
-import com.example.netpulse.ui.theme.PrimaryAccent
-import com.example.netpulse.ui.theme.TextSecondary
 
 @Composable
 fun ProUpgradeCard(
@@ -34,10 +27,6 @@ fun ProUpgradeCard(
     onRestoreClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val gradientBorder = Brush.linearGradient(
-        colors = listOf(Color(0xFF3B8BFF), Color(0xFF9B59FF))
-    )
-
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -49,7 +38,7 @@ fun ProUpgradeCard(
                 )
             }
             .clip(RoundedCornerShape(16.dp))
-            .background(CardSurface)
+            .background(MaterialTheme.colorScheme.surface)
             .padding(20.dp)
     ) {
         Column {
@@ -61,7 +50,7 @@ fun ProUpgradeCard(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "SpeedCheck Pro",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -71,7 +60,7 @@ fun ProUpgradeCard(
             
             Text(
                 text = "Remove ads, export history, widget support.",
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontSize = 13.sp
             )
             
@@ -88,13 +77,13 @@ fun ProUpgradeCard(
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
                         contentDescription = null,
-                        tint = Color(0xFF00E676),
+                        tint = MaterialTheme.colorScheme.tertiary,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "Pro Active ✓",
-                        color = Color(0xFF00E676),
+                        color = MaterialTheme.colorScheme.tertiary,
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp
                     )
@@ -108,7 +97,7 @@ fun ProUpgradeCard(
                         .shadow(
                             elevation = 8.dp,
                             shape = RoundedCornerShape(26.dp),
-                            spotColor = PrimaryAccent.copy(alpha = 0.3f)
+                            spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
                         ),
                     shape = RoundedCornerShape(26.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
@@ -119,7 +108,7 @@ fun ProUpgradeCard(
                             .fillMaxSize()
                             .background(
                                 Brush.horizontalGradient(
-                                    colors = listOf(Color(0xFF3B8BFF), Color(0xFF00D4FF))
+                                    colors = listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary)
                                 )
                             ),
                         contentAlignment = Alignment.Center
@@ -142,7 +131,7 @@ fun ProUpgradeCard(
                 ) {
                     Text(
                         text = "Restore Purchase",
-                        color = TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 12.sp,
                         textAlign = TextAlign.Center
                     )

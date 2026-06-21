@@ -11,6 +11,7 @@ import com.example.netpulse.data.datastore.UserPreferences
 import com.example.netpulse.data.network.SpeedTestEngine
 import com.example.netpulse.utils.IspInfo
 import com.example.netpulse.utils.IspInfoHelper
+import com.example.netpulse.utils.NotificationHelper
 import com.example.netpulse.widget.NetPulseWidget
 import com.example.netpulse.widget.WidgetDataStore
 import kotlinx.coroutines.Dispatchers
@@ -23,6 +24,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.glance.appwidget.updateAll
+import java.util.Calendar
 
 enum class TestPhase {
     PING, JITTER, DOWNLOAD, UPLOAD
@@ -92,9 +94,9 @@ class SpeedTestViewModel(
         testJob?.cancel()
         testJob = viewModelScope.launch {
             
-            // Read settings BEFORE starting
             val parallelConnections = userPreferences.parallelConnections.first()
             val durationSeconds = userPreferences.testDurationSeconds.first()
+            val notificationsEnabled = userPreferences.notificationsEnabled.first()
 
             _uiState.value = SpeedTestUiState(
                 testState = SpeedTestState.Running(TestPhase.PING),
@@ -192,12 +194,26 @@ class SpeedTestViewModel(
 
             withContext(Dispatchers.IO) {
                 dao.insert(result)
+                
+                if (notificationsEnabled) {
+                    NotificationHelper.showTestCompleteNotification(getApplication(), download, upload, ping.toInt())
+                    
+                    if (download < 5.0) {
+                        NotificationHelper.showSlowInternetWarning(getApplication(), download)
+                    }
+
+                    // Check for speed drop
+                    val sevenDaysAgo = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -7) }.timeInMillis
+                    val avgSpeed = dao.getAverageDownloadSpeedAfter(sevenDaysAgo)
+                    if (avgSpeed != null && download < (avgSpeed * 0.5)) {
+                        NotificationHelper.showSpeedDropAlert(getApplication(), download, avgSpeed)
+                    }
+                }
             }
 
             WidgetDataStore.saveWidgetData(getApplication(), result)
             NetPulseWidget().updateAll(getApplication())
 
-            // Overshoot and Settle effect for Gauge
             val overshootValue = (download * 1.12).toFloat().coerceAtMost(100f)
             _uiState.value = _uiState.value.copy(
                 testState = SpeedTestState.Running(TestPhase.DOWNLOAD, overshootValue, ping.toFloat(), jitter.toFloat())

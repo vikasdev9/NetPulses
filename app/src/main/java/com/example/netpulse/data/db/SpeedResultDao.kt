@@ -13,6 +13,12 @@ interface SpeedResultDao {
     @Query("SELECT * FROM speed_results ORDER BY timestamp DESC")
     fun getAll(): Flow<List<SpeedResult>>
 
+    @Query("SELECT * FROM speed_results WHERE timestamp >= :timestamp ORDER BY timestamp DESC")
+    fun getResultsAfter(timestamp: Long): Flow<List<SpeedResult>>
+
+    @Query("SELECT AVG(downloadMbps) FROM speed_results WHERE timestamp >= :startTime")
+    suspend fun getAverageDownloadSpeedAfter(startTime: Long): Double?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(result: SpeedResult)
 

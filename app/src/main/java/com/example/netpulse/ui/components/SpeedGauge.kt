@@ -9,6 +9,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,34 +32,31 @@ import kotlin.math.sin
 
 @Composable
 fun SpeedGauge(
-    speedMbps: Float,          // current live speed
-    maxSpeed: Float = 100f,    // max scale value
-    statusLabel: String,       // "READY" / "DOWNLOADING..." etc
-    statusColor: Color,        // cyan / blue / green
-    isRunning: Boolean,        // true = pulse animation on
+    speedMbps: Float,
+    maxSpeed: Float = 100f,
+    statusLabel: String,
+    statusColor: Color,
+    isRunning: Boolean,
     modifier: Modifier = Modifier
 ) {
-    // Animate the DISPLAYED number separately from arc:
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val secondaryColor = MaterialTheme.colorScheme.secondary
+    val outlineColor = MaterialTheme.colorScheme.outline
+    val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
+    val onBackground = MaterialTheme.colorScheme.onBackground
+
     val animatedDisplayNum by animateFloatAsState(
         targetValue = speedMbps,
-        animationSpec = tween(
-            durationMillis = 250,
-            easing = LinearEasing  // linear for number rolling
-        ),
+        animationSpec = tween(durationMillis = 250, easing = LinearEasing),
         label = "DisplayNumberAnimation"
     )
 
-    // Arc animates with ease-out (feels like real acceleration):
     val animatedArcProgress by animateFloatAsState(
         targetValue = (speedMbps / maxSpeed).coerceIn(0f, 1f),
-        animationSpec = tween(
-            durationMillis = 300,
-            easing = FastOutSlowInEasing
-        ),
+        animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
         label = "ArcAnimation"
     )
 
-    // Pulse animation on tip dot:
     val infiniteTransition = rememberInfiniteTransition(label = "PulseTransition")
     val pulseScale by if (isRunning) {
         infiniteTransition.animateFloat(
@@ -86,13 +84,12 @@ fun SpeedGauge(
             val startAngle = 135f
             val sweepAngle = 270f
             
-            // BUG 3 FIX — Define arcRect for all layers
             val arcRectTopLeft = Offset(cx - radius, cy - radius)
             val arcRectSize = Size(radius * 2, radius * 2)
 
-            // 1. Background arc track (#1A2744)
+            // 1. Background arc track
             drawArc(
-                color = Color(0xFF1A2744),
+                color = outlineColor.copy(alpha = 0.2f),
                 startAngle = startAngle,
                 sweepAngle = sweepAngle,
                 useCenter = false,
@@ -101,24 +98,10 @@ fun SpeedGauge(
                 style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
             )
 
-            // 2. Inner shadow arc (#0F1729, 60% alpha, 2px inside)
-            val innerShadowRadius = radius - 2f
-            drawArc(
-                color = Color(0xFF0F1729).copy(alpha = 0.6f),
-                startAngle = startAngle,
-                sweepAngle = sweepAngle,
-                useCenter = false,
-                topLeft = Offset(cx - innerShadowRadius, cy - innerShadowRadius),
-                size = Size(innerShadowRadius * 2, innerShadowRadius * 2),
-                style = Stroke(width = 2f, cap = StrokeCap.Round)
-            )
-
             if (animatedArcProgress > 0f) {
-                // BUG 3 FIX — Use arcRect for glow layers and fill
-                
-                // 3. Outer glow arc (blue 15% alpha, wide)
+                // 3. Outer glow arc
                 drawArc(
-                    color = Color(0xFF3B8BFF).copy(alpha = 0.15f),
+                    color = primaryColor.copy(alpha = 0.15f),
                     startAngle = startAngle,
                     sweepAngle = sweepAngle * animatedArcProgress,
                     useCenter = false,
@@ -127,9 +110,9 @@ fun SpeedGauge(
                     style = Stroke(width = strokeWidth * 2.2f, cap = StrokeCap.Round)
                 )
 
-                // 4. Mid glow arc (blue 35% alpha, medium)
+                // 4. Mid glow arc
                 drawArc(
-                    color = Color(0xFF3B8BFF).copy(alpha = 0.35f),
+                    color = primaryColor.copy(alpha = 0.35f),
                     startAngle = startAngle,
                     sweepAngle = sweepAngle * animatedArcProgress,
                     useCenter = false,
@@ -138,9 +121,9 @@ fun SpeedGauge(
                     style = Stroke(width = strokeWidth * 1.5f, cap = StrokeCap.Round)
                 )
 
-                // 5. Cyan arc (first half of fill)
+                // 5. Secondary color arc (first half of fill)
                 drawArc(
-                    color = Color(0xFF00D4FF),
+                    color = secondaryColor,
                     startAngle = startAngle,
                     sweepAngle = sweepAngle * animatedArcProgress * 0.5f,
                     useCenter = false,
@@ -149,10 +132,10 @@ fun SpeedGauge(
                     style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
                 )
 
-                // 6. Blue arc (second half of fill)
+                // 6. Primary color arc (second half of fill)
                 if (animatedArcProgress > 0.5f) {
                     drawArc(
-                        color = Color(0xFF3B8BFF),
+                        color = primaryColor,
                         startAngle = startAngle + sweepAngle * animatedArcProgress * 0.5f,
                         sweepAngle = sweepAngle * animatedArcProgress * 0.5f,
                         useCenter = false,
@@ -162,35 +145,33 @@ fun SpeedGauge(
                     )
                 }
 
-                // BUG 1 FIX — Tip Dot Calculation
                 val tipAngle = Math.toRadians((startAngle + sweepAngle * animatedArcProgress).toDouble())
                 val tipX = cx + radius * cos(tipAngle).toFloat()
                 val tipY = cy + radius * sin(tipAngle).toFloat()
                 val tipOffset = Offset(tipX, tipY)
 
-                // 7. Tip outer glow circle (pulsing when running)
+                // 7. Tip outer glow circle
                 drawCircle(
-                    color = Color(0xFF3B8BFF).copy(alpha = 0.25f),
+                    color = primaryColor.copy(alpha = 0.25f),
                     radius = strokeWidth * 1.1f * pulseScale,
                     center = tipOffset
                 )
 
                 // 8. Tip mid glow circle
                 drawCircle(
-                    color = Color(0xFF00D4FF).copy(alpha = 0.5f),
+                    color = secondaryColor.copy(alpha = 0.5f),
                     radius = strokeWidth * 0.7f,
                     center = tipOffset
                 )
 
-                // 9. Tip core white dot
+                // 9. Tip core dot
                 drawCircle(
-                    color = Color.White,
+                    color = onBackground,
                     radius = strokeWidth * 0.42f,
                     center = tipOffset
                 )
             }
 
-            // 10. Minor tick marks & 11. Major tick marks
             val majorTicks = listOf(0f, 25f, 50f, 75f, 100f)
             val minorTicks = listOf(12.5f, 37.5f, 62.5f, 87.5f)
 
@@ -199,7 +180,7 @@ fun SpeedGauge(
                 val outerR = radius + strokeWidth * 0.45f
                 val innerR = outerR - (strokeWidth * 0.3f)
                 drawLine(
-                    color = Color(0xFF334155).copy(alpha = 0.8f),
+                    color = onSurfaceVariant.copy(alpha = 0.8f),
                     start = Offset(cx + innerR * cos(tickAngle).toFloat(), cy + innerR * sin(tickAngle).toFloat()),
                     end = Offset(cx + outerR * cos(tickAngle).toFloat(), cy + outerR * sin(tickAngle).toFloat()),
                     strokeWidth = 1.dp.toPx()
@@ -211,13 +192,12 @@ fun SpeedGauge(
                 val outerR = radius + strokeWidth * 0.6f
                 val innerR = outerR - (strokeWidth * 0.55f)
                 drawLine(
-                    color = Color(0xFF3B8BFF).copy(alpha = 0.7f),
+                    color = primaryColor.copy(alpha = 0.7f),
                     start = Offset(cx + innerR * cos(tickAngle).toFloat(), cy + innerR * sin(tickAngle).toFloat()),
                     end = Offset(cx + outerR * cos(tickAngle).toFloat(), cy + outerR * sin(tickAngle).toFloat()),
                     strokeWidth = 2.5.dp.toPx()
                 )
 
-                // 12. Tick labels (OUTSIDE arc, no collision)
                 val baseLabelRadius = radius + strokeWidth * 1.5f
                 val labelRadius = when(tick) {
                     0f       -> baseLabelRadius + strokeWidth * 0.5f
@@ -230,7 +210,6 @@ fun SpeedGauge(
                     else     -> 0f
                 }
                 
-                // BUG 2 FIX — Add yNudge for bottom corner labels
                 val yNudge = when(tick) {
                     0f       -> -strokeWidth * 0.8f
                     maxSpeed -> -strokeWidth * 0.8f
@@ -242,7 +221,7 @@ fun SpeedGauge(
 
                 drawContext.canvas.nativeCanvas.apply {
                     val paint = android.graphics.Paint().apply {
-                        color = android.graphics.Color.parseColor("#64748B")
+                        color = onSurfaceVariant.toArgb()
                         textSize = 24f
                         textAlign = android.graphics.Paint.Align.CENTER
                         isAntiAlias = true
@@ -265,14 +244,13 @@ fun SpeedGauge(
                 .offset(y = 18.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Rolling number
             Text(
                 text = String.format(Locale.US, "%.1f", animatedDisplayNum),
                 style = TextStyle(
                     fontSize = 52.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = FontFamily.Monospace,
-                    color = Color.White,
+                    color = onBackground,
                     letterSpacing = (-1.5).sp
                 )
             )
@@ -283,14 +261,13 @@ fun SpeedGauge(
                 text = "Mbps",
                 style = TextStyle(
                     fontSize = 13.sp,
-                    color = Color(0xFF64748B),
+                    color = onSurfaceVariant,
                     letterSpacing = 1.sp
                 )
             )
             
             Spacer(Modifier.height(10.dp))
             
-            // Animated status label
             AnimatedContent(
                 targetState = statusLabel,
                 transitionSpec = {

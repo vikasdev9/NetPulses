@@ -15,8 +15,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.netpulse.data.SpeedResult
-import com.example.netpulse.ui.theme.DarkColor2
-import com.example.netpulse.ui.theme.Teal200
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -24,7 +22,7 @@ import java.util.*
 fun ShareCard(result: SpeedResult) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = DarkColor2),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(
@@ -34,7 +32,7 @@ fun ShareCard(result: SpeedResult) {
             Text(
                 text = "NetPulse Speed Test",
                 style = MaterialTheme.typography.titleMedium,
-                color = Teal200
+                color = MaterialTheme.colorScheme.secondary
             )
             
             Spacer(modifier = Modifier.height(16.dp))
@@ -51,7 +49,7 @@ fun ShareCard(result: SpeedResult) {
             
             Text(
                 text = "${result.pingMs} ms Ping",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.Bold
             )
             
@@ -61,20 +59,20 @@ fun ShareCard(result: SpeedResult) {
             Text(
                 text = sdf.format(Date(result.timestamp)),
                 style = MaterialTheme.typography.bodySmall,
-                color = Color.White.copy(alpha = 0.6f)
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             
             Spacer(modifier = Modifier.height(16.dp))
             
             Box(
                 modifier = Modifier
-                    .background(Color.White.copy(alpha = 0.1f), RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f), RoundedCornerShape(8.dp))
                     .padding(horizontal = 12.dp, vertical = 6.dp)
             ) {
                 Text(
                     text = "${result.networkType} · ${result.isp} · ${result.location}",
                     style = MaterialTheme.typography.labelSmall,
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
         }
@@ -84,8 +82,8 @@ fun ShareCard(result: SpeedResult) {
 @Composable
 fun MetricItem(label: String, value: String, unit: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(label, style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.6f))
-        Text(value, fontSize = 32.sp, fontWeight = FontWeight.Black, color = Color.White)
-        Text(unit, style = MaterialTheme.typography.labelSmall, color = Teal200)
+        Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(value, fontSize = 32.sp, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onBackground)
+        Text(unit, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.secondary)
     }
 }

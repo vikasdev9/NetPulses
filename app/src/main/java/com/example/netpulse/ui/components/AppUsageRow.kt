@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,8 +20,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.netpulse.ui.theme.TextPrimary
-import com.example.netpulse.ui.theme.TextSecondary
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import kotlinx.coroutines.delay
 
@@ -55,7 +54,7 @@ fun AppUsageRow(
             modifier = Modifier
                 .size(32.dp)
                 .clip(CircleShape)
-                .background(Color.Gray.copy(alpha = 0.1f)),
+                .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.05f)),
             contentAlignment = Alignment.Center
         ) {
             if (icon != null) {
@@ -77,13 +76,13 @@ fun AppUsageRow(
             ) {
                 Text(
                     text = name,
-                    color = TextPrimary,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 14.sp,
                     maxLines = 1
                 )
                 Text(
                     text = value,
-                    color = TextPrimary,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 14.sp,
                     fontFamily = FontFamily.Monospace
                 )
@@ -97,7 +96,7 @@ fun AppUsageRow(
                         .weight(1f)
                         .height(4.dp)
                         .clip(RoundedCornerShape(2.dp))
-                        .background(Color.White.copy(alpha = 0.05f))
+                        .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.05f))
                 ) {
                     Box(
                         modifier = Modifier
@@ -111,7 +110,7 @@ fun AppUsageRow(
                 
                 Text(
                     text = subValue,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 11.sp
                 )
             }

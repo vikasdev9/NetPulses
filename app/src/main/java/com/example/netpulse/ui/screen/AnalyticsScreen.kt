@@ -51,13 +51,13 @@ fun AnalyticsScreen(
                             text = "Network Analytics",
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.ExtraBold,
-                            color = TextPrimary
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                         if (scrollBehavior.state.collapsedFraction < 0.5f) {
                             Text(
                                 text = "Real-time network intelligence",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = TextSecondary
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -67,7 +67,7 @@ fun AnalyticsScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = TextPrimary
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 },
@@ -77,24 +77,24 @@ fun AnalyticsScreen(
                         onRangeClick = { viewModel.setDateRange(getNextRange(uiState.selectedRange)) }
                     )
                     IconButton(onClick = { viewModel.refreshData() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Refresh", tint = TextPrimary)
+                        Icon(Icons.Default.Refresh, contentDescription = "Refresh", tint = MaterialTheme.colorScheme.onBackground)
                     }
                 },
                 colors = TopAppBarDefaults.largeTopAppBarColors(
-                    containerColor = Background,
-                    scrolledContainerColor = CardSurface.copy(alpha = 0.95f),
-                    navigationIconContentColor = TextPrimary,
-                    titleContentColor = TextPrimary,
-                    actionIconContentColor = TextPrimary
+                    containerColor = MaterialTheme.colorScheme.background,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    actionIconContentColor = MaterialTheme.colorScheme.onBackground
                 ),
                 scrollBehavior = scrollBehavior
             )
         },
-        containerColor = Background
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         if (uiState.isLoading) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = PrimaryAccent)
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
         } else {
             LazyColumn(
@@ -115,7 +115,7 @@ fun AnalyticsScreen(
                             maxValue = 100f,
                             label = "Signal",
                             unit = "%",
-                            color = PrimaryAccent,
+                            color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.weight(1f)
                         )
                         CircularMetricIndicator(
@@ -123,7 +123,7 @@ fun AnalyticsScreen(
                             maxValue = 100f,
                             label = "Latency",
                             unit = "ms",
-                            color = GreenAccentIcon,
+                            color = MaterialTheme.colorScheme.tertiary,
                             modifier = Modifier.weight(1f)
                         )
                         CircularMetricIndicator(
@@ -148,10 +148,10 @@ fun AnalyticsScreen(
                         InfoRow("Link Speed", "${uiState.networkStatus.linkSpeed} Mbps")
                         
                         Spacer(modifier = Modifier.height(12.dp))
-                        Text("Traffic", color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        Text("Traffic", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.height(8.dp))
-                        LinearProgressRow("TX Speed", uiState.networkStatus.txSpeed.toFloat(), 1000f, BlueAccentIcon)
-                        LinearProgressRow("RX Speed", uiState.networkStatus.rxSpeed.toFloat(), 1000f, CyanAccentIcon)
+                        LinearProgressRow("TX Speed", uiState.networkStatus.txSpeed.toFloat(), 1000f, MaterialTheme.colorScheme.primary)
+                        LinearProgressRow("RX Speed", uiState.networkStatus.rxSpeed.toFloat(), 1000f, MaterialTheme.colorScheme.secondary)
                     }
                 }
 
@@ -167,7 +167,7 @@ fun AnalyticsScreen(
                     }
                 }
 
-                // 4. Traffic Analysis (Old Analytics card summary + Chart)
+                // 4. Traffic Analysis
                 item {
                     AnalyticsCard(title = "Traffic Analysis", icon = Icons.Default.BarChart) {
                         Row(
@@ -185,7 +185,7 @@ fun AnalyticsScreen(
                     }
                 }
 
-                // 5. App Usage Insights (NEW INTEGRATED CARD)
+                // 5. App Usage Insights
                 item {
                     AppUsageInsightsCard(
                         isLoading = uiState.isLoading,
@@ -235,12 +235,12 @@ fun AnalyticsScreen(
                                 modifier = Modifier
                                     .padding(vertical = 6.dp)
                                     .clip(RoundedCornerShape(8.dp))
-                                    .background(PrimaryAccent.copy(alpha = 0.05f))
+                                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.05f))
                                     .padding(12.dp)
                             ) {
-                                Icon(Icons.Default.Info, null, tint = PrimaryAccent, modifier = Modifier.size(18.dp))
+                                Icon(Icons.Default.Info, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
                                 Spacer(modifier = Modifier.width(12.dp))
-                                Text(rec, color = TextPrimary, fontSize = 13.sp)
+                                Text(rec, color = MaterialTheme.colorScheme.onBackground, fontSize = 13.sp)
                             }
                         }
                         
@@ -251,12 +251,12 @@ fun AnalyticsScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clip(RoundedCornerShape(12.dp))
-                                    .background(PrimaryAccent.copy(alpha = 0.1f))
+                                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
                                     .padding(12.dp)
                             ) {
                                 Text(
-                                    text = "💡 Data Tip: ${app.appName} consumed high data today.",
-                                    color = PrimaryAccent,
+                                    text = "\uD83D\uDCA1 Data Tip: ${app.appName} consumed high data today.",
+                                    color = MaterialTheme.colorScheme.primary,
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Medium
                                 )
@@ -288,8 +288,8 @@ fun AnalyticsScreen(
 @Composable
 fun SummaryItem(label: String, value: String, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
-        Text(text = label, color = TextSecondary, fontSize = 11.sp)
-        Text(text = value, color = TextPrimary, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Text(text = label, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
+        Text(text = value, color = MaterialTheme.colorScheme.onBackground, fontSize = 16.sp, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -300,8 +300,8 @@ fun LinearProgressRow(label: String, value: Float, max: Float, color: Color) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(label, color = TextSecondary, fontSize = 11.sp)
-            Text("${value.toInt()} Mbps", color = TextPrimary, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+            Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
+            Text("${value.toInt()} Mbps", color = MaterialTheme.colorScheme.onBackground, fontSize = 11.sp, fontWeight = FontWeight.Bold)
         }
         Spacer(modifier = Modifier.height(4.dp))
         LinearProgressIndicator(
@@ -322,8 +322,8 @@ fun SecondaryActionButton(text: String, icon: ImageVector, modifier: Modifier = 
         onClick = {},
         modifier = modifier.height(52.dp),
         shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(1.dp, CardBorder),
-        colors = ButtonDefaults.outlinedButtonColors(contentColor = TextPrimary)
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onBackground)
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(icon, null, modifier = Modifier.size(18.dp))
@@ -344,8 +344,8 @@ fun AppUsageInsightsCard(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(24.dp))
-            .background(CardSurface)
-            .border(0.5.dp, CardBorder, RoundedCornerShape(24.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .border(0.5.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(24.dp))
     ) {
         Row(
             modifier = Modifier
@@ -359,22 +359,22 @@ fun AppUsageInsightsCard(
                     modifier = Modifier
                         .size(32.dp)
                         .clip(RoundedCornerShape(8.dp))
-                        .background(PrimaryAccent.copy(alpha = 0.1f)),
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(Icons.Default.Apps, null, tint = PrimaryAccent, modifier = Modifier.size(18.dp))
+                    Icon(Icons.Default.Apps, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
                     text = "App Usage Insights",
-                    color = TextPrimary,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold
                 )
             }
             Text(
                 text = "Show More ›",
-                color = PrimaryAccent,
+                color = MaterialTheme.colorScheme.primary,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.clickable { onShowMore() }
@@ -388,17 +388,17 @@ fun AppUsageInsightsCard(
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Icon(Icons.Outlined.Lock, null, tint = TextSecondary, modifier = Modifier.size(24.dp))
+                Icon(Icons.Outlined.Lock, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(24.dp))
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
                     "Enable Usage Access to see app insights",
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 13.sp,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 TextButton(onClick = onGrantAccess) {
-                    Text("Grant Access", color = PrimaryAccent, fontWeight = FontWeight.Bold)
+                    Text("Grant Access", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                 }
             }
         } else if (isLoading) {
@@ -434,7 +434,7 @@ fun AppInsightRow(
                 modifier = Modifier
                     .size(32.dp)
                     .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.05f)),
+                    .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.05f)),
                 contentAlignment = Alignment.Center
             ) {
                 if (app.appIcon != null) {
@@ -446,7 +446,7 @@ fun AppInsightRow(
                 } else {
                     Text(
                         text = app.appName.take(1).uppercase(),
-                        color = PrimaryAccent,
+                        color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp
                     )
@@ -459,7 +459,7 @@ fun AppInsightRow(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = app.appName,
-                    color = TextPrimary,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,
@@ -471,26 +471,26 @@ fun AppInsightRow(
                     Row(
                         modifier = Modifier
                             .clip(RoundedCornerShape(99.dp))
-                            .background(CardBorder)
-                            .padding(horizontal = 6.dp, vertical = 3.dp),
+                            .background(MaterialTheme.colorScheme.outline)
+                            .padding(horizontal = 4.dp, vertical = 3.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Outlined.Schedule, null, tint = GreenAccentIcon, modifier = Modifier.size(10.dp))
+                        Icon(Icons.Outlined.Schedule, null, tint = MaterialTheme.colorScheme.tertiary, modifier = Modifier.size(10.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(app.screenTimeFormatted, color = GreenAccentIcon, fontSize = 10.sp)
+                        Text(app.screenTimeFormatted, color = MaterialTheme.colorScheme.tertiary, fontSize = 10.sp)
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     // Data Chip
                     Row(
                         modifier = Modifier
                             .clip(RoundedCornerShape(99.dp))
-                            .background(CardBorder)
-                            .padding(horizontal = 6.dp, vertical = 3.dp),
+                            .background(MaterialTheme.colorScheme.outline)
+                            .padding(horizontal = 4.dp, vertical = 3.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Outlined.SwapVert, null, tint = PrimaryAccent, modifier = Modifier.size(10.dp))
+                        Icon(Icons.Outlined.SwapVert, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(10.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(app.totalBytesFormatted, color = PrimaryAccent, fontSize = 10.sp)
+                        Text(app.totalBytesFormatted, color = MaterialTheme.colorScheme.primary, fontSize = 10.sp)
                     }
                 }
             }
@@ -503,14 +503,14 @@ fun AppInsightRow(
                     .width(4.dp)
                     .height(36.dp)
                     .clip(RoundedCornerShape(2.dp))
-                    .background(CardBorder),
+                    .background(MaterialTheme.colorScheme.outline),
                 contentAlignment = Alignment.BottomCenter
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .fillMaxHeight(usageRatio.coerceIn(0.1f, 1f))
-                        .background(PrimaryAccent)
+                        .background(MaterialTheme.colorScheme.primary)
                 )
             }
         }
@@ -519,7 +519,7 @@ fun AppInsightRow(
             HorizontalDivider(
                 modifier = Modifier.padding(start = 64.dp),
                 thickness = 0.5.dp,
-                color = CardBorder
+                color = MaterialTheme.colorScheme.outline
             )
         }
     }
@@ -548,7 +548,7 @@ fun ShimmerAppRow() {
             modifier = Modifier
                 .size(32.dp)
                 .clip(CircleShape)
-                .background(Color.White.copy(alpha = alpha * 0.1f))
+                .background(MaterialTheme.colorScheme.onBackground.copy(alpha = alpha * 0.1f))
         )
         Spacer(modifier = Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {
@@ -556,7 +556,7 @@ fun ShimmerAppRow() {
                 modifier = Modifier
                     .width(120.dp)
                     .height(14.dp)
-                    .background(Color.White.copy(alpha = alpha * 0.1f), RoundedCornerShape(4.dp))
+                    .background(MaterialTheme.colorScheme.onBackground.copy(alpha = alpha * 0.1f), RoundedCornerShape(4.dp))
             )
             Spacer(modifier = Modifier.height(8.dp))
             Row {
@@ -564,14 +564,14 @@ fun ShimmerAppRow() {
                     modifier = Modifier
                         .width(60.dp)
                         .height(16.dp)
-                        .background(Color.White.copy(alpha = alpha * 0.1f), RoundedCornerShape(99.dp))
+                        .background(MaterialTheme.colorScheme.onBackground.copy(alpha = alpha * 0.1f), RoundedCornerShape(99.dp))
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Box(
                     modifier = Modifier
                         .width(60.dp)
                         .height(16.dp)
-                        .background(Color.White.copy(alpha = alpha * 0.1f), RoundedCornerShape(99.dp))
+                        .background(MaterialTheme.colorScheme.onBackground.copy(alpha = alpha * 0.1f), RoundedCornerShape(99.dp))
                 )
             }
         }
@@ -583,8 +583,8 @@ fun RangeChip(currentRange: AnalyticsRange, onRangeClick: () -> Unit) {
     Surface(
         onClick = onRangeClick,
         shape = RoundedCornerShape(20.dp),
-        color = CardSurface,
-        border = BorderStroke(0.5.dp, CardBorder)
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline)
     ) {
         Text(
             text = when(currentRange) {
@@ -592,7 +592,7 @@ fun RangeChip(currentRange: AnalyticsRange, onRangeClick: () -> Unit) {
                 AnalyticsRange.WEEK -> "This Week"
                 AnalyticsRange.MONTH -> "This Month"
             },
-            color = TextPrimary,
+            color = MaterialTheme.colorScheme.onBackground,
             fontSize = 11.sp,
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
         )

@@ -66,31 +66,30 @@ fun HistoryScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("History", color = Color.White) },
+                title = { Text("History", color = MaterialTheme.colorScheme.onBackground) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 },
                 actions = {
                     IconButton(onClick = { viewModel.clearAll() }) {
-                        Icon(Icons.Default.DeleteSweep, contentDescription = "Clear All", tint = Color.White)
+                        Icon(Icons.Default.DeleteSweep, contentDescription = "Clear All", tint = MaterialTheme.colorScheme.onBackground)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkColor)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
-        containerColor = DarkColor
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .background(DarkGradient)
         ) {
             Row(
                 modifier = Modifier
@@ -104,9 +103,9 @@ fun HistoryScreen(
                         onClick = { selectedFilter = filter },
                         label = { Text(filter) },
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = Teal200,
-                            selectedLabelColor = Color.Black,
-                            labelColor = Color.White
+                            selectedContainerColor = MaterialTheme.colorScheme.primary,
+                            selectedLabelColor = Color.White,
+                            labelColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     )
                 }
@@ -114,7 +113,7 @@ fun HistoryScreen(
 
             if (filteredResults.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No results found", color = Color.White.copy(alpha = 0.6f))
+                    Text("No results found", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             } else {
                 LazyColumn(
@@ -142,8 +141,8 @@ fun HistoryScreen(
             ModalBottomSheet(
                 onDismissRequest = { showSheet = false },
                 sheetState = sheetState,
-                containerColor = CardSurface,
-                dragHandle = { BottomSheetDefaults.DragHandle(color = CardBorder) }
+                containerColor = MaterialTheme.colorScheme.surface,
+                dragHandle = { BottomSheetDefaults.DragHandle(color = MaterialTheme.colorScheme.outline) }
             ) {
                 ShareSheetContent(
                     result = selectedResult!!,
@@ -168,7 +167,7 @@ fun ShareSheetContent(result: SpeedResult, onDismiss: () -> Unit) {
         Text(
             "Share Result",
             style = MaterialTheme.typography.headlineSmall,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onBackground,
             fontWeight = FontWeight.Bold
         )
         
@@ -176,7 +175,7 @@ fun ShareSheetContent(result: SpeedResult, onDismiss: () -> Unit) {
         
         Text(
             "Select how you want to share your test",
-            color = TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 14.sp
         )
         
@@ -215,23 +214,23 @@ fun ShareSheetContent(result: SpeedResult, onDismiss: () -> Unit) {
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
-            color = Color.White.copy(alpha = 0.05f),
-            border = BorderStroke(1.dp, CardBorder)
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.05f),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("Download", color = TextSecondary, fontSize = 12.sp)
-                    Text("Upload", color = TextSecondary, fontSize = 12.sp)
+                    Text("Download", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+                    Text("Upload", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("%.1f Mbps".format(result.downloadMbps), color = Color(0xFF3B8BFF), fontWeight = FontWeight.Bold)
-                    Text("%.1f Mbps".format(result.uploadMbps), color = Color(0xFF00D4FF), fontWeight = FontWeight.Bold)
+                    Text("%.1f Mbps".format(result.downloadMbps), color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                    Text("%.1f Mbps".format(result.uploadMbps), color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -239,7 +238,7 @@ fun ShareSheetContent(result: SpeedResult, onDismiss: () -> Unit) {
         Spacer(Modifier.height(16.dp))
         
         TextButton(onClick = onDismiss) {
-            Text("Cancel", color = TextSecondary)
+            Text("Cancel", color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
@@ -254,15 +253,15 @@ fun ShareOptionButton(
 ) {
     Surface(
         modifier = modifier
-            .height(130.dp) // Increased from 120dp to prevent cutting
+            .height(130.dp)
             .clip(RoundedCornerShape(20.dp))
             .clickable { onClick() },
-        color = CardSurface,
-        border = BorderStroke(1.dp, CardBorder),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
         shape = RoundedCornerShape(20.dp)
     ) {
         Column(
-            modifier = Modifier.padding(12.dp), // Slightly reduced padding to give more room
+            modifier = Modifier.padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -270,14 +269,14 @@ fun ShareOptionButton(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(PrimaryAccent.copy(alpha = 0.1f)),
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(icon, contentDescription = null, tint = PrimaryAccent, modifier = Modifier.size(20.dp))
+                Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
             }
             Spacer(Modifier.height(10.dp))
-            Text(title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-            Text(subtitle, color = TextSecondary, fontSize = 11.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+            Text(title, color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+            Text(subtitle, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
         }
     }
 }
@@ -286,22 +285,18 @@ fun shareResultImage(context: Context, result: SpeedResult) {
     val bitmap = Bitmap.createBitmap(1080, 1350, Bitmap.Config.ARGB_8888)
     val canvas = Canvas(bitmap)
     
-    // 1. Background (Dark Gradient Style)
     val paint = Paint().apply { isAntiAlias = true }
     paint.color = android.graphics.Color.parseColor("#0F1729")
     canvas.drawRect(0f, 0f, 1080f, 1350f, paint)
     
-    // 2. Decorative elements (Arc Glow)
     paint.color = android.graphics.Color.parseColor("#1A2744")
     canvas.drawCircle(540f, 400f, 600f, paint)
     
-    // 3. Logo/App Name
     paint.color = android.graphics.Color.WHITE
     paint.textSize = 48f
     paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
     canvas.drawText("NetPulse", 80f, 120f, paint)
     
-    // 4. Main Speed (Download)
     paint.textAlign = Paint.Align.CENTER
     paint.color = android.graphics.Color.parseColor("#3B8BFF")
     paint.textSize = 180f
@@ -311,7 +306,6 @@ fun shareResultImage(context: Context, result: SpeedResult) {
     paint.color = android.graphics.Color.parseColor("#94A3B8")
     canvas.drawText("Mbps Download", 540f, 560f, paint)
     
-    // 5. Secondary Speed (Upload)
     paint.color = android.graphics.Color.parseColor("#00D4FF")
     paint.textSize = 120f
     canvas.drawText("%.1f".format(result.uploadMbps), 540f, 750f, paint)
@@ -320,7 +314,6 @@ fun shareResultImage(context: Context, result: SpeedResult) {
     paint.color = android.graphics.Color.parseColor("#94A3B8")
     canvas.drawText("Mbps Upload", 540f, 800f, paint)
     
-    // 6. Stats Grid
     val gridTop = 950f
     paint.color = android.graphics.Color.parseColor("#1E293B")
     val rect = RectF(100f, gridTop, 980f, gridTop + 240f)
@@ -341,13 +334,11 @@ fun shareResultImage(context: Context, result: SpeedResult) {
     canvas.drawText(result.networkType, 180f, gridTop + 230f, paint)
     canvas.drawText(result.isp, 580f, gridTop + 230f, paint)
     
-    // 7. Footer
     paint.textAlign = Paint.Align.CENTER
     paint.textSize = 30f
     paint.color = android.graphics.Color.parseColor("#475569")
     canvas.drawText("Tested with NetPulse Speed Test App", 540f, 1300f, paint)
 
-    // Save and Share
     try {
         val cachePath = File(context.cacheDir, "images")
         cachePath.mkdirs()
@@ -395,11 +386,11 @@ fun shareResult(context: Context, result: SpeedResult) {
 @Composable
 fun DetailItem(label: String, value: String, unit: String, color: Color) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(label, color = TextSecondary, style = MaterialTheme.typography.labelMedium)
+        Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
         Row(verticalAlignment = Alignment.Bottom) {
             Text(value, color = color, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
             Spacer(Modifier.width(4.dp))
-            Text(unit, color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+            Text(unit, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelSmall)
         }
     }
 }

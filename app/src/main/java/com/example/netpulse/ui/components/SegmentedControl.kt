@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -17,10 +18,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.netpulse.ui.theme.Background
-import com.example.netpulse.ui.theme.CardBorder
-import com.example.netpulse.ui.theme.PrimaryAccent
-import com.example.netpulse.ui.theme.TextSecondary
 
 @Composable
 fun SegmentedControl(
@@ -31,8 +28,8 @@ fun SegmentedControl(
     Row(
         modifier = Modifier
             .height(34.dp)
-            .border(1.dp, CardBorder, RoundedCornerShape(8.dp))
-            .background(Background, RoundedCornerShape(8.dp))
+            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.background, RoundedCornerShape(8.dp))
             .padding(1.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -40,13 +37,13 @@ fun SegmentedControl(
             val isSelected = selectedIndex == index
             
             val backgroundColor by animateColorAsState(
-                targetValue = if (isSelected) PrimaryAccent else Color.Transparent,
+                targetValue = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
                 animationSpec = tween(300),
                 label = "bgColor"
             )
             
             val textColor by animateColorAsState(
-                targetValue = if (isSelected) Color.White else TextSecondary,
+                targetValue = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
                 animationSpec = tween(300),
                 label = "textColor"
             )

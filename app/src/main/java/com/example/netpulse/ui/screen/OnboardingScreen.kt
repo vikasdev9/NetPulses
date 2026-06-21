@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.netpulse.ui.screen.onboarding.*
-import com.example.netpulse.ui.theme.DarkGradient
 import com.example.netpulse.ui.theme.NetPulseTheme
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -49,12 +48,11 @@ fun OnboardingScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = Color.Transparent
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
-                .background(DarkGradient)
                 .padding(padding)
         ) {
             val isTablet = maxWidth > 600.dp
@@ -81,7 +79,7 @@ fun OnboardingScreen(
                         ) {
                             Text(
                                 "Skip",
-                                color = Color.White.copy(alpha = 0.5f),
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
                                 style = MaterialTheme.typography.labelLarge,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -131,7 +129,7 @@ fun OnboardingScreen(
                             PremiumGradientButton(
                                 text = "Start Testing",
                                 onClick = { viewModel.onNext(items.size) },
-                                colors = listOf(Color(0xFF00D4FF), Color(0xFF3B8BFF))
+                                colors = listOf(MaterialTheme.colorScheme.secondary, MaterialTheme.colorScheme.primary)
                             )
                         }
                     }

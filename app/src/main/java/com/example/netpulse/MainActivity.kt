@@ -37,7 +37,7 @@ class MainActivity : BaseActivity() {
         val settingsViewModel: SettingsViewModel by viewModels {
             object : androidx.lifecycle.ViewModelProvider.Factory {
                 override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
-                    return SettingsViewModel(userPreferences) as T
+                    return SettingsViewModel(application, userPreferences) as T
                 }
             }
         }
@@ -73,9 +73,18 @@ class MainActivity : BaseActivity() {
                     if (onboardingDone == null) {
                         SplashScreen { }
                     } else {
+                        val startTest = intent.getBooleanExtra("START_TEST", false)
+                        val navigateTo = intent.getStringExtra("NAVIGATE_TO")
+                        
+                        LaunchedEffect(intent) {
+                            if (startTest) {
+                                speedTestViewModel.startTest()
+                            }
+                        }
+
                         NavHost(
                             navController = navController,
-                            startDestination = NavRoutes.Splash
+                            startDestination = if (navigateTo == "analytics") NavRoutes.Analytics else NavRoutes.Splash
                         ) {
                             composable(NavRoutes.Splash) {
                                 SplashScreen {

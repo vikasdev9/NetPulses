@@ -1,5 +1,12 @@
 package com.example.netpulse.ui.screen
 
+import android.Manifest
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -17,17 +24,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.ui.res.stringResource
 import com.example.netpulse.R
 import com.example.netpulse.ui.components.ProUpgradeCard
 import com.example.netpulse.ui.components.SegmentedControl
 import com.example.netpulse.ui.components.SettingsRow
-import com.example.netpulse.ui.theme.*
 import com.example.netpulse.ui.viewmodel.SettingsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,9 +49,24 @@ fun SettingsScreen(
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
     val scrollState = rememberScrollState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    var showPermissionRationale by remember { mutableStateOf(false) }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            viewModel.setNotificationsEnabled(true)
+        } else {
+            viewModel.setNotificationsEnabled(false)
+        }
+    }
 
     Scaffold(
-        containerColor = Background,
+        containerColor = MaterialTheme.colorScheme.background,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             SettingsBottomNavigationBar(onNavigateToHome, onNavigateToHistory)
         }
@@ -60,7 +82,7 @@ fun SettingsScreen(
             
             Text(
                 text = stringResource(R.string.screen_settings),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -70,9 +92,9 @@ fun SettingsScreen(
             // GENERAL SECTION
             SectionLabel(stringResource(R.string.settings_section_general))
             Card(
-                colors = CardDefaults.cardColors(containerColor = CardSurface),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 shape = RoundedCornerShape(16.dp),
-                border = androidx.compose.foundation.BorderStroke(0.5.dp, CardBorder)
+                border = androidx.compose.foundation.BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline)
             ) {
                 Column {
                     SettingsRow(
@@ -93,14 +115,14 @@ fun SettingsScreen(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
                                     text = state.currentLanguage,
-                                    color = TextSecondary,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     fontSize = 13.sp
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                                     contentDescription = null,
-                                    tint = TextSecondary,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.size(14.dp)
                                 )
                             }
@@ -113,32 +135,21 @@ fun SettingsScreen(
                         trailing = {
                             Switch(
                                 checked = state.notificationsEnabled,
-                                onCheckedChange = { viewModel.toggleNotifications(it) },
+                                onCheckedChange = { enabled ->
+                                    if (enabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                        val status = ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
+                                        if (status != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                                            showPermissionRationale = true
+                                        } else {
+                                            viewModel.toggleNotifications(true)
+                                        }
+                                    } else {
+                                        viewModel.toggleNotifications(enabled)
+                                    }
+                                },
                                 colors = customSwitchColors()
                             )
                         }
-                    )
-                    SettingsRow(
-                        icon = Icons.Outlined.Storage,
-                        title = stringResource(R.string.settings_default_server),
-                        trailing = {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(
-                                    text = state.defaultServer,
-                                    color = TextSecondary,
-                                    fontSize = 13.sp
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                                    contentDescription = null,
-                                    tint = TextSecondary,
-                                    modifier = Modifier.size(14.dp)
-                                )
-                            }
-                        },
-                        showDivider = false,
-                        onClick = { /* Handle Server Selection */ }
                     )
                 }
             }
@@ -148,9 +159,9 @@ fun SettingsScreen(
             // TEST SETTINGS SECTION
             SectionLabel(stringResource(R.string.settings_section_test))
             Card(
-                colors = CardDefaults.cardColors(containerColor = CardSurface),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 shape = RoundedCornerShape(16.dp),
-                border = androidx.compose.foundation.BorderStroke(0.5.dp, CardBorder)
+                border = androidx.compose.foundation.BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline)
             ) {
                 Column {
                     SettingsRow(
@@ -210,23 +221,23 @@ fun SettingsScreen(
                 }
             }
             
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            // PRO CARD
-            ProUpgradeCard(
-                isPro = state.isPro,
-                onUpgradeClick = { viewModel.onUpgradeTapped() },
-                onRestoreClick = { viewModel.onRestorePurchase() }
-            )
+//            Spacer(modifier = Modifier.height(16.dp))
+//
+//            // PRO CARD
+//            ProUpgradeCard(
+//                isPro = state.isPro,
+//                onUpgradeClick = { viewModel.onUpgradeTapped() },
+//                onRestoreClick = { viewModel.onRestorePurchase() }
+//            )
             
             Spacer(modifier = Modifier.height(24.dp))
             
             // ABOUT SECTION
             SectionLabel(stringResource(R.string.settings_section_about))
             Card(
-                colors = CardDefaults.cardColors(containerColor = CardSurface),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 shape = RoundedCornerShape(16.dp),
-                border = androidx.compose.foundation.BorderStroke(0.5.dp, CardBorder)
+                border = androidx.compose.foundation.BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline)
             ) {
                 Column {
                     SettingsRow(
@@ -255,7 +266,7 @@ fun SettingsScreen(
             
             Text(
                 text = stringResource(R.string.settings_version, state.appVersion),
-                color = TextSecondary,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontSize = 12.sp,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
@@ -264,13 +275,34 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(32.dp))
         }
     }
+
+    if (showPermissionRationale) {
+        AlertDialog(
+            onDismissRequest = { showPermissionRationale = false },
+            title = { Text("Allow Notifications") },
+            text = { Text("NetPulse will notify you when speed tests complete and alert you about speed drops.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showPermissionRationale = false
+                    permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }) {
+                    Text("Allow")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showPermissionRationale = false }) {
+                    Text("Not Now")
+                }
+            }
+        )
+    }
 }
 
 @Composable
 fun SectionLabel(text: String) {
     Text(
         text = text,
-        color = TextSecondary,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
         fontSize = 11.sp,
         fontWeight = FontWeight.Medium,
         letterSpacing = 1.5.sp,
@@ -283,7 +315,7 @@ fun ChevronIcon() {
     Icon(
         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
         contentDescription = null,
-        tint = TextSecondary,
+        tint = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.size(14.dp)
     )
 }
@@ -291,26 +323,26 @@ fun ChevronIcon() {
 @Composable
 fun customSwitchColors() = SwitchDefaults.colors(
     checkedThumbColor = Color.White,
-    checkedTrackColor = PrimaryAccent,
-    uncheckedThumbColor = Color.White,
-    uncheckedTrackColor = Color(0xFF2E3A50),
-    uncheckedBorderColor = Color.Transparent
+    checkedTrackColor = MaterialTheme.colorScheme.primary,
+    uncheckedThumbColor = MaterialTheme.colorScheme.outline,
+    uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant,
+    uncheckedBorderColor = MaterialTheme.colorScheme.outline
 )
 
 @Composable
 fun SettingsBottomNavigationBar(onNavigateToHome: () -> Unit, onNavigateToHistory: () -> Unit) {
     NavigationBar(
-        containerColor = Background,
+        containerColor = MaterialTheme.colorScheme.background,
         tonalElevation = 0.dp,
-        modifier = Modifier.border(0.5.dp, CardBorder, RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp))
+        modifier = Modifier.border(0.5.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp))
     ) {
         NavigationBarItem(
             selected = false,
             onClick = onNavigateToHome,
             icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = PrimaryAccent,
-                unselectedIconColor = TextSecondary,
+                selectedIconColor = MaterialTheme.colorScheme.primary,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 indicatorColor = Color.Transparent
             )
         )
@@ -319,8 +351,8 @@ fun SettingsBottomNavigationBar(onNavigateToHome: () -> Unit, onNavigateToHistor
             onClick = onNavigateToHistory,
             icon = { Icon(Icons.Default.History, contentDescription = "History") },
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = PrimaryAccent,
-                unselectedIconColor = TextSecondary,
+                selectedIconColor = MaterialTheme.colorScheme.primary,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 indicatorColor = Color.Transparent
             )
         )
@@ -330,9 +362,9 @@ fun SettingsBottomNavigationBar(onNavigateToHome: () -> Unit, onNavigateToHistor
             icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
             label = { Text(stringResource(R.string.screen_settings)) },
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = PrimaryAccent,
-                selectedTextColor = PrimaryAccent,
-                unselectedIconColor = TextSecondary,
+                selectedIconColor = MaterialTheme.colorScheme.primary,
+                selectedTextColor = MaterialTheme.colorScheme.primary,
+                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                 indicatorColor = Color.Transparent
             )
         )

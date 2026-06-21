@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.androidx.glance.material3)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.accompanist.drawablepainter)
+    implementation(libs.androidx.work.runtime.ktx)
 
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))

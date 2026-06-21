@@ -17,15 +17,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import com.example.netpulse.R
-import com.example.netpulse.ui.theme.DarkColor
-import com.example.netpulse.ui.theme.Teal200
 
 data class AppLanguage(
-    val code: String,        // "hi", "de", "ar" etc
-    val nameNative: String,  // "हिंदी", "Deutsch" etc
-    val nameEnglish: String, // "Hindi", "German" etc
-    val flag: String,        // emoji flag "🇮🇳"
-    val cpmTier: String      // "High CPM", "Medium CPM"
+    val code: String,
+    val nameNative: String,
+    val nameEnglish: String,
+    val flag: String,
+    val cpmTier: String
 )
 
 val supportedLanguages = listOf(
@@ -63,16 +61,16 @@ fun LanguageScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.settings_language), color = Color.White) },
+                title = { Text(stringResource(R.string.settings_language), color = MaterialTheme.colorScheme.onBackground) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = MaterialTheme.colorScheme.onBackground)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkColor)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
-        containerColor = DarkColor
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         LazyColumn(
             modifier = Modifier
@@ -85,7 +83,7 @@ fun LanguageScreen(
                     isSelected = lang.code == currentLanguageCode,
                     onClick = { onLanguageSelected(lang) }
                 )
-                HorizontalDivider(color = Color.White.copy(alpha = 0.1f))
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f))
             }
         }
     }
@@ -111,27 +109,35 @@ fun LanguageItem(
             Column {
                 Text(
                     text = language.nameNative,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp
                 )
                 Text(
                     text = language.nameEnglish,
-                    color = Color.White.copy(alpha = 0.6f),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 14.sp
                 )
             }
         }
         
         Row(verticalAlignment = Alignment.CenterVertically) {
+            val badgeContainerColor = when (language.cpmTier) {
+                "High CPM" -> MaterialTheme.colorScheme.tertiary
+                "Medium CPM" -> Color(0xFFFF9800)
+                "High Volume" -> MaterialTheme.colorScheme.primary
+                else -> MaterialTheme.colorScheme.surfaceVariant
+            }
+            val badgeContentColor = when (language.cpmTier) {
+                "High CPM" -> MaterialTheme.colorScheme.onTertiary
+                "Medium CPM" -> Color.White
+                "High Volume" -> MaterialTheme.colorScheme.onPrimary
+                else -> MaterialTheme.colorScheme.onSurfaceVariant
+            }
+
             Badge(
-                containerColor = when (language.cpmTier) {
-                    "High CPM" -> Color(0xFF4CAF50)
-                    "Medium CPM" -> Color(0xFFFF9800)
-                    "High Volume" -> Color(0xFF2196F3)
-                    else -> Color(0xFF9E9E9E)
-                },
-                contentColor = Color.White,
+                containerColor = badgeContainerColor,
+                contentColor = badgeContentColor,
                 modifier = Modifier.padding(end = 8.dp)
             ) {
                 Text(language.cpmTier, modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp), fontSize = 10.sp)
@@ -141,7 +147,7 @@ fun LanguageItem(
                 Icon(
                     imageVector = Icons.Default.Check,
                     contentDescription = "Selected",
-                    tint = Teal200
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
         }

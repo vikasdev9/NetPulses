@@ -41,8 +41,8 @@ fun AnalyticsCard(
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        CardSurface.copy(alpha = 0.7f),
-                        CardSurface.copy(alpha = 0.4f)
+                        MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
+                        MaterialTheme.colorScheme.surface.copy(alpha = 0.4f)
                     )
                 )
             )
@@ -51,8 +51,8 @@ fun AnalyticsCard(
                     1.dp,
                     Brush.verticalGradient(
                         colors = listOf(
-                            Color.White.copy(alpha = 0.15f),
-                            Color.White.copy(alpha = 0.05f)
+                            MaterialTheme.colorScheme.onBackground.copy(alpha = 0.15f),
+                            MaterialTheme.colorScheme.onBackground.copy(alpha = 0.05f)
                         )
                     )
                 ),
@@ -68,20 +68,20 @@ fun AnalyticsCard(
                 modifier = Modifier
                     .size(36.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(PrimaryAccent.copy(alpha = 0.15f)),
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = PrimaryAccent,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(20.dp)
                 )
             }
             Spacer(modifier = Modifier.width(12.dp))
             Text(
                 text = title,
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 0.5.sp
@@ -95,7 +95,7 @@ fun AnalyticsCard(
 fun InfoRow(
     label: String,
     value: String,
-    valueColor: Color = TextPrimary,
+    valueColor: Color = MaterialTheme.colorScheme.onBackground,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -107,7 +107,7 @@ fun InfoRow(
     ) {
         Text(
             text = label,
-            color = TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 13.sp
         )
         Text(
@@ -124,6 +124,9 @@ fun UsageChart(
     data: List<Float>,
     modifier: Modifier = Modifier
 ) {
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val backgroundColor = MaterialTheme.colorScheme.background
+    
     Canvas(modifier = modifier) {
         if (data.size < 2) return@Canvas
         
@@ -157,7 +160,7 @@ fun UsageChart(
         drawPath(
             path = fillPath,
             brush = Brush.verticalGradient(
-                colors = listOf(PrimaryAccent.copy(alpha = 0.4f), Color.Transparent),
+                colors = listOf(primaryColor.copy(alpha = 0.4f), Color.Transparent),
                 startY = 0f,
                 endY = height
             )
@@ -165,7 +168,7 @@ fun UsageChart(
 
         drawPath(
             path = path,
-            color = PrimaryAccent,
+            color = primaryColor,
             style = Stroke(
                 width = 3.dp.toPx(),
                 cap = androidx.compose.ui.graphics.StrokeCap.Round,
@@ -174,8 +177,8 @@ fun UsageChart(
         )
         
         points.forEach { point ->
-            drawCircle(color = PrimaryAccent, radius = 4.dp.toPx(), center = point)
-            drawCircle(color = Background, radius = 2.dp.toPx(), center = point)
+            drawCircle(color = primaryColor, radius = 4.dp.toPx(), center = point)
+            drawCircle(color = backgroundColor, radius = 2.dp.toPx(), center = point)
         }
     }
 }
@@ -208,8 +211,8 @@ fun CircularMetricIndicator(
             )
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = value.toInt().toString(), color = TextPrimary, fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
-            Text(text = unit, color = TextSecondary, fontSize = 10.sp)
+            Text(text = value.toInt().toString(), color = MaterialTheme.colorScheme.onBackground, fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
+            Text(text = unit, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 10.sp)
         }
     }
 }
@@ -217,8 +220,8 @@ fun CircularMetricIndicator(
 @Composable
 fun QualityIndicator(quality: String) {
     val color = when (quality) {
-        "Excellent" -> GreenAccentIcon
-        "Good" -> CyanAccentIcon
+        "Excellent" -> MaterialTheme.colorScheme.tertiary
+        "Good" -> MaterialTheme.colorScheme.secondary
         "Fair" -> AmberAccentIcon
         else -> Color.Red
     }
@@ -226,7 +229,7 @@ fun QualityIndicator(quality: String) {
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val pulseAlpha by infiniteTransition.animateFloat(
         initialValue = 0.3f,
-        targetValue = 0.9f,
+        targetValue = 0.8f,
         animationSpec = infiniteRepeatable(
             animation = tween(1200, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse
@@ -260,28 +263,31 @@ fun QualityIndicator(quality: String) {
 @Composable
 fun UsageStat(label: String, value: String) {
     Column {
-        Text(label, color = TextSecondary, fontSize = 12.sp)
-        Text(value, color = TextPrimary, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+        Text(value, color = MaterialTheme.colorScheme.onBackground, fontSize = 16.sp, fontWeight = FontWeight.Bold)
     }
 }
 
 @Composable
 fun SecurityToggle(label: String, active: Boolean) {
+    val activeColor = MaterialTheme.colorScheme.tertiary
+    val inactiveColor = MaterialTheme.colorScheme.onSurfaceVariant
+    
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(label, color = TextSecondary, fontSize = 13.sp)
+        Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 13.sp)
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(4.dp))
-                .background(if (active) GreenAccentBg else Color.Gray.copy(alpha = 0.2f))
+                .background(if (active) activeColor.copy(alpha = 0.1f) else Color.Gray.copy(alpha = 0.2f))
                 .padding(horizontal = 8.dp, vertical = 2.dp)
         ) {
             Text(
                 if (active) "ACTIVE" else "INACTIVE",
-                color = if (active) GreenAccentIcon else TextSecondary,
+                color = if (active) activeColor else inactiveColor,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -291,22 +297,28 @@ fun SecurityToggle(label: String, active: Boolean) {
 
 @Composable
 fun TimelineItem(event: TimelineEvent) {
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val outlineColor = MaterialTheme.colorScheme.outline
+    
     Row(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Box(modifier = Modifier.size(12.dp).border(2.dp, PrimaryAccent, CircleShape).background(Background))
-            Box(modifier = Modifier.width(2.dp).height(40.dp).background(CardBorder))
+            Box(modifier = Modifier.size(12.dp).border(2.dp, primaryColor, CircleShape).background(MaterialTheme.colorScheme.background))
+            Box(modifier = Modifier.width(2.dp).height(40.dp).background(outlineColor))
         }
         Spacer(modifier = Modifier.width(16.dp))
         Column {
-            Text(event.title, color = TextPrimary, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-            Text(event.time, color = TextSecondary, fontSize = 11.sp)
-            Text(event.description, color = TextSecondary, fontSize = 12.sp)
+            Text(event.title, color = MaterialTheme.colorScheme.onBackground, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            Text(event.time, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
+            Text(event.description, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
         }
     }
 }
 
 @Composable
 fun GradientButton(text: String, icon: ImageVector, modifier: Modifier = Modifier) {
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val secondaryColor = MaterialTheme.colorScheme.secondary
+    
     Button(
         onClick = {},
         modifier = modifier.height(56.dp),
@@ -315,7 +327,7 @@ fun GradientButton(text: String, icon: ImageVector, modifier: Modifier = Modifie
         contentPadding = PaddingValues(0.dp)
     ) {
         Box(
-            modifier = Modifier.fillMaxSize().background(Brush.horizontalGradient(listOf(PrimaryAccent, GaugeCyan))),
+            modifier = Modifier.fillMaxSize().background(Brush.horizontalGradient(listOf(primaryColor, secondaryColor))),
             contentAlignment = Alignment.Center
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -333,10 +345,13 @@ fun getNextRange(current: AnalyticsRange): AnalyticsRange = when(current) {
     AnalyticsRange.MONTH -> AnalyticsRange.TODAY
 }
 
-fun getBarColor(index: Int): Color = when(index) {
-    0 -> Color(0xFF3B8BFF)
-    1 -> Color(0xFF00D4FF)
-    2 -> Color(0xFF00E676)
-    3 -> Color(0xFFFFB300)
-    else -> Color.Gray.copy(alpha = 0.4f)
+@Composable
+fun getBarColor(index: Int): Color {
+    return when(index) {
+        0 -> MaterialTheme.colorScheme.primary
+        1 -> MaterialTheme.colorScheme.secondary
+        2 -> MaterialTheme.colorScheme.tertiary
+        3 -> AmberAccentIcon
+        else -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+    }
 }

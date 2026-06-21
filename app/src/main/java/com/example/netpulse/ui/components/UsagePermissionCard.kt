@@ -16,9 +16,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.netpulse.ui.theme.AmberAccentIcon
-import com.example.netpulse.ui.theme.CardSurface
-import com.example.netpulse.ui.theme.TextPrimary
-import com.example.netpulse.ui.theme.TextSecondary
 
 @Composable
 fun UsagePermissionCard(
@@ -29,7 +26,7 @@ fun UsagePermissionCard(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
-            .background(CardSurface)
+            .background(MaterialTheme.colorScheme.surface)
             .border(0.5.dp, AmberAccentIcon.copy(alpha = 0.5f), RoundedCornerShape(14.dp))
             .padding(16.dp)
     ) {
@@ -43,7 +40,7 @@ fun UsagePermissionCard(
             Spacer(modifier = Modifier.width(12.dp))
             Text(
                 text = "Enable Usage Access",
-                color = TextPrimary,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -53,7 +50,7 @@ fun UsagePermissionCard(
         
         Text(
             text = "Track your screen time and per-app data usage by granting NetPulse access to your usage stats.",
-            color = TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 13.sp,
             lineHeight = 18.sp
         )

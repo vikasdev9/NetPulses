@@ -1,6 +1,7 @@
 package com.example.netpulse.ui.viewmodel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.netpulse.data.datastore.UserPreferences
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -9,8 +10,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
+    application: Application,
     private val userPreferences: UserPreferences
-) : ViewModel() {
+) : AndroidViewModel(application) {
 
     data class SettingsState(
         val parallelConnections: Int = 3,
@@ -86,6 +88,12 @@ class SettingsViewModel(
     fun setNotificationsEnabled(enabled: Boolean) {
         viewModelScope.launch {
             userPreferences.setNotificationsEnabled(enabled)
+            if (enabled) {
+                com.example.netpulse.service.DailySummaryWorker.schedule(getApplication())
+            } else {
+                com.example.netpulse.service.DailySummaryWorker.cancel(getApplication())
+                com.example.netpulse.utils.NotificationHelper.cancelAll(getApplication())
+            }
         }
     }
 

@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,7 +19,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.netpulse.data.SpeedResult
-import com.example.netpulse.ui.theme.*
 
 @Composable
 fun HistoryCard(
@@ -28,28 +28,27 @@ fun HistoryCard(
     onShare: () -> Unit
 ) {
     val networkColor = when (result.networkType) {
-        "WiFi" -> Color(0xFF3B8BFF)
-        "5G" -> Color(0xFF00E676)
-        "4G" -> Color(0xFFFFB300)
-        else -> TextSecondary
+        "WiFi" -> MaterialTheme.colorScheme.primary
+        "5G" -> MaterialTheme.colorScheme.tertiary
+        "4G" -> Color(0xFFFFB300) // Amber
+        else -> MaterialTheme.colorScheme.onSurfaceVariant
     }
 
     val badgeBg = when (result.networkType) {
-        "WiFi" -> Color(0xFF0D1E2E)
-        "5G" -> Color(0xFF0D2E1A)
-        "4G" -> Color(0xFF2E1F0D)
-        else -> CardSurface
+        "WiFi" -> MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+        "5G" -> MaterialTheme.colorScheme.tertiary.copy(alpha = 0.1f)
+        "4G" -> Color(0xFFFFB300).copy(alpha = 0.1f)
+        else -> MaterialTheme.colorScheme.surface
     }
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
-            .background(CardSurface)
-            .border(0.5.dp, CardBorder, RoundedCornerShape(14.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .border(0.5.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(14.dp))
             .clickable { onShare() }
     ) {
-        // Left colored border
         Box(
             modifier = Modifier
                 .width(4.dp)
@@ -67,7 +66,7 @@ fun HistoryCard(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = dateLabel,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontSize = 13.sp
                 )
                 Spacer(modifier = Modifier.height(6.dp))
@@ -83,27 +82,27 @@ fun HistoryCard(
                 verticalArrangement = Arrangement.spacedBy(3.dp)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("↓", color = Color(0xFF3B8BFF), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                    Text("↓", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = "%.1f Mbps".format(result.downloadMbps),
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onBackground,
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp
                     )
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("↑", color = Color(0xFF00D4FF), fontSize = 13.sp)
+                    Text("↑", color = MaterialTheme.colorScheme.secondary, fontSize = 13.sp)
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = "%.1f Mbps".format(result.uploadMbps),
-                        color = TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 13.sp
                     )
                 }
                 Text(
                     text = "${result.pingMs} ms ping",
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 11.sp
                 )
             }
@@ -113,7 +112,7 @@ fun HistoryCard(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = null,
-                tint = TextSecondary,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(16.dp)
             )
         }

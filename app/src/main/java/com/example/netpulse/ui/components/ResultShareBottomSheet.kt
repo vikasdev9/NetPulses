@@ -15,7 +15,8 @@ fun ResultShareBottomSheet(
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        dragHandle = { BottomSheetDefaults.DragHandle() }
+        dragHandle = { BottomSheetDefaults.DragHandle() },
+        containerColor = MaterialTheme.colorScheme.surface
     ) {
         Column(
             modifier = Modifier
@@ -29,7 +30,11 @@ fun ResultShareBottomSheet(
             
             Button(
                 onClick = { /* TODO: Implement actual image share */ },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = androidx.compose.ui.graphics.Color.White
+                )
             ) {
                 Text("Share as Image")
             }

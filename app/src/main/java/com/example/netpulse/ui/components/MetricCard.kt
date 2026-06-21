@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,7 +34,7 @@ fun MetricCard(
     modifier: Modifier = Modifier
 ) {
     val borderColor by animateColorAsState(
-        targetValue = if (isActive) accentColor else CardBorder,
+        targetValue = if (isActive) accentColor else MaterialTheme.colorScheme.outline,
         animationSpec = tween(300),
         label = "borderColor"
     )
@@ -49,7 +50,7 @@ fun MetricCard(
                 ambientColor = accentColor
             )
             .clip(RoundedCornerShape(16.dp))
-            .background(CardSurface)
+            .background(MaterialTheme.colorScheme.surface)
             .border(1.dp, borderColor, RoundedCornerShape(16.dp))
             .padding(16.dp)
     ) {
@@ -86,7 +87,7 @@ fun MetricCard(
                 Row(verticalAlignment = Alignment.Bottom) {
                     Text(
                         text = value,
-                        color = TextPrimary,
+                        color = MaterialTheme.colorScheme.onBackground,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         fontFamily = MonospaceFontFamily
@@ -95,7 +96,7 @@ fun MetricCard(
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = unit,
-                            color = TextPrimary,
+                            color = MaterialTheme.colorScheme.onBackground,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Medium
                         )
@@ -103,7 +104,7 @@ fun MetricCard(
                 }
                 Text(
                     text = label,
-                    color = TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 12.sp
                 )
             }
@@ -116,12 +117,12 @@ fun LiveBadge() {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(4.dp))
-            .background(LiveBadgeBg.copy(alpha = 0.2f))
+            .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f))
             .padding(horizontal = 6.dp, vertical = 2.dp)
     ) {
         Text(
             text = "LIVE",
-            color = StatusCyan,
+            color = MaterialTheme.colorScheme.secondary,
             fontSize = 9.sp,
             fontWeight = FontWeight.Bold
         )

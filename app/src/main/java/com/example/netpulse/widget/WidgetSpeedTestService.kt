@@ -10,6 +10,7 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.glance.appwidget.updateAll
 import com.example.netpulse.R
+import com.example.netpulse.utils.NotificationHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -30,9 +31,12 @@ class WidgetSpeedTestService : Service() {
                 // Simulate Speed Test logic
                 delay(3000) 
                 
+                val download = (50..120).random().toDouble() + Math.random()
+                val upload = (20..60).random().toDouble() + Math.random()
+
                 val data = WidgetData(
-                    downloadMbps = (50..120).random().toDouble() + Math.random(),
-                    uploadMbps = (20..60).random().toDouble() + Math.random(),
+                    downloadMbps = download,
+                    uploadMbps = upload,
                     pingMs = (10..22).random(),
                     jitterMs = (2..6).random(),
                     networkType = "WiFi",
@@ -43,6 +47,10 @@ class WidgetSpeedTestService : Service() {
                 
                 WidgetDataStore.updateData(applicationContext, data)
                 NetPulseWidget().updateAll(applicationContext)
+
+                // Fire notification
+                NotificationHelper.showWidgetTestComplete(applicationContext, download, upload)
+
             } catch (e: Exception) {
                 updateWidgetState(WidgetState.ERROR)
             } finally {

@@ -63,8 +63,10 @@ fun AnimatedPageIndicator(
     currentPage: Int,
     modifier: Modifier = Modifier,
     activeColor: Color = Color(0xFF3B8BFF),
-    inactiveColor: Color = Color.White.copy(alpha = 0.2f)
+    inactiveColor: Color? = null
 ) {
+    val finalInactiveColor = inactiveColor ?: MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f)
+    
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -86,7 +88,7 @@ fun AnimatedPageIndicator(
                     .height(8.dp)
                     .width(width)
                     .clip(CircleShape)
-                    .background(if (isSelected) activeColor else inactiveColor)
+                    .background(if (isSelected) activeColor else finalInactiveColor)
             )
         }
     }
@@ -99,9 +101,9 @@ fun TrustBadgeItem(
 ) {
     Surface(
         modifier = modifier,
-        color = Color.White.copy(alpha = 0.05f),
+        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.05f),
         shape = RoundedCornerShape(12.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.1f))
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f))
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
@@ -111,13 +113,13 @@ fun TrustBadgeItem(
             Icon(
                 imageVector = badge.icon,
                 contentDescription = null,
-                tint = Color(0xFF00D4FF),
+                tint = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.size(16.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = badge.label,
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium
             )
