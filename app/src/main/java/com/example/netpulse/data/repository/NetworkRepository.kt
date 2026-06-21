@@ -96,10 +96,10 @@ class NetworkRepository(private val context: Context) {
         }
     }
 
-    fun getDataUsage(): Flow<DataUsage> = flow {
+    fun getDataUsage(): Flow<NetworkDataUsage> = flow {
         // Real data usage requires NetworkStatsManager and special permissions.
         // For now, we return empty usage or mocked zeros.
-        emit(DataUsage())
+        emit(NetworkDataUsage())
     }
 
     fun getDeviceInfo(): Flow<DeviceInfo> = flow {

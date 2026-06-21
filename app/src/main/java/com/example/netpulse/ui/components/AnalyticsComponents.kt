@@ -23,7 +23,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.netpulse.ui.theme.*
+import com.example.netpulse.ui.viewmodel.AnalyticsRange
 import com.example.netpulse.ui.viewmodel.TimelineEvent
+import com.example.netpulse.ui.viewmodel.TimelineType
 
 @Composable
 fun AnalyticsCard(
@@ -323,4 +325,18 @@ fun GradientButton(text: String, icon: ImageVector, modifier: Modifier = Modifie
             }
         }
     }
+}
+
+fun getNextRange(current: AnalyticsRange): AnalyticsRange = when(current) {
+    AnalyticsRange.TODAY -> AnalyticsRange.WEEK
+    AnalyticsRange.WEEK -> AnalyticsRange.MONTH
+    AnalyticsRange.MONTH -> AnalyticsRange.TODAY
+}
+
+fun getBarColor(index: Int): Color = when(index) {
+    0 -> Color(0xFF3B8BFF)
+    1 -> Color(0xFF00D4FF)
+    2 -> Color(0xFF00E676)
+    3 -> Color(0xFFFFB300)
+    else -> Color.Gray.copy(alpha = 0.4f)
 }

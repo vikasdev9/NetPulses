@@ -2,21 +2,6 @@ package com.example.netpulse.ui.viewmodel
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
-data class AnalyticsUiState(
-    val networkStatus: NetworkStatus = NetworkStatus(),
-    val internetDetails: InternetDetails = InternetDetails(),
-    val ispInfo: IspInfo = IspInfo(),
-    val speedSummary: SpeedSummary = SpeedSummary(),
-    val networkQuality: NetworkQuality = NetworkQuality.FAIR,
-    val dataUsage: DataUsage = DataUsage(),
-    val deviceInfo: DeviceInfo = DeviceInfo(),
-    val timeline: List<TimelineEvent> = emptyList(),
-    val diagnostics: AdvancedDiagnostics = AdvancedDiagnostics(),
-    val security: SecurityStatus = SecurityStatus(),
-    val recommendations: List<String> = emptyList(),
-    val isLoading: Boolean = false
-)
-
 data class NetworkStatus(
     val isConnected: Boolean = false,
     val type: String = "—",
@@ -65,7 +50,7 @@ enum class NetworkQuality(val label: String) {
     EXCELLENT("Excellent"), GOOD("Good"), FAIR("Fair"), POOR("Poor")
 }
 
-data class DataUsage(
+data class NetworkDataUsage(
     val today: String = "0 MB",
     val weekly: String = "0 MB",
     val monthly: String = "0 MB",

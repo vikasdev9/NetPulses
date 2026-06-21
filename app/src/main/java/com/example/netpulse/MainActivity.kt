@@ -16,6 +16,7 @@ import com.example.netpulse.data.datastore.UserPreferences
 import com.example.netpulse.navigation.NavRoutes
 import com.example.netpulse.ui.screen.*
 import com.example.netpulse.ui.theme.NetPulseTheme
+import com.example.netpulse.ui.viewmodel.AnalyticsViewModel
 import com.example.netpulse.ui.viewmodel.SettingsViewModel
 import com.example.netpulse.ui.viewmodel.SpeedTestViewModel
 import com.example.netpulse.utils.LocaleUtils
@@ -111,7 +112,16 @@ class MainActivity : BaseActivity() {
                                 )
                             }
                             composable(NavRoutes.Analytics) {
-                                AnalyticsScreen(onNavigateBack = { navController.popBackStack() })
+                                AnalyticsScreen(
+                                    onNavigateBack = { navController.popBackStack() },
+                                    onNavigateToDashboard = { navController.navigate(NavRoutes.AppUsageDashboard) }
+                                )
+                            }
+                            composable(NavRoutes.AppUsageDashboard) {
+                                AppUsageDashboardScreen(
+                                    onBack = { navController.popBackStack() },
+                                    viewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+                                )
                             }
                             composable(NavRoutes.History) {
                                 HistoryScreen(
@@ -123,7 +133,8 @@ class MainActivity : BaseActivity() {
                                     },
                                     onNavigateToSettings = {
                                         navController.navigate(NavRoutes.Settings) { launchSingleTop = true }
-                                    }
+                                    },
+                                    onBack = { navController.popBackStack() }
                                 )
                             }
                             composable(NavRoutes.Settings) {

@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Share
@@ -45,7 +46,8 @@ import java.util.*
 fun HistoryScreen(
     viewModel: HistoryViewModel = viewModel(),
     onNavigateToHome: () -> Unit = {},
-    onNavigateToSettings: () -> Unit = {}
+    onNavigateToSettings: () -> Unit = {},
+    onBack: () -> Unit = {}
 ) {
     val results by viewModel.allResults.collectAsState()
     var selectedFilter by remember { mutableStateOf("All") }
@@ -65,6 +67,15 @@ fun HistoryScreen(
         topBar = {
             TopAppBar(
                 title = { Text("History", color = Color.White) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color.White
+                        )
+                    }
+                },
                 actions = {
                     IconButton(onClick = { viewModel.clearAll() }) {
                         Icon(Icons.Default.DeleteSweep, contentDescription = "Clear All", tint = Color.White)
