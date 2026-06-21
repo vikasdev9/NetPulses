@@ -24,7 +24,6 @@ import java.util.Locale
 fun SmallWidget(data: WidgetData) {
     // Using fully qualified factory functions to avoid restricted API issues in Glance 1.0.0
     val backgroundColor = androidx.glance.color.ColorProvider(day = Color(0xFF0A0E1A), night = Color(0xFF0A0E1A))
-    val accentColor = androidx.glance.color.ColorProvider(day = Color(0xFF3B8BFF), night = Color(0xFF3B8BFF))
     val textPrimary = androidx.glance.color.ColorProvider(day = Color.White, night = Color.White)
     val textSecondary = androidx.glance.color.ColorProvider(day = Color(0xFF8892A4), night = Color(0xFF8892A4))
     val dividerColor = androidx.glance.color.ColorProvider(day = Color(0xFF2E3A50), night = Color(0xFF2E3A50))
@@ -45,14 +44,13 @@ fun SmallWidget(data: WidgetData) {
             Box(
                 modifier = GlanceModifier
                     .size(28.dp)
-                    .background(accentColor)
-                    .cornerRadius(14.dp),
+                    .cornerRadius(8.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    provider = ImageProvider(R.drawable.ic_bolt),
+                    provider = ImageProvider(R.drawable.netpulsesicon),
                     contentDescription = null,
-                    modifier = GlanceModifier.size(16.dp)
+                    modifier = GlanceModifier.fillMaxSize()
                 )
             }
             

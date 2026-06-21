@@ -36,25 +36,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.netpulse.data.Prefs
+import com.example.netpulse.data.datastore.UserPreferences
 import com.example.netpulse.ui.theme.*
 import com.example.netpulse.ui.viewmodel.SpeedTestUiState
 import com.example.netpulse.ui.viewmodel.SpeedTestViewModel
 import kotlinx.coroutines.launch
-
-import com.example.netpulse.NetPulseApplication
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SpeedTestScreen() {
     val context = LocalContext.current
     val application = context.applicationContext as android.app.Application
-    val viewModel: SpeedTestViewModel = viewModel(factory = SpeedTestViewModel.Factory(application))
+    val prefs = remember { UserPreferences(context.applicationContext) }
+    val viewModel: SpeedTestViewModel = viewModel(factory = SpeedTestViewModel.Factory(application, prefs))
     val uiState by viewModel.uiState.collectAsState(SpeedTestUiState())
-    val prefs = remember { Prefs(context.applicationContext) }
     var darkMode by remember { mutableStateOf(true) }
     LaunchedEffect(Unit) {
-        prefs.darkTheme.collect { darkMode = it }
+        prefs.darkMode.collect { darkMode = it }
     }
     var selectedTab by remember { mutableIntStateOf(0) }
     val scope = rememberCoroutineScope()
@@ -137,7 +135,7 @@ fun SpeedTestScreen() {
                 darkMode = darkMode,
                 onDarkModeChange = { enabled ->
                     darkMode = enabled
-                    scope.launch { prefs.setDarkTheme(enabled) }
+                    scope.launch { prefs.setDarkMode(enabled) }
                 },
                 modifier = Modifier.padding(pad)
             )
@@ -581,7 +579,7 @@ fun SettingsScreenContent(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val prefs = remember { Prefs(context.applicationContext) }
+    val prefs = remember { UserPreferences(context.applicationContext) }
     val scope = rememberCoroutineScope()
 
     var showPrivacyPolicy by remember { mutableStateOf(false) }
@@ -1347,7 +1345,7 @@ fun PrivacyDetailsDialog(onDismiss: () -> Unit) {
 // Ads Settings Dialog
 @Composable
 fun AdsSettingsDialog(
-    prefs: Prefs,
+    prefs: UserPreferences,
     scope: kotlinx.coroutines.CoroutineScope,
     onDismiss: () -> Unit
 ) {

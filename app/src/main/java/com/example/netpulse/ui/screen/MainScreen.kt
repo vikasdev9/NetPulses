@@ -29,6 +29,7 @@ import com.example.netpulse.R
 import com.example.netpulse.ui.components.*
 import com.example.netpulse.ui.theme.*
 import com.example.netpulse.ui.viewmodel.*
+import com.example.netpulse.data.datastore.UserPreferences
 import kotlin.math.min
 
 import androidx.compose.ui.platform.LocalContext
@@ -43,7 +44,8 @@ fun MainScreen(
 ) {
     val context = LocalContext.current
     val application = context.applicationContext as Application
-    val viewModel: SpeedTestViewModel = viewModel(factory = SpeedTestViewModel.Factory(application))
+    val userPreferences = remember { UserPreferences(context) }
+    val viewModel: SpeedTestViewModel = viewModel(factory = SpeedTestViewModel.Factory(application, userPreferences))
     val uiState by viewModel.uiState.collectAsState()
     val ispInfo by viewModel.ispInfo.collectAsState()
 

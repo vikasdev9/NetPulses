@@ -8,6 +8,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,7 +29,9 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.example.netpulse.R
 
 
 @Composable
@@ -142,17 +145,15 @@ fun GlowingIcon() {
         Box(
             modifier = Modifier
                 .scale(scale)
-                .size(88.dp)
-                .clip(RoundedCornerShape(24.dp))
-                .background(Color(0xFF2470B3)),
+                .size(120.dp),
             contentAlignment = Alignment.Center
         ) {
-
-            Icon(
-                Icons.Default.Bolt,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(28.dp)
+            Image(
+                painter = painterResource(id = R.drawable.netpulsesicon),
+                contentDescription = "NetPulse Icon",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(24.dp))
             )
         }
     }

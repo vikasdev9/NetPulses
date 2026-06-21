@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.netpulse.NetPulseApplication
 import com.example.netpulse.data.SpeedResult
+import com.example.netpulse.data.datastore.UserPreferences
 import com.example.netpulse.data.network.SpeedTestEngine
 import com.example.netpulse.utils.IspInfo
 import com.example.netpulse.utils.IspInfoHelper
@@ -18,6 +19,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.glance.appwidget.updateAll
@@ -61,7 +63,10 @@ data class SpeedTestUiState(
     val errorMessage: String? = null
 )
 
-class SpeedTestViewModel(application: Application) : AndroidViewModel(application) {
+class SpeedTestViewModel(
+    application: Application,
+    private val userPreferences: UserPreferences
+) : AndroidViewModel(application) {
 
     private val dao = (application as NetPulseApplication).database.speedResultDao()
 
@@ -86,6 +91,11 @@ class SpeedTestViewModel(application: Application) : AndroidViewModel(applicatio
     fun startSpeedTest() {
         testJob?.cancel()
         testJob = viewModelScope.launch {
+            
+            // Read settings BEFORE starting
+            val parallelConnections = userPreferences.parallelConnections.first()
+            val durationSeconds = userPreferences.testDurationSeconds.first()
+
             _uiState.value = SpeedTestUiState(
                 testState = SpeedTestState.Running(TestPhase.PING),
                 isTestRunning = true,
@@ -111,7 +121,10 @@ class SpeedTestViewModel(application: Application) : AndroidViewModel(applicatio
             )
 
             val downloadSamples = mutableListOf<Float>()
-            val download = SpeedTestEngine.measureDownload { speed ->
+            val download = SpeedTestEngine.measureDownload(
+                parallelConnections = parallelConnections,
+                durationSeconds = durationSeconds
+            ) { speed ->
                 val floatSpeed = speed.toFloat()
                 downloadSamples.add(floatSpeed)
                 _uiState.value = _uiState.value.copy(
@@ -143,7 +156,10 @@ class SpeedTestViewModel(application: Application) : AndroidViewModel(applicatio
             )
 
             val uploadSamples = mutableListOf<Float>()
-            val upload = SpeedTestEngine.measureUpload { speed ->
+            val upload = SpeedTestEngine.measureUpload(
+                parallelConnections = parallelConnections,
+                durationSeconds = durationSeconds
+            ) { speed ->
                 val floatSpeed = speed.toFloat()
                 uploadSamples.add(floatSpeed)
                 _uiState.value = _uiState.value.copy(
@@ -207,11 +223,14 @@ class SpeedTestViewModel(application: Application) : AndroidViewModel(applicatio
     
     fun resetTest() = stopTest()
 
-    class Factory(private val application: Application) : ViewModelProvider.Factory {
+    class Factory(
+        private val application: Application,
+        private val userPreferences: UserPreferences
+    ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(SpeedTestViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return SpeedTestViewModel(application) as T
+                return SpeedTestViewModel(application, userPreferences) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }

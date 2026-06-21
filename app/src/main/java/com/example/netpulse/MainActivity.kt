@@ -3,62 +3,73 @@ package com.example.netpulse
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.netpulse.data.Prefs
+import com.example.netpulse.data.datastore.UserPreferences
 import com.example.netpulse.navigation.NavRoutes
-import com.example.netpulse.ui.screen.HistoryScreen
-import com.example.netpulse.ui.screen.MainScreen
-import com.example.netpulse.ui.screen.OnboardingScreen
-import com.example.netpulse.ui.screen.SettingsScreen
-import com.example.netpulse.ui.screen.SplashScreen
-import com.example.netpulse.ui.screen.AnalyticsScreen
-import com.example.netpulse.ui.screen.LanguageScreen
-import com.example.netpulse.ui.screen.PrivacyPolicyScreen
+import com.example.netpulse.ui.screen.*
 import com.example.netpulse.ui.theme.NetPulseTheme
+import com.example.netpulse.ui.viewmodel.SettingsViewModel
+import com.example.netpulse.ui.viewmodel.SpeedTestViewModel
 import com.example.netpulse.utils.LocaleUtils
+import com.example.netpulse.utils.WiFiAutoRunManager
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class MainActivity : BaseActivity() {
+
+    private lateinit var userPreferences: UserPreferences
+    private lateinit var wifiAutoRunManager: WiFiAutoRunManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val prefs = Prefs(applicationContext)
+        userPreferences = UserPreferences(applicationContext)
+
+        val settingsViewModel: SettingsViewModel by viewModels {
+            object : androidx.lifecycle.ViewModelProvider.Factory {
+                override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                    return SettingsViewModel(userPreferences) as T
+                }
+            }
+        }
+
+        val speedTestViewModel: SpeedTestViewModel by viewModels {
+            SpeedTestViewModel.Factory(application, userPreferences)
+        }
+
+        wifiAutoRunManager = WiFiAutoRunManager(this) {
+            lifecycleScope.launch {
+                val autoRun = userPreferences.autoRunOnWifi.first()
+                if (autoRun) {
+                    delay(2000) // connection stabilizes
+                    speedTestViewModel.startTest()
+                }
+            }
+        }
 
         setContent {
-            var isDark by remember { mutableStateOf<Boolean?>(null) }
-            LaunchedEffect(Unit) {
-                prefs.darkTheme.collect { v -> isDark = v }
-            }
-            NetPulseTheme(darkTheme = (isDark ?: true)) {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                ) {
+            val settingsState by settingsViewModel.state.collectAsState()
+            
+            NetPulseTheme(darkTheme = settingsState.isDarkMode) {
+                Surface(modifier = Modifier.fillMaxSize()) {
                     val navController = rememberNavController()
                     var onboardingDone by remember { mutableStateOf<Boolean?>(null) }
 
                     LaunchedEffect(Unit) {
-                        prefs.onboardingDone.collect { done ->
+                        userPreferences.onboardingDone.collect { done ->
                             onboardingDone = done
                         }
                     }
 
-                    if (onboardingDone == null || isDark == null) {
-                        // Simple splash while loading prefs
+                    if (onboardingDone == null) {
                         SplashScreen { }
                     } else {
                         NavHost(
@@ -80,7 +91,7 @@ class MainActivity : BaseActivity() {
                             }
                             composable(NavRoutes.Onboarding) {
                                 OnboardingScreen {
-                                    lifecycleScope.launch { prefs.setOnboardingDone(true) }
+                                    lifecycleScope.launch { userPreferences.setOnboardingDone(true) }
                                     navController.navigate(NavRoutes.Home) {
                                         popUpTo(NavRoutes.Onboarding) { inclusive = true }
                                     }
@@ -89,28 +100,18 @@ class MainActivity : BaseActivity() {
                             composable(NavRoutes.Home) {
                                 MainScreen(
                                     onNavigateToHistory = {
-                                        navController.navigate(NavRoutes.History) {
-                                            launchSingleTop = true
-                                        }
+                                        navController.navigate(NavRoutes.History) { launchSingleTop = true }
                                     },
                                     onNavigateToSettings = {
-                                        navController.navigate(NavRoutes.Settings) {
-                                            launchSingleTop = true
-                                        }
+                                        navController.navigate(NavRoutes.Settings) { launchSingleTop = true }
                                     },
                                     onNavigateToAnalytics = {
-                                        navController.navigate(NavRoutes.Analytics) {
-                                            launchSingleTop = true
-                                        }
+                                        navController.navigate(NavRoutes.Analytics) { launchSingleTop = true }
                                     }
                                 )
                             }
                             composable(NavRoutes.Analytics) {
-                                AnalyticsScreen(
-                                    onNavigateBack = {
-                                        navController.popBackStack()
-                                    }
-                                )
+                                AnalyticsScreen(onNavigateBack = { navController.popBackStack() })
                             }
                             composable(NavRoutes.History) {
                                 HistoryScreen(
@@ -121,65 +122,62 @@ class MainActivity : BaseActivity() {
                                         }
                                     },
                                     onNavigateToSettings = {
-                                        navController.navigate(NavRoutes.Settings) {
-                                            launchSingleTop = true
-                                        }
+                                        navController.navigate(NavRoutes.Settings) { launchSingleTop = true }
                                     }
                                 )
                             }
-                            try {
-                                composable(NavRoutes.Settings) {
-                                    SettingsScreen(
-                                        onNavigateToHome = {
-                                            navController.navigate(NavRoutes.Home) {
-                                                popUpTo(NavRoutes.Home) { inclusive = false }
-                                                launchSingleTop = true
-                                            }
-                                        },
-                                        onNavigateToHistory = {
-                                            navController.navigate(NavRoutes.History) {
-                                                launchSingleTop = true
-                                            }
-                                        },
-                                        onNavigateToLanguage = {
-                                            navController.navigate(NavRoutes.Language)
-                                        },
-                                        onNavigateToPrivacyPolicy = {
-                                            navController.navigate(NavRoutes.PrivacyPolicy)
+                            composable(NavRoutes.Settings) {
+                                SettingsScreen(
+                                    onNavigateToHome = {
+                                        navController.navigate(NavRoutes.Home) {
+                                            popUpTo(NavRoutes.Home) { inclusive = false }
+                                            launchSingleTop = true
                                         }
-                                    )
+                                    },
+                                    onNavigateToHistory = {
+                                        navController.navigate(NavRoutes.History) { launchSingleTop = true }
+                                    },
+                                    onNavigateToLanguage = { navController.navigate(NavRoutes.Language) },
+                                    onNavigateToPrivacyPolicy = { navController.navigate(NavRoutes.PrivacyPolicy) },
+                                    viewModel = settingsViewModel
+                                )
+                            }
+                            composable(NavRoutes.Language) {
+                                val currentLang = remember {
+                                    mutableStateOf(LocaleUtils.getSavedLanguage(applicationContext).ifEmpty { "en" })
                                 }
-                                composable(NavRoutes.Language) {
-                                    val currentLang = remember {
-                                        mutableStateOf(LocaleUtils.getSavedLanguage(applicationContext).ifEmpty { "en" })
-                                    }
-                                    LanguageScreen(
-                                        currentLanguageCode = currentLang.value,
-                                        onLanguageSelected = { lang ->
-                                            LocaleUtils.saveLanguage(applicationContext, lang.code)
-                                            currentLang.value = lang.code
-                                            recreate()
-                                        },
-                                        onBack = {
-                                            navController.popBackStack()
-                                        }
-                                    )
-                                }
-                                composable(NavRoutes.PrivacyPolicy) {
-                                    PrivacyPolicyScreen(
-                                        onBack = {
-                                            navController.popBackStack()
-                                        }
-                                    )
-                                }
-                            } catch (e: Exception) {
-                                throw e
-                            } finally {
+                                LanguageScreen(
+                                    currentLanguageCode = currentLang.value,
+                                    onLanguageSelected = { lang ->
+                                        LocaleUtils.saveLanguage(applicationContext, lang.code)
+                                        currentLang.value = lang.code
+                                        recreate()
+                                    },
+                                    onBack = { navController.popBackStack() }
+                                )
+                            }
+                            composable(NavRoutes.PrivacyPolicy) {
+                                PrivacyPolicyScreen(onBack = { navController.popBackStack() })
                             }
                         }
                     }
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        lifecycleScope.launch {
+            userPreferences.autoRunOnWifi.collect { enabled ->
+                if (enabled) wifiAutoRunManager.startWatching()
+                else wifiAutoRunManager.stopWatching()
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        wifiAutoRunManager.stopWatching()
     }
 }

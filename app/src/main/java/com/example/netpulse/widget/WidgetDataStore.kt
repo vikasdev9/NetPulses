@@ -7,7 +7,7 @@ import com.example.netpulse.data.SpeedResult
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
-val Context.dataStore by preferencesDataStore(name = "widget_prefs")
+private val Context.dataStore by preferencesDataStore(name = "widget_prefs")
 
 enum class WidgetState {
     NO_DATA, HAS_DATA, LOADING, ERROR
