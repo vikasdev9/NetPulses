@@ -26,6 +26,16 @@ class UserPreferences(private val context: Context) {
         val AD_FREQUENCY = stringPreferencesKey("ad_frequency")
         val PRIVACY_POLICY_ACCEPTED = booleanPreferencesKey("privacy_policy_accepted")
         val DATA_USAGE_ACCEPTED = booleanPreferencesKey("data_usage_accepted")
+        val LANGUAGE_CODE = stringPreferencesKey("language_code")
+    }
+
+    val languageCode: Flow<String> = context.dataStore.data
+        .map { prefs -> prefs[LANGUAGE_CODE] ?: "en" }
+    
+    suspend fun setLanguageCode(code: String) {
+        context.dataStore.edit { prefs ->
+            prefs[LANGUAGE_CODE] = code
+        }
     }
 
     val parallelConnections: Flow<Int> = context.dataStore.data

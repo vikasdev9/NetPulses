@@ -163,14 +163,19 @@ class MainActivity : BaseActivity() {
                                 )
                             }
                             composable(NavRoutes.Language) {
-                                val currentLang = remember {
-                                    mutableStateOf(LocaleUtils.getSavedLanguage(applicationContext).ifEmpty { "en" })
-                                }
                                 LanguageScreen(
-                                    currentLanguageCode = currentLang.value,
+                                    currentLanguageCode = settingsState.currentLanguageCode,
                                     onLanguageSelected = { lang ->
+                                        // 1. Save synchronously for attachBaseContext on next run
                                         LocaleUtils.saveLanguage(applicationContext, lang.code)
-                                        currentLang.value = lang.code
+                                        
+                                        // 2. Save asynchronously to DataStore via ViewModel
+                                        settingsViewModel.setLanguage(lang.code)
+                                        
+                                        // 3. Update current application context for immediate effect
+                                        LocaleUtils.setLocale(applicationContext, lang.code)
+                                        
+                                        // 4. Force activity recreation to reload all string resources
                                         recreate()
                                     },
                                     onBack = { navController.popBackStack() }

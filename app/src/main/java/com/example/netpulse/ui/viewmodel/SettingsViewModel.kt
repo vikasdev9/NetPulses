@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.netpulse.data.datastore.UserPreferences
+import com.example.netpulse.utils.LocaleUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -22,6 +23,7 @@ class SettingsViewModel(
         val isDarkMode: Boolean = true,
         val notificationsEnabled: Boolean = false,
         val currentLanguage: String = "English",
+        val currentLanguageCode: String = "en",
         val defaultServer: String = "Automatic",
         val appVersion: String = "1.0.0"
     )
@@ -37,15 +39,19 @@ class SettingsViewModel(
                 userPreferences.autoRunOnWifi,
                 userPreferences.isPro,
                 userPreferences.darkMode,
-                userPreferences.notificationsEnabled
+                userPreferences.notificationsEnabled,
+                userPreferences.languageCode
             ) { values ->
+                val langCode = values[6] as String
                 SettingsState(
                     parallelConnections = values[0] as Int,
                     testDurationSeconds = values[1] as Int,
                     autoRunOnWifi = values[2] as Boolean,
                     isPro = values[3] as Boolean,
                     isDarkMode = values[4] as Boolean,
-                    notificationsEnabled = values[5] as Boolean
+                    notificationsEnabled = values[5] as Boolean,
+                    currentLanguageCode = langCode,
+                    currentLanguage = LocaleUtils.getLanguageName(langCode)
                 )
             }.collect { 
                 _state.value = it 
@@ -99,6 +105,14 @@ class SettingsViewModel(
 
     fun toggleNotifications(enabled: Boolean) {
         setNotificationsEnabled(enabled)
+    }
+    
+    fun setLanguage(code: String) {
+        viewModelScope.launch {
+            // Update both for sync/async needs
+            LocaleUtils.saveLanguage(getApplication(), code)
+            userPreferences.setLanguageCode(code)
+        }
     }
 
     fun onUpgradeTapped() {
