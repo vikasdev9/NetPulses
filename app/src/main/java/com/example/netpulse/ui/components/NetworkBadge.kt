@@ -1,7 +1,6 @@
 package com.example.netpulse.ui.components
 
-import androidx.compose.ui.res.stringResource
-import com.example.netpulse.R
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -9,7 +8,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Cable
+import androidx.compose.material.icons.outlined.SignalCellularAlt
 import androidx.compose.material.icons.outlined.Wifi
+import androidx.compose.material.icons.outlined.WifiOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -21,13 +23,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.netpulse.utils.NetworkIcon
+import com.example.netpulse.utils.NetworkState
 
 @Composable
 fun NetworkBadge(
-    networkType: String = "WiFi",
-    isConnected: Boolean = true
+    networkState: NetworkState
 ) {
-    val infiniteTransition = rememberInfiniteTransition(label = "pulsing")
+    val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val dotScale by infiniteTransition.animateFloat(
         initialValue = 0.8f,
         targetValue = 1.2f,
@@ -38,34 +41,66 @@ fun NetworkBadge(
         label = "dotScale"
     )
 
+    val dotColor by animateColorAsState(
+        targetValue = if (networkState.isConnected)
+            MaterialTheme.colorScheme.tertiary
+        else
+            MaterialTheme.colorScheme.error,
+        animationSpec = tween(300),
+        label = "dotColor"
+    )
+
+    val networkIcon = when (networkState.signalIcon) {
+        NetworkIcon.WIFI -> Icons.Outlined.Wifi
+        NetworkIcon.MOBILE_5G,
+        NetworkIcon.MOBILE_4G,
+        NetworkIcon.MOBILE_3G,
+        NetworkIcon.MOBILE_2G -> Icons.Outlined.SignalCellularAlt
+        NetworkIcon.ETHERNET -> Icons.Outlined.Cable
+        NetworkIcon.NONE -> Icons.Outlined.WifiOff
+    }
+
+    val badgeText = if (networkState.isConnected) {
+        "${networkState.networkType} · Connected"
+    } else {
+        "No Connection"
+    }
+
     Row(
         modifier = Modifier
             .clip(RoundedCornerShape(99.dp))
             .background(MaterialTheme.colorScheme.surface)
-            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(99.dp))
+            .border(
+                0.5.dp,
+                MaterialTheme.colorScheme.outline,
+                RoundedCornerShape(99.dp)
+            )
             .padding(horizontal = 12.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         Icon(
-            imageVector = Icons.Outlined.Wifi,
+            imageVector = networkIcon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onBackground,
+            tint = if (networkState.isConnected)
+                MaterialTheme.colorScheme.primary
+            else
+                MaterialTheme.colorScheme.error,
             modifier = Modifier.size(16.dp)
         )
+
         Text(
-            text = "$networkType · ${if (isConnected) stringResource(R.string.network_connected) else stringResource(R.string.network_disconnected)}",
-            color = MaterialTheme.colorScheme.onBackground,
+            text = badgeText,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 13.sp
         )
-        if (isConnected) {
-            Box(
-                modifier = Modifier
-                    .size(8.dp)
-                    .scale(dotScale)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.tertiary)
-            )
-        }
+
+        Box(
+            modifier = Modifier
+                .size(7.dp)
+                .scale(if (networkState.isConnected) dotScale else 1f)
+                .clip(CircleShape)
+                .background(dotColor)
+        )
     }
 }

@@ -44,6 +44,7 @@ fun MainScreen(
     val userPreferences = remember { UserPreferences(context) }
     val viewModel: SpeedTestViewModel = viewModel(factory = SpeedTestViewModel.Factory(application, userPreferences))
     val uiState by viewModel.uiState.collectAsState()
+    val networkState by viewModel.networkState.collectAsState()
 
     Scaffold(
         topBar = {
@@ -71,7 +72,7 @@ fun MainScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    NetworkBadge()
+                    NetworkBadge(networkState = networkState)
 
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,

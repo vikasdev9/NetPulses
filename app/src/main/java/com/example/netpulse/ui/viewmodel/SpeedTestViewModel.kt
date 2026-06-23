@@ -14,6 +14,8 @@ import com.example.netpulse.utils.IspInfoHelper
 import com.example.netpulse.utils.NotificationHelper
 import com.example.netpulse.widget.NetPulseWidget
 import com.example.netpulse.widget.WidgetDataStore
+import com.example.netpulse.utils.NetworkState
+import com.example.netpulse.utils.NetworkStateManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -78,12 +80,21 @@ class SpeedTestViewModel(
     private val _ispInfo = MutableStateFlow(IspInfo())
     val ispInfo: StateFlow<IspInfo> = _ispInfo.asStateFlow()
 
+    private val networkStateManager = NetworkStateManager(application)
+    val networkState: StateFlow<NetworkState> = networkStateManager.networkState
+
     private var testJob: Job? = null
 
     init {
+        networkStateManager.startObserving()
         viewModelScope.launch {
             _ispInfo.value = IspInfoHelper.fetchIspInfo(application)
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        networkStateManager.stopObserving()
     }
 
     fun startTest() {
