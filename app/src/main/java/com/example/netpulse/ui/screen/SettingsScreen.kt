@@ -332,7 +332,7 @@ fun customSwitchColors() = SwitchDefaults.colors(
     checkedThumbColor = Color.White,
     checkedTrackColor = MaterialTheme.colorScheme.primary,
     uncheckedThumbColor = MaterialTheme.colorScheme.outline,
-    uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant,
+    uncheckedTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
     uncheckedBorderColor = MaterialTheme.colorScheme.outline
 )
 
