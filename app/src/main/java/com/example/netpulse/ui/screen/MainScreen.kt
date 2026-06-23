@@ -228,21 +228,23 @@ fun HomeTopBar(onNavigateToAnalytics: () -> Unit) {
             }
         },
         actions = {
-            IconButton(
+            Surface(
                 onClick = onNavigateToAnalytics,
                 modifier = Modifier
-                    .padding(end = 4.dp)
-                    .size(36.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(MaterialTheme.colorScheme.surface)
-                    .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp))
+                    .padding(end = 12.dp)
+                    .size(44.dp),
+                shape = RoundedCornerShape(10.dp),
+                color = MaterialTheme.colorScheme.surface,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Analytics,
-                    contentDescription = "Analytics",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(20.dp)
-                )
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.Default.Analytics,
+                        contentDescription = "Analytics",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(26.dp)
+                    )
+                }
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
