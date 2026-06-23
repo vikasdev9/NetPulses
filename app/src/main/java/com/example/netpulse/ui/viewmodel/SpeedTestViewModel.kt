@@ -90,6 +90,12 @@ class SpeedTestViewModel(
         viewModelScope.launch {
             _ispInfo.value = IspInfoHelper.fetchIspInfo(application)
         }
+        // Sync networkType into UI state
+        viewModelScope.launch {
+            networkState.collect { state ->
+                _uiState.value = _uiState.value.copy(networkType = state.networkType)
+            }
+        }
     }
 
     override fun onCleared() {
@@ -112,7 +118,8 @@ class SpeedTestViewModel(
             _uiState.value = SpeedTestUiState(
                 testState = SpeedTestState.Running(TestPhase.PING),
                 isTestRunning = true,
-                currentTest = "PING"
+                currentTest = "PING",
+                networkType = networkState.value.networkType
             )
 
             val (ping, jitter) = SpeedTestEngine.measurePing()
@@ -197,7 +204,7 @@ class SpeedTestViewModel(
                 uploadMbps = upload,
                 pingMs = ping.toInt(),
                 jitterMs = jitter.toInt(),
-                networkType = _uiState.value.networkType,
+                networkType = networkState.value.networkType,
                 isp = _ispInfo.value.isp,
                 ipAddress = _ispInfo.value.ip,
                 location = "Closest Edge"
@@ -245,7 +252,9 @@ class SpeedTestViewModel(
 
     fun stopTest() {
         testJob?.cancel()
-        _uiState.value = SpeedTestUiState()
+        _uiState.value = SpeedTestUiState(
+            networkType = networkState.value.networkType
+        )
     }
     
     fun resetTest() = stopTest()
