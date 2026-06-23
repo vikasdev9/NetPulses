@@ -10,6 +10,7 @@ import android.graphics.Typeface
 import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,7 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.DeleteSweep
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.*
@@ -33,7 +34,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.res.stringResource
+import com.example.netpulse.R
 import com.example.netpulse.data.SpeedResult
+import com.example.netpulse.navigation.NavRoutes
+import com.example.netpulse.ui.components.AppBottomNavigation
 import com.example.netpulse.ui.components.HistoryCard
 import com.example.netpulse.ui.theme.*
 import com.example.netpulse.ui.viewmodel.HistoryViewModel
@@ -82,6 +87,14 @@ fun HistoryScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
+            )
+        },
+        bottomBar = {
+            AppBottomNavigation(
+                currentRoute = NavRoutes.History,
+                onNavigateToHome = onNavigateToHome,
+                onNavigateToHistory = { /* Already here */ },
+                onNavigateToSettings = onNavigateToSettings
             )
         },
         containerColor = MaterialTheme.colorScheme.background

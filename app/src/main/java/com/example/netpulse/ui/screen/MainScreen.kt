@@ -32,9 +32,12 @@ import kotlin.math.min
 
 import androidx.compose.ui.platform.LocalContext
 
+import com.example.netpulse.navigation.NavRoutes
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
+    onNavigateToHome: () -> Unit = {},
     onNavigateToHistory: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
     onNavigateToAnalytics: () -> Unit = {}
@@ -51,7 +54,12 @@ fun MainScreen(
             HomeTopBar(onNavigateToAnalytics)
         },
         bottomBar = {
-            BottomNavigationBar(onNavigateToHistory, onNavigateToSettings)
+            AppBottomNavigation(
+                currentRoute = NavRoutes.Home,
+                onNavigateToHome = onNavigateToHome,
+                onNavigateToHistory = onNavigateToHistory,
+                onNavigateToSettings = onNavigateToSettings
+            )
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
@@ -371,53 +379,5 @@ fun ResponsiveActionButton(
                 )
             }
         }
-    }
-}
-
-@Composable
-fun BottomNavigationBar(onNavigateToHistory: () -> Unit, onNavigateToSettings: () -> Unit) {
-    var selectedItem by remember { mutableStateOf(0) }
-    
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.background,
-        tonalElevation = 0.dp,
-        modifier = Modifier.border(0.5.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp))
-    ) {
-        NavigationBarItem(
-            selected = selectedItem == 0,
-            onClick = { selectedItem = 0 },
-            icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-            label = { Text(stringResource(R.string.label_home)) },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = MaterialTheme.colorScheme.primary,
-                selectedTextColor = MaterialTheme.colorScheme.primary,
-                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                indicatorColor = Color.Transparent
-            )
-        )
-        NavigationBarItem(
-            selected = selectedItem == 1,
-            onClick = onNavigateToHistory,
-            icon = { Icon(Icons.Default.History, contentDescription = "History") },
-            label = { Text(stringResource(R.string.screen_history)) },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = MaterialTheme.colorScheme.primary,
-                selectedTextColor = MaterialTheme.colorScheme.primary,
-                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                indicatorColor = Color.Transparent
-            )
-        )
-        NavigationBarItem(
-            selected = selectedItem == 2,
-            onClick = onNavigateToSettings,
-            icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
-            label = { Text(stringResource(R.string.screen_settings)) },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = MaterialTheme.colorScheme.primary,
-                selectedTextColor = MaterialTheme.colorScheme.primary,
-                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                indicatorColor = Color.Transparent
-            )
-        )
     }
 }
