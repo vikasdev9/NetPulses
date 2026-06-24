@@ -40,7 +40,7 @@ fun MainScreen(
     onNavigateToHome: () -> Unit = {},
     onNavigateToHistory: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
-    onNavigateToAnalytics: () -> Unit = {}
+    onNavigateToInsights: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val application = context.applicationContext as Application
@@ -51,7 +51,7 @@ fun MainScreen(
 
     Scaffold(
         topBar = {
-            HomeTopBar(onNavigateToAnalytics)
+            HomeTopBar(onNavigateToInsights)
         },
         bottomBar = {
             AppBottomNavigation(

@@ -7,6 +7,7 @@ object NavRoutes {
     const val History = "history"
     const val Settings = "settings"
     const val Analytics = "analytics"
+    const val Insights = "insights"
     const val AppUsageDashboard = "app_usage_dashboard"
     const val Language = "language"
     const val PrivacyPolicy = "privacy_policy"

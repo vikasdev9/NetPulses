@@ -31,6 +31,10 @@ class UserPreferences(private val context: Context) {
         val AUTO_SCHEDULE_ENABLED = booleanPreferencesKey("auto_schedule_enabled")
         val BASELINE_SPEED = floatPreferencesKey("baseline_speed")
         val LAST_AUTO_TEST_TIME = longPreferencesKey("last_auto_test_time")
+        val DATA_PLAN_LIMIT_GB = intPreferencesKey("data_plan_limit_gb")
+        val USAGE_TODAY_MB = floatPreferencesKey("usage_today_mb")
+        val USAGE_WEEK_MB = floatPreferencesKey("usage_week_mb")
+        val USAGE_MONTH_MB = floatPreferencesKey("usage_month_mb")
     }
 
     val languageCode: Flow<String> = context.dataStore.data
@@ -80,6 +84,18 @@ class UserPreferences(private val context: Context) {
 
     val lastAutoTestTime: Flow<Long> = context.dataStore.data
         .map { prefs -> prefs[LAST_AUTO_TEST_TIME] ?: 0L }
+
+    val dataPlanLimitGb: Flow<Int> = context.dataStore.data
+        .map { prefs -> prefs[DATA_PLAN_LIMIT_GB] ?: 100 }
+
+    val usageTodayMb: Flow<Float> = context.dataStore.data
+        .map { prefs -> prefs[USAGE_TODAY_MB] ?: 0f }
+
+    val usageWeekMb: Flow<Float> = context.dataStore.data
+        .map { prefs -> prefs[USAGE_WEEK_MB] ?: 0f }
+
+    val usageMonthMb: Flow<Float> = context.dataStore.data
+        .map { prefs -> prefs[USAGE_MONTH_MB] ?: 0f }
 
     suspend fun setParallelConnections(value: Int) {
         context.dataStore.edit { prefs ->
@@ -156,6 +172,26 @@ class UserPreferences(private val context: Context) {
     suspend fun setLastAutoTestTime(time: Long) {
         context.dataStore.edit { prefs ->
             prefs[LAST_AUTO_TEST_TIME] = time
+        }
+    }
+
+    suspend fun setDataPlanLimitGb(limit: Int) {
+        context.dataStore.edit { prefs ->
+            prefs[DATA_PLAN_LIMIT_GB] = limit
+        }
+    }
+
+    suspend fun addUsage(mb: Float) {
+        context.dataStore.edit { prefs ->
+            prefs[USAGE_TODAY_MB] = (prefs[USAGE_TODAY_MB] ?: 0f) + mb
+            prefs[USAGE_WEEK_MB] = (prefs[USAGE_WEEK_MB] ?: 0f) + mb
+            prefs[USAGE_MONTH_MB] = (prefs[USAGE_MONTH_MB] ?: 0f) + mb
+        }
+    }
+
+    suspend fun resetUsageToday() {
+        context.dataStore.edit { prefs ->
+            prefs[USAGE_TODAY_MB] = 0f
         }
     }
 }

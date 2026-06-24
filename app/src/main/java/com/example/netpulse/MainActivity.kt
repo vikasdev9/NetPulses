@@ -15,6 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.netpulse.data.datastore.UserPreferences
 import com.example.netpulse.navigation.NavRoutes
 import com.example.netpulse.ui.screen.*
+import com.example.netpulse.ui.screen.InsightsScreen
 import com.example.netpulse.ui.theme.NetPulseTheme
 import com.example.netpulse.ui.viewmodel.AnalyticsViewModel
 import com.example.netpulse.ui.viewmodel.SettingsViewModel
@@ -120,8 +121,8 @@ class MainActivity : BaseActivity() {
                                     onNavigateToSettings = {
                                         navController.navigate(NavRoutes.Settings) { launchSingleTop = true }
                                     },
-                                    onNavigateToAnalytics = {
-                                        navController.navigate(NavRoutes.Analytics) { launchSingleTop = true }
+                                    onNavigateToInsights = {
+                                        navController.navigate(NavRoutes.Insights) { launchSingleTop = true }
                                     }
                                 )
                             }
@@ -129,6 +130,11 @@ class MainActivity : BaseActivity() {
                                 AnalyticsScreen(
                                     onNavigateBack = { navController.popBackStack() },
                                     onNavigateToDashboard = { navController.navigate(NavRoutes.AppUsageDashboard) }
+                                )
+                            }
+                            composable(NavRoutes.Insights) {
+                                InsightsScreen(
+                                    onBack = { navController.popBackStack() }
                                 )
                             }
                             composable(NavRoutes.AppUsageDashboard) {
