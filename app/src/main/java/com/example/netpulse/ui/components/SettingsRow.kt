@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 fun SettingsRow(
     icon: ImageVector,
     title: String,
+    subtitle: String? = null,
     trailing: @Composable () -> Unit,
     onClick: (() -> Unit)? = null,
     showDivider: Boolean = true
@@ -58,11 +59,20 @@ fun SettingsRow(
                 
                 Spacer(modifier = Modifier.width(12.dp))
                 
-                Text(
-                    text = title,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    fontSize = 15.sp
-                )
+                Column {
+                    Text(
+                        text = title,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontSize = 15.sp
+                    )
+                    if (subtitle != null) {
+                        Text(
+                            text = subtitle,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 12.sp
+                        )
+                    }
+                }
             }
             
             Box(contentAlignment = Alignment.CenterEnd) {

@@ -15,6 +15,7 @@ import java.util.*
 object NotificationHelper {
     const val CHANNEL_TEST_RESULTS = "channel_test_results"
     const val CHANNEL_ALERTS = "channel_alerts"
+    const val CHANNEL_SPEED_ALERTS = "speed_alerts"
     const val CHANNEL_DAILY_SUMMARY = "channel_daily_summary"
     const val CHANNEL_WIDGET = "channel_widget"
 
@@ -38,6 +39,14 @@ object NotificationHelper {
                 description = "Alerts for speed drops or slow internet"
             }
 
+            val speedAlerts = NotificationChannel(
+                CHANNEL_SPEED_ALERTS,
+                "Speed Drop Alerts",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Notifies when your internet speed drops significantly"
+            }
+
             val dailySummary = NotificationChannel(
                 CHANNEL_DAILY_SUMMARY,
                 "Daily Summary",
@@ -54,7 +63,7 @@ object NotificationHelper {
                 description = "Background tests from the home screen widget"
             }
 
-            manager.createNotificationChannels(listOf(testResults, alerts, dailySummary, widget))
+            manager.createNotificationChannels(listOf(testResults, alerts, speedAlerts, dailySummary, widget))
         }
     }
 
@@ -76,6 +85,22 @@ object NotificationHelper {
             .build()
 
         notify(context, 1001, notification)
+    }
+
+    fun showSpeedDropAlert(context: Context, current: Double, baseline: Float) {
+        val intent = Intent(context, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+
+        val notification = NotificationCompat.Builder(context, CHANNEL_SPEED_ALERTS)
+            .setSmallIcon(R.drawable.ic_bolt)
+            .setContentTitle("Speed Drop Alert")
+            .setContentText("Your speed dropped to ${"%.1f".format(current)} Mbps (baseline: ${"%.1f".format(baseline)} Mbps)")
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .setContentIntent(pendingIntent)
+            .build()
+
+        notify(context, 1002, notification)
     }
 
     fun showSpeedDropAlert(context: Context, current: Double, avg: Double) {

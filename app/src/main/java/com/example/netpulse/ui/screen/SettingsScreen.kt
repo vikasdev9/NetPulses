@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import java.util.concurrent.TimeUnit
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
@@ -38,6 +39,7 @@ import com.example.netpulse.ui.components.ProUpgradeCard
 import com.example.netpulse.ui.components.SegmentedControl
 import com.example.netpulse.ui.components.SettingsRow
 import com.example.netpulse.ui.viewmodel.SettingsViewModel
+import com.example.netpulse.ui.viewmodel.SpeedTestSettingsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,9 +48,27 @@ fun SettingsScreen(
     onNavigateToHistory: () -> Unit,
     onNavigateToLanguage: () -> Unit,
     onNavigateToPrivacyPolicy: () -> Unit,
-    viewModel: SettingsViewModel = viewModel()
+    viewModel: SettingsViewModel = viewModel(),
+    speedTestViewModel: SpeedTestSettingsViewModel = viewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    val speedTestState by speedTestViewModel.speedDropAlertEnabled.collectAsState()
+    val autoScheduleEnabled by speedTestViewModel.autoScheduleEnabled.collectAsState()
+    val baselineSpeed by speedTestViewModel.baselineSpeed.collectAsState()
+    val lastAutoTestTime by speedTestViewModel.lastAutoTestTime.collectAsState()
+
+    val nextTestText = remember(lastAutoTestTime, autoScheduleEnabled) {
+        if (!autoScheduleEnabled) ""
+        else if (lastAutoTestTime == 0L) "Next test: Scheduled"
+        else {
+            val nextTime = lastAutoTestTime + TimeUnit.HOURS.toMillis(24)
+            val diffMs = nextTime - System.currentTimeMillis()
+            val diffHours = (diffMs / (1000 * 60 * 60)).coerceAtLeast(0)
+            if (diffHours > 0) "Next test: in $diffHours hours"
+            else "Next test: soon"
+        }
+    }
+
     val context = LocalContext.current
     val scrollState = rememberScrollState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -227,15 +247,61 @@ fun SettingsScreen(
                     )
                 }
             }
-            
-//            Spacer(modifier = Modifier.height(16.dp))
-//
-//            // PRO CARD
-//            ProUpgradeCard(
-//                isPro = state.isPro,
-//                onUpgradeClick = { viewModel.onUpgradeTapped() },
-//                onRestoreClick = { viewModel.onRestorePurchase() }
-//            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // MONITORING SECTION
+            SectionLabel("ADVANCED MONITORING")
+            Card(
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                shape = RoundedCornerShape(16.dp),
+                border = androidx.compose.foundation.BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline)
+            ) {
+                Column {
+                    SettingsRow(
+                        icon = Icons.Outlined.Speed,
+                        title = "Speed Drop Alert",
+                        subtitle = "Notify when speed drops 50% below your baseline",
+                        trailing = {
+                            Switch(
+                                checked = speedTestState,
+                                onCheckedChange = { speedTestViewModel.toggleSpeedDropAlert(it) },
+                                colors = customSwitchColors()
+                            )
+                        }
+                    )
+                    if (speedTestState) {
+                        Text(
+                            text = "Baseline: ${"%.1f".format(baselineSpeed)} Mbps",
+                            color = MaterialTheme.colorScheme.primary,
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(start = 56.dp, bottom = 12.dp)
+                        )
+                    }
+
+                    SettingsRow(
+                        icon = Icons.Outlined.Timer,
+                        title = "Auto Schedule Test",
+                        subtitle = "Run speed test every 24 hours automatically",
+                        trailing = {
+                            Switch(
+                                checked = autoScheduleEnabled,
+                                onCheckedChange = { speedTestViewModel.toggleAutoSchedule(it) },
+                                colors = customSwitchColors()
+                            )
+                        },
+                        showDivider = false
+                    )
+                    if (autoScheduleEnabled) {
+                        Text(
+                            text = nextTestText,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(start = 56.dp, bottom = 12.dp)
+                        )
+                    }
+                }
+            }
             
             Spacer(modifier = Modifier.height(24.dp))
             

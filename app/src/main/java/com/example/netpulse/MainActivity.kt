@@ -18,6 +18,7 @@ import com.example.netpulse.ui.screen.*
 import com.example.netpulse.ui.theme.NetPulseTheme
 import com.example.netpulse.ui.viewmodel.AnalyticsViewModel
 import com.example.netpulse.ui.viewmodel.SettingsViewModel
+import com.example.netpulse.ui.viewmodel.SpeedTestSettingsViewModel
 import com.example.netpulse.ui.viewmodel.SpeedTestViewModel
 import com.example.netpulse.utils.LocaleUtils
 import com.example.netpulse.utils.WiFiAutoRunManager
@@ -44,6 +45,10 @@ class MainActivity : BaseActivity() {
 
         val speedTestViewModel: SpeedTestViewModel by viewModels {
             SpeedTestViewModel.Factory(application, userPreferences)
+        }
+
+        val speedTestSettingsViewModel: SpeedTestSettingsViewModel by viewModels {
+            SpeedTestSettingsViewModel.Factory(application, userPreferences)
         }
 
         wifiAutoRunManager = WiFiAutoRunManager(this) {
@@ -159,7 +164,8 @@ class MainActivity : BaseActivity() {
                                     },
                                     onNavigateToLanguage = { navController.navigate(NavRoutes.Language) },
                                     onNavigateToPrivacyPolicy = { navController.navigate(NavRoutes.PrivacyPolicy) },
-                                    viewModel = settingsViewModel
+                                    viewModel = settingsViewModel,
+                                    speedTestViewModel = speedTestSettingsViewModel
                                 )
                             }
                             composable(NavRoutes.Language) {

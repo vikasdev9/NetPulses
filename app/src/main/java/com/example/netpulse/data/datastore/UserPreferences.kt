@@ -27,6 +27,10 @@ class UserPreferences(private val context: Context) {
         val PRIVACY_POLICY_ACCEPTED = booleanPreferencesKey("privacy_policy_accepted")
         val DATA_USAGE_ACCEPTED = booleanPreferencesKey("data_usage_accepted")
         val LANGUAGE_CODE = stringPreferencesKey("language_code")
+        val SPEED_DROP_ALERT_ENABLED = booleanPreferencesKey("speed_drop_alert_enabled")
+        val AUTO_SCHEDULE_ENABLED = booleanPreferencesKey("auto_schedule_enabled")
+        val BASELINE_SPEED = floatPreferencesKey("baseline_speed")
+        val LAST_AUTO_TEST_TIME = longPreferencesKey("last_auto_test_time")
     }
 
     val languageCode: Flow<String> = context.dataStore.data
@@ -64,6 +68,18 @@ class UserPreferences(private val context: Context) {
 
     val adFrequency: Flow<String> = context.dataStore.data
         .map { prefs -> prefs[AD_FREQUENCY] ?: "Normal" }
+
+    val speedDropAlertEnabled: Flow<Boolean> = context.dataStore.data
+        .map { prefs -> prefs[SPEED_DROP_ALERT_ENABLED] ?: false }
+
+    val autoScheduleEnabled: Flow<Boolean> = context.dataStore.data
+        .map { prefs -> prefs[AUTO_SCHEDULE_ENABLED] ?: false }
+
+    val baselineSpeed: Flow<Float> = context.dataStore.data
+        .map { prefs -> prefs[BASELINE_SPEED] ?: 0f }
+
+    val lastAutoTestTime: Flow<Long> = context.dataStore.data
+        .map { prefs -> prefs[LAST_AUTO_TEST_TIME] ?: 0L }
 
     suspend fun setParallelConnections(value: Int) {
         context.dataStore.edit { prefs ->
@@ -116,6 +132,30 @@ class UserPreferences(private val context: Context) {
     suspend fun setAdFrequency(frequency: String) {
         context.dataStore.edit { prefs ->
             prefs[AD_FREQUENCY] = frequency
+        }
+    }
+
+    suspend fun setSpeedDropAlertEnabled(enabled: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[SPEED_DROP_ALERT_ENABLED] = enabled
+        }
+    }
+
+    suspend fun setAutoScheduleEnabled(enabled: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[AUTO_SCHEDULE_ENABLED] = enabled
+        }
+    }
+
+    suspend fun setBaselineSpeed(speed: Float) {
+        context.dataStore.edit { prefs ->
+            prefs[BASELINE_SPEED] = speed
+        }
+    }
+
+    suspend fun setLastAutoTestTime(time: Long) {
+        context.dataStore.edit { prefs ->
+            prefs[LAST_AUTO_TEST_TIME] = time
         }
     }
 }
