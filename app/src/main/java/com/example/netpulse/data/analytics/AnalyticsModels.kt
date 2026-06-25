@@ -3,14 +3,56 @@ package com.example.netpulse.data.analytics
 import android.graphics.drawable.Drawable
 import java.util.Date
 
+enum class TimeOfDay { MORNING, AFTERNOON, EVENING, NIGHT }
+
+data class HealthBadge(val label: String, val status: BadgeStatus)
+enum class BadgeStatus { GOOD, FAIR, POOR, EXCELLENT }
+
+data class SmartInsight(
+    val title: String,
+    val description: String,
+    val type: InsightType
+)
+enum class InsightType { WARNING, SUCCESS, INFO, ALERT }
+
+data class StreakDay(val dayLabel: String, val status: StreakStatus)
+enum class StreakStatus { COMPLETED, MISSED, TODAY }
+
+data class Achievement(
+    val id: String,
+    val title: String,
+    val description: String,
+    val isUnlocked: Boolean,
+    val unlockedDate: Long? = null
+)
+
+enum class SignalStrength { EXCELLENT, GOOD, FAIR, WEAK }
+
+data class Recommendation(
+    val id: String,
+    val title: String,
+    val description: String,
+    val priority: RecommendationPriority,
+    val isDismissed: Boolean = false
+)
+enum class RecommendationPriority { HIGH, MEDIUM, LOW }
+
+data class DailyReport(
+    val bestSpeed: Float,
+    val worstSpeed: Float,
+    val averageSpeed: Float,
+    val totalTests: Int,
+    val bestHour: Int,
+    val worstHour: Int,
+    val date: Long
+)
+
 data class DataUsage(
     val rxBytes: Long = 0L,
     val txBytes: Long = 0L
 ) {
-    val totalBytes: Long = rxBytes + txBytes
-    val totalFormatted: String = formatBytes(totalBytes)
-    val rxFormatted: String = formatBytes(rxBytes)
-    val txFormatted: String = formatBytes(txBytes)
+    val totalBytes: Long get() = rxBytes + txBytes
+    val totalFormatted: String get() = formatBytes(totalBytes)
 }
 
 data class AppDataUsage(
@@ -21,8 +63,21 @@ data class AppDataUsage(
     val rxBytes: Long,
     val txBytes: Long
 ) {
-    val totalBytes: Long = rxBytes + txBytes
-    val totalFormatted: String = formatBytes(totalBytes)
+    val totalBytes: Long get() = rxBytes + txBytes
+    val totalFormatted: String get() = formatBytes(totalBytes)
+}
+
+data class DailyUsage(
+    val date: Date,
+    val dayLabel: String,
+    val mobileRx: Long,
+    val mobileTx: Long,
+    val wifiRx: Long,
+    val wifiTx: Long
+) {
+    val totalMobile: Long get() = mobileRx + mobileTx
+    val totalWifi: Long get() = wifiRx + wifiTx
+    val totalAll: Long get() = totalMobile + totalWifi
 }
 
 data class AppScreenTime(
@@ -34,19 +89,6 @@ data class AppScreenTime(
     val lastUsedLabel: String,
     val formattedTime: String
 )
-
-data class DailyUsage(
-    val date: Date,
-    val dayLabel: String,
-    val mobileRx: Long = 0L,
-    val mobileTx: Long = 0L,
-    val wifiRx: Long = 0L,
-    val wifiTx: Long = 0L
-) {
-    val totalMobile: Long = mobileRx + mobileTx
-    val totalWifi: Long = wifiRx + wifiTx
-    val totalAll: Long = totalMobile + totalWifi
-}
 
 data class DailyScreenTime(
     val date: Date,
@@ -68,16 +110,11 @@ data class CombinedAppUsage(
     val lastUsedLabel: String
 )
 
-fun formatBytes(bytes: Long): String {
-    if (bytes < 1024) return "$bytes B"
-    val exp = (Math.log(bytes.toDouble()) / Math.log(1024.0)).toInt()
-    val pre = "KMGTPE"[exp - 1]
-    return String.format("%.2f %sB", bytes / Math.pow(1024.0, exp.toDouble()), pre)
-}
-
-fun formatDuration(ms: Long): String {
-    if (ms < 60000) return "< 1m"
-    val minutes = (ms / 60000) % 60
-    val hours = ms / 3600000
-    return if (hours > 0) "${hours}h ${minutes}m" else "${minutes}m"
-}
+data class SpeedTestResult(
+    val downloadMbps: Float,
+    val uploadMbps: Float,
+    val pingMs: Int,
+    val jitterMs: Float,
+    val timestamp: Long,
+    val timeOfDay: TimeOfDay
+)

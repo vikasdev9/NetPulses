@@ -25,6 +25,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.example.netpulse.insights.achievements.AchievementRepository
+import com.example.netpulse.insights.usage.UsageRepository
+import com.example.netpulse.insights.isp.ISPRepository
 import androidx.glance.appwidget.updateAll
 import java.util.Calendar
 
@@ -73,6 +76,9 @@ class SpeedTestViewModel(
 ) : AndroidViewModel(application) {
 
     private val dao = (application as NetPulseApplication).database.speedResultDao()
+    private val achievementRepository = AchievementRepository(application)
+    private val usageRepository = UsageRepository(application)
+    private val ispRepository = ISPRepository(application)
 
     private val _uiState = MutableStateFlow(SpeedTestUiState())
     val uiState: StateFlow<SpeedTestUiState> = _uiState.asStateFlow()
@@ -212,6 +218,9 @@ class SpeedTestViewModel(
 
             withContext(Dispatchers.IO) {
                 dao.insert(result)
+                achievementRepository.checkAchievements(result)
+                usageRepository.addUsage(download, upload)
+                ispRepository.updateStats(result.isp, download.toFloat(), upload.toFloat(), ping.toFloat())
                 
                 if (notificationsEnabled) {
                     NotificationHelper.showTestCompleteNotification(getApplication(), download, upload, ping.toInt())

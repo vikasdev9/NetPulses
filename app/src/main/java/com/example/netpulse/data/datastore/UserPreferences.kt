@@ -31,6 +31,7 @@ class UserPreferences(private val context: Context) {
         val AUTO_SCHEDULE_ENABLED = booleanPreferencesKey("auto_schedule_enabled")
         val BASELINE_SPEED = floatPreferencesKey("baseline_speed")
         val LAST_AUTO_TEST_TIME = longPreferencesKey("last_auto_test_time")
+        val ADVERTISED_SPEED = floatPreferencesKey("advertised_speed")
     }
 
     val languageCode: Flow<String> = context.dataStore.data
@@ -80,6 +81,9 @@ class UserPreferences(private val context: Context) {
 
     val lastAutoTestTime: Flow<Long> = context.dataStore.data
         .map { prefs -> prefs[LAST_AUTO_TEST_TIME] ?: 0L }
+
+    val advertisedSpeed: Flow<Float> = context.dataStore.data
+        .map { prefs -> prefs[ADVERTISED_SPEED] ?: 100f }
 
     suspend fun setParallelConnections(value: Int) {
         context.dataStore.edit { prefs ->
@@ -156,6 +160,12 @@ class UserPreferences(private val context: Context) {
     suspend fun setLastAutoTestTime(time: Long) {
         context.dataStore.edit { prefs ->
             prefs[LAST_AUTO_TEST_TIME] = time
+        }
+    }
+
+    suspend fun setAdvertisedSpeed(speed: Float) {
+        context.dataStore.edit { prefs ->
+            prefs[ADVERTISED_SPEED] = speed
         }
     }
 }

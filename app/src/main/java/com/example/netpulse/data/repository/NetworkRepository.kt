@@ -147,18 +147,58 @@ class NetworkRepository(private val context: Context) {
         ))
     }
 
-    fun getRecommendations(): Flow<List<String>> = flow {
+    fun calculateHealthScore(download: Float, upload: Float, ping: Int, jitter: Float): Int {
+        val idealDown = 100f
+        val idealUp = 50f
+        val idealPing = 10f
+        val idealJitter = 1f
+
+        val downScore = (download / idealDown).coerceIn(0f, 1f) * 0.40f
+        val upScore = (upload / idealUp).coerceIn(0f, 1f) * 0.20f
+        val pingScore = (idealPing / ping.coerceAtLeast(1)).coerceIn(0f, 1f) * 0.25f
+        val jitterScore = (idealJitter / jitter.coerceAtLeast(0.1f)).coerceIn(0f, 1f) * 0.15f
+
+        return ((downScore + upScore + pingScore + jitterScore) * 100).toInt()
+    }
+
+    fun getRecommendations(): Flow<List<RecommendationItem>> = flow {
         val latest = dao.getAll().first().firstOrNull()
-        val recs = mutableListOf<String>()
+        val recs = mutableListOf<RecommendationItem>()
         
         if (latest != null) {
-            if (latest.downloadMbps < 25) recs.add("Download speed is low for 4K streaming.")
-            if (latest.pingMs > 50) recs.add("High latency detected. Gaming might be affected.")
-        } else {
-            recs.add("Perform a speed test to get recommendations.")
+            val down = latest.downloadMbps.toFloat()
+            val up = latest.uploadMbps.toFloat()
+            val ping = latest.pingMs
+            val jitter = latest.jitterMs.toFloat()
+
+            // 1. Evening speed (Mocked comparison for now)
+            // 2. High latency
+            if (ping > 50) {
+                recs.add(RecommendationItem("lat", "High latency detected", "Try connecting via ethernet or restart your router.", RecommendationPriority.HIGH))
+            }
+            // 3. Jitter
+            if (jitter > 10) {
+                recs.add(RecommendationItem("jit", "Unstable connection", "Avoid video calls during peak hours.", RecommendationPriority.MEDIUM))
+            }
+            // 4. Actual < 50% Advertised (Assume 100 Mbps)
+            if (down < 50) {
+                recs.add(RecommendationItem("isp", "Low ISP performance", "Your ISP is delivering less than 50% of your plan speed.", RecommendationPriority.HIGH))
+            }
+            // 5. Upload < 10% Download
+            if (up < down * 0.1f) {
+                recs.add(RecommendationItem("up", "Low upload speed", "This affects video calls and cloud backup performance.", RecommendationPriority.MEDIUM))
+            }
+            
+            val score = calculateHealthScore(down, up, ping, jitter)
+            if (score < 50) {
+                recs.add(RecommendationItem("health", "Poor network health", "Try restarting your router and modem.", RecommendationPriority.HIGH))
+            }
         }
         
-        recs.add("Network performing normally.")
+        if (recs.isEmpty()) {
+            recs.add(RecommendationItem("all_clear", "All clear", "Network performing normally.", RecommendationPriority.LOW))
+        }
+
         emit(recs)
     }
 

@@ -30,6 +30,7 @@ import com.example.netpulse.ui.components.*
 import com.example.netpulse.ui.theme.*
 import com.example.netpulse.ui.viewmodel.*
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
+import kotlin.collections.forEachIndexed
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -137,6 +138,14 @@ fun AnalyticsScreen(
                     }
                 }
 
+                // FEATURE 1: Internet Health Score
+                item {
+                    HealthScoreCard(
+                        score = uiState.healthScore,
+                        trend = uiState.healthTrend
+                    )
+                }
+
                 // 2. Current Network Status
                 item {
                     AnalyticsCard(title = "Current Network", icon = Icons.Default.Wifi) {
@@ -167,6 +176,24 @@ fun AnalyticsScreen(
                     }
                 }
 
+                // FEATURE 3: Weekly & Monthly Trends
+                item {
+                    TrendChartCard(
+                        trendData = uiState.trendData,
+                        stats = uiState.trendStats
+                    )
+                }
+
+                // FEATURE 4: Internet Usage (Estimated from tests)
+                item {
+                    UsageCard(usage = uiState.estimatedUsage)
+                }
+
+                // FEATURE 5: ISP Performance Dashboard
+                item {
+                    IspPerformanceCard(performance = uiState.ispPerformance)
+                }
+
                 // 4. Traffic Analysis
                 item {
                     AnalyticsCard(title = "Traffic Analysis", icon = Icons.Default.BarChart) {
@@ -194,6 +221,20 @@ fun AnalyticsScreen(
                         onShowMore = onNavigateToDashboard,
                         onGrantAccess = { viewModel.openUsageSettings() }
                     )
+                }
+
+                // FEATURE 7: Achievement & Streak System
+                item {
+                    AchievementSection(
+                        streak = uiState.streak,
+                        recentDays = uiState.recentStreakDays,
+                        achievements = uiState.achievements
+                    )
+                }
+
+                // FEATURE 8: Wi-Fi Stability Monitoring
+                item {
+                    StabilityCard(metrics = uiState.stabilityMetrics)
                 }
 
                 // 6. Advanced Diagnostics
@@ -226,43 +267,12 @@ fun AnalyticsScreen(
                     }
                 }
 
-                // 9. Optimization Suggestions
+                // FEATURE 9: Smart Recommendations
                 item {
-                    AnalyticsCard(title = "Optimization Suggestions", icon = Icons.Default.TipsAndUpdates) {
-                        uiState.recommendations.forEach { rec ->
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .padding(vertical = 6.dp)
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.05f))
-                                    .padding(12.dp)
-                            ) {
-                                Icon(Icons.Default.Info, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
-                                Spacer(modifier = Modifier.width(12.dp))
-                                Text(rec, color = MaterialTheme.colorScheme.onBackground, fontSize = 13.sp)
-                            }
-                        }
-                        
-                        // Show tip if present
-                        uiState.tipApp?.let { app ->
-                            Spacer(modifier = Modifier.height(12.dp))
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
-                                    .padding(12.dp)
-                            ) {
-                                Text(
-                                    text = "\uD83D\uDCA1 Data Tip: ${app.appName} consumed high data today.",
-                                    color = MaterialTheme.colorScheme.primary,
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Medium
-                                )
-                            }
-                        }
-                    }
+                    RecommendationsSection(
+                        recommendations = uiState.recommendations,
+                        onDismiss = { /* viewModel.dismissRecommendation(it) */ }
+                    )
                 }
 
                 // 10. Master Actions
