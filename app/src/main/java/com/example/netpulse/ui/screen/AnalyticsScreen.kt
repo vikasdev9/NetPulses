@@ -37,6 +37,7 @@ import kotlin.collections.forEachIndexed
 fun AnalyticsScreen(
     onNavigateBack: () -> Unit = {},
     onNavigateToDashboard: () -> Unit = {},
+    onNavigateToHistory: () -> Unit = {},
     viewModel: AnalyticsViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -248,6 +249,79 @@ fun AnalyticsScreen(
                     }
                 }
 
+                // 5. Speed Test Intelligence
+                item {
+                    AnalyticsCard(title = "Speed Test Intelligence", icon = Icons.Default.Speed) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text("Last Test Result", color = MaterialTheme.colorScheme.primary, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                Text("${uiState.speedSummary.download.toInt()} / ${uiState.speedSummary.upload.toInt()} Mbps", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
+                                Text("Ping: ${uiState.speedSummary.ping} ms | Jitter: ${uiState.speedSummary.jitter} ms", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                            Column(horizontalAlignment = Alignment.End) {
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+                                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                                ) {
+                                    Text(
+                                        text = "Score: ${uiState.healthScore}",
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = uiState.speedSummary.testTime,
+                                    fontSize = 10.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(24.dp))
+                        SectionSubHeader("Peak Performance")
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                            InfoItem("Peak Download", "${uiState.speedSummary.peakDownload.toInt()} Mbps", Modifier.weight(1f))
+                            InfoItem("Peak Upload", "${uiState.speedSummary.peakUpload.toInt()} Mbps", Modifier.weight(1f))
+                        }
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+                        SectionSubHeader("Average & Stability")
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                            InfoItem("Avg Download", "${uiState.speedSummary.avgDownload.toInt()} Mbps", Modifier.weight(1f))
+                            InfoItem("Avg Upload", "${uiState.speedSummary.avgUpload.toInt()} Mbps", Modifier.weight(1f))
+                        }
+                        Row(modifier = Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                            InfoItem("Minimum Ping", "${uiState.speedSummary.minPing} ms", Modifier.weight(1f))
+                            InfoItem("Maximum Ping", "${uiState.speedSummary.maxPing} ms", Modifier.weight(1f))
+                        }
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+                        SectionSubHeader("Diagnostic Details")
+                        InfoRow("Test Duration", uiState.speedSummary.testDuration)
+                        InfoRow("Packet Loss", "${String.format(java.util.Locale.US, "%.1f", uiState.speedSummary.packetLoss)}%")
+                        InfoRow("Test Server", uiState.speedSummary.server)
+                        
+                        Spacer(modifier = Modifier.height(20.dp))
+                        OutlinedButton(
+                            onClick = onNavigateToHistory,
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+                        ) {
+                            Icon(Icons.Default.History, null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("View Test History", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+
                 // FEATURE 3: Weekly & Monthly Trends
                 item {
                     TrendChartCard(
@@ -417,6 +491,14 @@ fun AnalyticsScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun InfoItem(label: String, value: String, modifier: Modifier = Modifier) {
+    Column(modifier = modifier) {
+        Text(text = label, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 10.sp)
+        Text(text = value, color = MaterialTheme.colorScheme.onBackground, fontSize = 14.sp, fontWeight = FontWeight.Bold)
     }
 }
 

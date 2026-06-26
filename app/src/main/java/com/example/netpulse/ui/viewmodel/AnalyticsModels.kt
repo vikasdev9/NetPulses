@@ -71,7 +71,14 @@ data class SpeedSummary(
     val jitter: Int = 0,
     val packetLoss: Float = 0.0f,
     val testTime: String = "—",
-    val server: String = "—"
+    val server: String = "—",
+    val avgDownload: Float = 0f,
+    val avgUpload: Float = 0f,
+    val peakDownload: Float = 0f,
+    val peakUpload: Float = 0f,
+    val minPing: Int = 0,
+    val maxPing: Int = 0,
+    val testDuration: String = "0s"
 )
 
 enum class NetworkQuality(val label: String) {

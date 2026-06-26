@@ -148,15 +148,31 @@ class NetworkRepository(private val context: Context) {
     }
 
     fun getSpeedSummary(): Flow<SpeedSummary> = flow {
-        val latest = dao.getAll().first().firstOrNull()
+        val allResults = dao.getAll().first()
+        val latest = allResults.firstOrNull()
+        
         if (latest != null) {
+            val avgDown = allResults.map { it.downloadMbps }.average().toFloat()
+            val avgUp = allResults.map { it.uploadMbps }.average().toFloat()
+            val peakDown = allResults.maxOf { it.downloadMbps }.toFloat()
+            val peakUp = allResults.maxOf { it.uploadMbps }.toFloat()
+            val minPing = allResults.minOf { it.pingMs }
+            val maxPing = allResults.maxOf { it.pingMs }
+
             emit(SpeedSummary(
                 download = latest.downloadMbps.toFloat(),
                 upload = latest.uploadMbps.toFloat(),
                 ping = latest.pingMs,
                 jitter = latest.jitterMs,
                 testTime = SimpleDateFormat("h:mm a", Locale.getDefault()).format(Date(latest.timestamp)),
-                server = latest.serverUsed
+                server = latest.serverUsed,
+                avgDownload = avgDown,
+                avgUpload = avgUp,
+                peakDownload = peakDown,
+                peakUpload = peakUp,
+                minPing = minPing,
+                maxPing = maxPing,
+                testDuration = "15s" // Defaulting since we don't store it yet
             ))
         } else {
             emit(SpeedSummary())
