@@ -237,6 +237,14 @@ fun AnalyticsScreen(
                         InfoRow("ASN", uiState.ispInfo.asn)
                         InfoRow("Location", "${uiState.ispInfo.city}, ${uiState.ispInfo.country}")
                         InfoRow("Gateway", uiState.internetDetails.gateway)
+
+                        Spacer(modifier = Modifier.height(12.dp))
+                        SectionSubHeader("DNS Intelligence")
+                        InfoRow("Primary DNS", uiState.internetDetails.dns1)
+                        InfoRow("Secondary DNS", uiState.internetDetails.dns2)
+                        InfoRow("Private DNS", if (uiState.security.privateDns) "Active (${uiState.security.privateDnsServer})" else "Inactive")
+                        InfoRow("DNS over TLS", if (uiState.security.dnsOverTls) "Enabled" else "Disabled")
+                        InfoRow("DNS Response Time", "${uiState.diagnostics.dnsLookup} ms")
                     }
                 }
 

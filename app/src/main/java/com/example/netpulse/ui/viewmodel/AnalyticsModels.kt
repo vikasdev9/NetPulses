@@ -154,6 +154,8 @@ data class AdvancedDiagnostics(
 data class SecurityStatus(
     val vpnActive: Boolean = false,
     val privateDns: Boolean = false,
+    val privateDnsServer: String = "—",
+    val dnsOverTls: Boolean = false,
     val captivePortal: Boolean = false,
     val metered: Boolean = false,
     val roaming: Boolean = false,

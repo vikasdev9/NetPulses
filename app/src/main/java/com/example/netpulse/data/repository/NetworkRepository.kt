@@ -398,9 +398,21 @@ class NetworkRepository(private val context: Context) {
         val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork = cm.activeNetwork
         val caps = cm.getNetworkCapabilities(activeNetwork)
+        val lp = cm.getLinkProperties(activeNetwork)
+
+        val privateDnsMode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            android.provider.Settings.Global.getString(context.contentResolver, "private_dns_mode")
+        } else null
+        
+        val privateDnsServer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            android.provider.Settings.Global.getString(context.contentResolver, "private_dns_specifier") ?: "—"
+        } else "—"
 
         emit(SecurityStatus(
             vpnActive = caps?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) == true,
+            privateDns = privateDnsMode != null && privateDnsMode != "off",
+            privateDnsServer = privateDnsServer,
+            dnsOverTls = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) lp?.isPrivateDnsActive == true else false,
             metered = cm.isActiveNetworkMetered,
             roaming = caps?.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_ROAMING) == false,
             validated = caps?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) == true
