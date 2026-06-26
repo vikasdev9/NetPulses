@@ -340,6 +340,9 @@ class NetworkRepository(private val context: Context) {
         val powerManager = context.getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
 
         emit(DeviceInfo(
+            deviceName = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+                android.provider.Settings.Global.getString(context.contentResolver, android.provider.Settings.Global.DEVICE_NAME) ?: Build.MODEL
+            } else Build.MODEL,
             brand = Build.BRAND,
             manufacturer = Build.MANUFACTURER,
             model = Build.MODEL,
@@ -354,6 +357,8 @@ class NetworkRepository(private val context: Context) {
             kernelVersion = System.getProperty("os.version") ?: "—",
             buildNumber = Build.DISPLAY,
             supportedAbis = Build.SUPPORTED_ABIS.joinToString(", "),
+            cpuArch = System.getProperty("os.arch") ?: "—",
+            cpuCores = Runtime.getRuntime().availableProcessors(),
             
             totalRam = formatSize(memoryInfo.totalMem),
             availableRam = formatSize(memoryInfo.availMem),
@@ -407,7 +412,25 @@ class NetworkRepository(private val context: Context) {
     }
 
     fun getDiagnostics(): Flow<AdvancedDiagnostics> = flow {
-        emit(AdvancedDiagnostics())
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork = cm.activeNetwork
+        val caps = cm.getNetworkCapabilities(activeNetwork)
+        val lp = cm.getLinkProperties(activeNetwork)
+
+        emit(AdvancedDiagnostics(
+            mtu = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) lp?.mtu ?: 1500 else 1500,
+            interfaceName = lp?.interfaceName ?: "—",
+            ipv6Support = lp?.linkAddresses?.any { it.address is java.net.Inet6Address } ?: false,
+            dualStack = (lp?.linkAddresses?.any { it.address is java.net.Inet4Address } == true) && 
+                        (lp?.linkAddresses?.any { it.address is java.net.Inet6Address } == true),
+            estimatedBandwidth = "${caps?.linkDownstreamBandwidthKbps?.div(1000) ?: 0} Mbps",
+            transportType = when {
+                caps?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true -> "Wi-Fi"
+                caps?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true -> "Cellular"
+                else -> "Other"
+            },
+            validationStatus = if (caps?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) == true) "Validated" else "Not Validated"
+        ))
     }
 
     fun getSecurityStatus(): Flow<SecurityStatus> = flow {

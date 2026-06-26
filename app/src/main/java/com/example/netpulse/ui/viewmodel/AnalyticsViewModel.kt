@@ -18,103 +18,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 
-enum class AnalyticsRange { TODAY, WEEK, MONTH }
-enum class AnalyticsTab { DATA, TIME }
-enum class DashboardTab { DATA, TIME }
-
-data class AnalyticsUiState(
-    val isLoading: Boolean = true,
-    val selectedRange: AnalyticsRange = AnalyticsRange.TODAY,
-    val selectedTab: AnalyticsTab = AnalyticsTab.DATA,
-    val dashboardTab: DashboardTab = DashboardTab.DATA,
-    
-    // Usage Insights (System APIs)
-    val mobileData: DataUsage = DataUsage(),
-    val wifiData: DataUsage = DataUsage(),
-    val weeklyUsage: List<DailyUsage> = emptyList(),
-    val perAppData: List<AppDataUsage> = emptyList(),
-    val totalScreenTimeMs: Long = 0L,
-    val perAppScreenTime: List<AppScreenTime> = emptyList(),
-    val weeklyScreenTime: List<DailyScreenTime> = emptyList(),
-    val top3Apps: List<CombinedAppUsage> = emptyList(),
-    val allAppsCombined: List<CombinedAppUsage> = emptyList(),
-    val hasUsagePermission: Boolean = false,
-    val tipApp: AppDataUsage? = null,
-
-    // Network Intelligence (Repository)
-    val networkStatus: NetworkStatus = NetworkStatus(),
-    val mobileNetworkInfo: MobileNetworkInfo = MobileNetworkInfo(),
-    val internetDetails: InternetDetails = InternetDetails(),
-    val ispInfo: IspInfo = IspInfo(),
-    val speedSummary: SpeedSummary = SpeedSummary(),
-    val networkQuality: NetworkQuality = NetworkQuality.FAIR,
-    val deviceInfo: DeviceInfo = DeviceInfo(),
-    val timeline: List<TimelineEvent> = emptyList(),
-    val diagnostics: AdvancedDiagnostics = AdvancedDiagnostics(),
-    val security: SecurityStatus = SecurityStatus(),
-    val recommendations: List<RecommendationItem> = emptyList(),
-
-    // FEATURE 1: Health Score
-    val healthScore: Int = 0,
-    val healthTrend: Float = 0f, // diff from yesterday
-
-    // FEATURE 3: Trends
-    val trendData: List<TrendPoint> = emptyList(),
-    val trendPeriod: TrendPeriod = TrendPeriod.WEEKLY,
-    val trendStats: TrendStats = TrendStats(),
-
-    // FEATURE 4: Usage (Estimated from tests)
-    val estimatedUsage: EstimatedUsage = EstimatedUsage(),
-
-    // FEATURE 5: ISP Performance
-    val ispPerformance: IspPerformance = IspPerformance(),
-
-    // FEATURE 7: Achievements
-    val achievements: List<Achievement> = emptyList(),
-    val streak: Int = 0,
-    val recentStreakDays: List<Boolean> = emptyList(),
-
-    // FEATURE 8: Wi-Fi Stability
-    val stabilityMetrics: StabilityMetrics = StabilityMetrics()
-)
-
-data class RecommendationItem(
-    val id: String,
-    val title: String,
-    val description: String,
-    val priority: RecommendationPriority,
-    val isDismissed: Boolean = false
-)
-
-enum class RecommendationPriority { HIGH, MEDIUM, LOW }
-
-data class TrendPoint(val label: String, val value: Float)
-enum class TrendPeriod { WEEKLY, MONTHLY }
-data class TrendStats(val highest: Float = 0f, val lowest: Float = 0f, val average: Float = 0f, val highestLabel: String = "", val lowestLabel: String = "")
-
-data class EstimatedUsage(
-    val todayMB: Float = 0f,
-    val weekMB: Float = 0f,
-    val monthMB: Float = 0f,
-    val planLimitGB: Float = 100f
-)
-
-data class IspPerformance(
-    val deliveryScore: Int = 0,
-    val reliabilityScore: Int = 0,
-    val rankBadge: String = "Average",
-    val actualAvg: Float = 0f,
-    val advertised: Float = 100f
-)
-
-data class StabilityMetrics(
-    val uptimePercentage: Int = 0,
-    val signalLabel: String = "Good",
-    val disconnectionCount: Int = 0,
-    val pingStability: Float = 0f,
-    val liveSignalStrength: Int = 0
-)
-
 class AnalyticsViewModel(application: Application) : AndroidViewModel(application) {
 
     private val dataUsageHelper = DataUsageHelper(application)
@@ -212,14 +115,27 @@ class AnalyticsViewModel(application: Application) : AndroidViewModel(applicatio
 
                 // Collect the network intelligence results once
                 val networkResults = networkIntelligenceFlow.first()
+                
+                val currentSpeedSummary = networkResults[4] as SpeedSummary
+                val healthScore = networkRepository.calculateHealthScore(
+                    currentSpeedSummary.download,
+                    currentSpeedSummary.upload,
+                    currentSpeedSummary.ping,
+                    currentSpeedSummary.jitter.toFloat()
+                )
+                val useCaseRating = calculateUseCaseRating(
+                    currentSpeedSummary.download,
+                    currentSpeedSummary.ping,
+                    currentSpeedSummary.jitter
+                )
 
                 withContext(Dispatchers.Main) {
                     _uiState.update { state ->
                         state.copy(
                             isLoading = false,
                             hasUsagePermission = hasPermission,
-                            mobileData = todayMobile,
-                            wifiData = todayWifi,
+                            mobileData = NetworkUsageStats(today = todayMobile.totalBytes, totalFormatted = todayMobile.totalFormatted),
+                            wifiData = NetworkUsageStats(today = todayWifi.totalBytes, totalFormatted = todayWifi.totalFormatted),
                             weeklyUsage = weeklyUsage,
                             perAppData = perAppDataWithIcons.take(8),
                             totalScreenTimeMs = totalTime,
@@ -234,7 +150,7 @@ class AnalyticsViewModel(application: Application) : AndroidViewModel(applicatio
                             mobileNetworkInfo = networkResults[1] as MobileNetworkInfo,
                             internetDetails = networkResults[2] as InternetDetails,
                             ispInfo = networkResults[3] as IspInfo,
-                            speedSummary = networkResults[4] as SpeedSummary,
+                            speedSummary = currentSpeedSummary,
                             deviceInfo = networkResults[5] as DeviceInfo,
                             timeline = networkResults[6] as List<TimelineEvent>,
                             diagnostics = networkResults[7] as AdvancedDiagnostics,
@@ -242,12 +158,8 @@ class AnalyticsViewModel(application: Application) : AndroidViewModel(applicatio
                             recommendations = networkResults[9] as List<RecommendationItem>,
 
                             // Feature Data
-                            healthScore = networkRepository.calculateHealthScore(
-                                (networkResults[4] as SpeedSummary).download,
-                                (networkResults[4] as SpeedSummary).upload,
-                                (networkResults[4] as SpeedSummary).ping,
-                                (networkResults[4] as SpeedSummary).jitter.toFloat()
-                            ),
+                            healthScore = healthScore,
+                            useCaseRating = useCaseRating,
                             streak = streakCount,
                             estimatedUsage = EstimatedUsage(usageToday, usageWeek, usageMonth, actualLimit),
                             ispPerformance = ispPerf,
@@ -285,6 +197,37 @@ class AnalyticsViewModel(application: Application) : AndroidViewModel(applicatio
             points.add(0, TrendPoint(label, avg))
         }
         return points
+    }
+
+    private fun calculateUseCaseRating(download: Float, ping: Int, jitter: Int): UseCaseRating {
+        fun rate(score: Int): NetworkQuality = when {
+            score >= 90 -> NetworkQuality.EXCELLENT
+            score >= 70 -> NetworkQuality.GOOD
+            score >= 40 -> NetworkQuality.FAIR
+            else -> NetworkQuality.POOR
+        }
+
+        val gamingScore = (if (ping < 30) 60 else if (ping < 60) 40 else 10) +
+                         (if (jitter < 5) 40 else if (jitter < 15) 20 else 0)
+        
+        val streamingScore = (if (download > 25) 70 else if (download > 10) 50 else 20) +
+                            (if (ping < 100) 30 else 0)
+        
+        val videoCallScore = (if (download > 5) 50 else 20) +
+                            (if (ping < 50) 50 else if (ping < 100) 30 else 0)
+        
+        val browsingScore = (if (download > 2) 60 else 30) +
+                           (if (ping < 150) 40 else 20)
+        
+        val downloadScore = (if (download > 100) 100 else if (download > 50) 80 else if (download > 20) 60 else 30)
+
+        return UseCaseRating(
+            gaming = rate(gamingScore),
+            streaming = rate(streamingScore),
+            videoCalls = rate(videoCallScore),
+            browsing = rate(browsingScore),
+            downloads = rate(downloadScore)
+        )
     }
 
     private fun calculateTrendStats(points: List<TrendPoint>): TrendStats {

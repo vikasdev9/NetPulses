@@ -147,6 +147,17 @@ fun AnalyticsScreen(
                     )
                 }
 
+                // NEW FEATURE: Use Case Ratings
+                item {
+                    AnalyticsCard(title = "Connection Suitability", icon = Icons.Default.FactCheck) {
+                        UseCaseRatingRow("Gaming & Low Latency", uiState.useCaseRating.gaming, Icons.Default.SportsEsports)
+                        UseCaseRatingRow("4K Streaming", uiState.useCaseRating.streaming, Icons.Default.Tv)
+                        UseCaseRatingRow("Video Conferencing", uiState.useCaseRating.videoCalls, Icons.Default.VideoCall)
+                        UseCaseRatingRow("Web Browsing", uiState.useCaseRating.browsing, Icons.Default.Language)
+                        UseCaseRatingRow("Large Downloads", uiState.useCaseRating.downloads, Icons.Default.Download)
+                    }
+                }
+
                 // 2. Current Network Status
                 item {
                     AnalyticsCard(title = "Current Network", icon = Icons.Default.Wifi) {
@@ -385,12 +396,21 @@ fun AnalyticsScreen(
 
                 // 6. Advanced Diagnostics
                 item {
-                    AnalyticsCard(title = "Advanced Diagnostics", icon = Icons.Default.SettingsSuggest) {
+                    AnalyticsCard(title = "Advanced Network", icon = Icons.Default.SettingsSuggest) {
+                        InfoRow("Interface Name", uiState.diagnostics.interfaceName)
                         InfoRow("MTU Size", uiState.diagnostics.mtu.toString())
+                        InfoRow("IPv6 Support", if (uiState.diagnostics.ipv6Support) "Active" else "Unavailable")
+                        InfoRow("Dual Stack", if (uiState.diagnostics.dualStack) "Enabled" else "Disabled")
+                        InfoRow("Estimated RTT", "${uiState.diagnostics.estimatedRtt} ms")
+                        InfoRow("Estimated BW", uiState.diagnostics.estimatedBandwidth)
+                        InfoRow("Transport Type", uiState.diagnostics.transportType)
+                        InfoRow("Validation", uiState.diagnostics.validationStatus)
+                        
+                        Spacer(modifier = Modifier.height(12.dp))
+                        SectionSubHeader("Protocol Latency")
                         InfoRow("TCP Latency", "${uiState.diagnostics.tcpLatency} ms")
                         InfoRow("DNS Lookup", "${uiState.diagnostics.dnsLookup} ms")
                         InfoRow("SSL Handshake", "${uiState.diagnostics.handshake} ms")
-                        InfoRow("Route Hops", uiState.diagnostics.hops.toString())
                     }
                 }
 
@@ -425,12 +445,15 @@ fun AnalyticsScreen(
                 item {
                     AnalyticsCard(title = "Device Intelligence", icon = Icons.Default.Smartphone) {
                         SectionSubHeader("System & Hardware")
+                        InfoRow("Device Name", uiState.deviceInfo.deviceName)
                         InfoRow("Brand", uiState.deviceInfo.brand)
                         InfoRow("Manufacturer", uiState.deviceInfo.manufacturer)
                         InfoRow("Model", uiState.deviceInfo.model)
                         InfoRow("Device", uiState.deviceInfo.device)
                         InfoRow("Board", uiState.deviceInfo.board)
                         InfoRow("Hardware", uiState.deviceInfo.hardware)
+                        InfoRow("CPU Arch", uiState.deviceInfo.cpuArch)
+                        InfoRow("CPU Cores", uiState.deviceInfo.cpuCores.toString())
                         InfoRow("Supported ABIs", uiState.deviceInfo.supportedAbis)
                         
                         Spacer(modifier = Modifier.height(12.dp))
@@ -546,6 +569,146 @@ fun LinearProgressRow(label: String, value: Float, max: Float, color: Color, uni
 }
 
 @Composable
+fun SecurityToggle(label: String, active: Boolean) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 13.sp)
+        Box(
+            modifier = Modifier
+                .clip(CircleShape)
+                .background(if (active) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f))
+                .padding(horizontal = 8.dp, vertical = 2.dp)
+        ) {
+            Text(
+                text = if (active) "Active" else "Inactive",
+                color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@Composable
+fun UseCaseRatingRow(label: String, quality: NetworkQuality, icon: ImageVector) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(icon, null, modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.primary)
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(label, modifier = Modifier.weight(1f), fontSize = 14.sp)
+        QualityIndicator(quality.label)
+    }
+}
+
+@Composable
+fun QualityIndicator(label: String) {
+    val color = when (label) {
+        "Excellent" -> Color(0xFF4CAF50)
+        "Good" -> Color(0xFF8BC34A)
+        "Fair" -> Color(0xFFFFC107)
+        else -> Color(0xFFF44336)
+    }
+    
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(4.dp))
+            .background(color.copy(alpha = 0.1f))
+            .padding(horizontal = 6.dp, vertical = 2.dp)
+    ) {
+        Text(label, color = color, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+    }
+}
+
+@Composable
+fun TimelineItem(event: TimelineEvent) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Box(
+                modifier = Modifier
+                    .size(8.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary)
+            )
+            Box(
+                modifier = Modifier
+                    .width(1.dp)
+                    .height(30.dp)
+                    .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
+            )
+        }
+        Spacer(modifier = Modifier.width(12.dp))
+        Column {
+            Text(event.time, fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(event.title, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            Text(event.description, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+}
+
+@Composable
+fun RecommendationsSection(recommendations: List<RecommendationItem>, onDismiss: (RecommendationItem) -> Unit) {
+    if (recommendations.isEmpty()) return
+    
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text("Smart Recommendations", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+        recommendations.take(3).forEach { recommendation ->
+            RecommendationCard(recommendation, onDismiss = { onDismiss(recommendation) })
+        }
+    }
+}
+
+@Composable
+fun RecommendationCard(item: RecommendationItem, onDismiss: () -> Unit) {
+    val icon = when (item.priority) {
+        RecommendationPriority.HIGH -> Icons.Default.PriorityHigh
+        RecommendationPriority.MEDIUM -> Icons.Default.Info
+        RecommendationPriority.LOW -> Icons.Default.Lightbulb
+    }
+    
+    val color = when (item.priority) {
+        RecommendationPriority.HIGH -> MaterialTheme.colorScheme.error
+        RecommendationPriority.MEDIUM -> MaterialTheme.colorScheme.primary
+        RecommendationPriority.LOW -> MaterialTheme.colorScheme.secondary
+    }
+
+    Surface(
+        shape = RoundedCornerShape(16.dp),
+        color = color.copy(alpha = 0.05f),
+        border = BorderStroke(1.dp, color.copy(alpha = 0.1f))
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(icon, null, tint = color, modifier = Modifier.size(24.dp))
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(item.title, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                Text(item.description, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            IconButton(onClick = onDismiss) {
+                Icon(Icons.Default.Close, null, modifier = Modifier.size(16.dp))
+            }
+        }
+    }
+}
+
+@Composable
 fun SecondaryActionButton(text: String, icon: ImageVector, modifier: Modifier = Modifier) {
     OutlinedButton(
         onClick = {},
@@ -557,6 +720,22 @@ fun SecondaryActionButton(text: String, icon: ImageVector, modifier: Modifier = 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(icon, null, modifier = Modifier.size(18.dp))
             Text(text, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
+@Composable
+fun GradientButton(text: String, icon: ImageVector, modifier: Modifier = Modifier) {
+    Button(
+        onClick = {},
+        modifier = modifier.height(52.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(icon, null, modifier = Modifier.size(20.dp))
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(text, fontSize = 14.sp, fontWeight = FontWeight.Bold)
         }
     }
 }
