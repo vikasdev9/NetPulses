@@ -180,4 +180,44 @@ object ShareUtils {
         }
         context.startActivity(Intent.createChooser(intent, "Share Result"))
     }
+
+    fun downloadReportAsImage(
+        context: Context,
+        content: @Composable () -> Unit
+    ) {
+        val scope = CoroutineScope(Dispatchers.Main)
+        scope.launch {
+            val bitmap = captureComposableAsBitmap(context, null) {
+                content()
+            }
+            saveBitmapToGallery(context, bitmap)
+        }
+    }
+
+    private suspend fun saveBitmapToGallery(context: Context, bitmap: Bitmap) {
+        withContext(Dispatchers.IO) {
+            val filename = "NetPulse_Report_${System.currentTimeMillis()}.png"
+            val fos: java.io.OutputStream?
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                val contentValues = android.content.ContentValues().apply {
+                    put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME, filename)
+                    put(android.provider.MediaStore.MediaColumns.MIME_TYPE, "image/png")
+                    put(android.provider.MediaStore.MediaColumns.RELATIVE_PATH, android.os.Environment.DIRECTORY_PICTURES)
+                }
+                val uri = context.contentResolver.insert(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+                fos = uri?.let { context.contentResolver.openOutputStream(it) }
+            } else {
+                val imagesDir = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_PICTURES)
+                if (!imagesDir.exists()) imagesDir.mkdirs()
+                val image = File(imagesDir, filename)
+                fos = FileOutputStream(image)
+            }
+            fos?.use {
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
+            }
+            withContext(Dispatchers.Main) {
+                android.widget.Toast.makeText(context, "Report saved to Pictures", android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 }

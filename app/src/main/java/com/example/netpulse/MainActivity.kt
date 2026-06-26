@@ -16,6 +16,7 @@ import com.example.netpulse.data.datastore.UserPreferences
 import com.example.netpulse.navigation.NavRoutes
 import com.example.netpulse.ui.screen.*
 import com.example.netpulse.ui.theme.NetPulseTheme
+import com.example.netpulse.ui.viewmodel.AnalyticsRange
 import com.example.netpulse.ui.viewmodel.AnalyticsViewModel
 import com.example.netpulse.ui.viewmodel.SettingsViewModel
 import com.example.netpulse.ui.viewmodel.SpeedTestSettingsViewModel
@@ -128,7 +129,22 @@ class MainActivity : BaseActivity() {
                             composable(NavRoutes.Analytics) {
                                 AnalyticsScreen(
                                     onNavigateBack = { navController.popBackStack() },
-                                    onNavigateToDashboard = { navController.navigate(NavRoutes.AppUsageDashboard) }
+                                    onNavigateToDashboard = { navController.navigate(NavRoutes.AppUsageDashboard) },
+                                    onNavigateToSummary = { range ->
+                                        navController.navigate("network_summary_detail/${range.name}")
+                                    }
+                                )
+                            }
+                            composable(
+                                route = NavRoutes.NetworkSummaryDetail,
+                                arguments = listOf(androidx.navigation.navArgument("range") { type = androidx.navigation.NavType.StringType })
+                            ) { backStackEntry ->
+                                val rangeName = backStackEntry.arguments?.getString("range") ?: "TODAY"
+                                val range = try { AnalyticsRange.valueOf(rangeName) } catch (e: Exception) { AnalyticsRange.TODAY }
+                                NetworkSummaryDetailScreen(
+                                    range = range,
+                                    onBack = { navController.popBackStack() },
+                                    viewModel = androidx.lifecycle.viewmodel.compose.viewModel()
                                 )
                             }
                             composable(NavRoutes.AppUsageDashboard) {

@@ -116,6 +116,7 @@ class AnalyticsViewModel(application: Application) : AndroidViewModel(applicatio
 
                 // Collect the network intelligence results once
                 val networkResults = networkIntelligenceFlow.first()
+                val summaries = calculateSummaries(allTests)
                 
                 val currentSpeedSummary = networkResults[4] as SpeedSummary
                 val healthScore = networkRepository.calculateHealthScore(
@@ -166,12 +167,62 @@ class AnalyticsViewModel(application: Application) : AndroidViewModel(applicatio
                             ispPerformance = ispPerf,
                             stabilityMetrics = stability,
                             trendData = trendPoints,
-                            trendStats = calculateTrendStats(trendPoints)
+                            trendStats = calculateTrendStats(trendPoints),
+                            summaries = summaries
                         )
                     }
                 }
             }
         }
+    }
+
+    private fun calculateSummaries(allResults: List<com.example.netpulse.data.SpeedResult>): List<NetworkSummary> {
+        val calendar = Calendar.getInstance()
+        val now = calendar.timeInMillis
+
+        // Today
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        val todayStart = calendar.timeInMillis
+        val todaySummary = createSummaryForRange("Today", allResults.filter { it.timestamp >= todayStart }, AnalyticsRange.TODAY)
+
+        // Weekly
+        calendar.timeInMillis = now
+        calendar.add(Calendar.DAY_OF_YEAR, -7)
+        val weekStart = calendar.timeInMillis
+        val weeklySummary = createSummaryForRange("Weekly", allResults.filter { it.timestamp >= weekStart }, AnalyticsRange.WEEK)
+
+        // Monthly
+        calendar.timeInMillis = now
+        calendar.add(Calendar.MONTH, -1)
+        val monthStart = calendar.timeInMillis
+        val monthlySummary = createSummaryForRange("Monthly", allResults.filter { it.timestamp >= monthStart }, AnalyticsRange.MONTH)
+
+        return listOf(todaySummary, weeklySummary, monthlySummary)
+    }
+
+    private fun createSummaryForRange(title: String, results: List<com.example.netpulse.data.SpeedResult>, range: AnalyticsRange): NetworkSummary {
+        if (results.isEmpty()) return NetworkSummary(title = title, range = range)
+
+        val avgDown = results.map { it.downloadMbps }.average().toFloat()
+        val avgUp = results.map { it.uploadMbps }.average().toFloat()
+        val avgPing = results.map { it.pingMs }.average().toInt()
+
+        // Group by day to find best day (highest avg download)
+        val bestDay = results.groupBy { 
+            java.text.SimpleDateFormat("MMM dd", Locale.getDefault()).format(Date(it.timestamp))
+        }.maxByOrNull { entry -> entry.value.map { it.downloadMbps }.average() }?.key ?: "—"
+
+        return NetworkSummary(
+            title = title,
+            testCount = results.size,
+            avgDownload = avgDown,
+            avgUpload = avgUp,
+            avgPing = avgPing,
+            bestDay = bestDay,
+            range = range
+        )
     }
 
     private fun calculateTrendPoints(results: List<com.example.netpulse.data.SpeedResult>, period: TrendPeriod): List<TrendPoint> {

@@ -245,6 +245,16 @@ data class IspPerformance(
     val advertised: Float = 100f
 )
 
+data class NetworkSummary(
+    val title: String, // Today, Weekly, Monthly
+    val testCount: Int = 0,
+    val avgDownload: Float = 0f,
+    val avgUpload: Float = 0f,
+    val avgPing: Int = 0,
+    val bestDay: String = "—",
+    val range: AnalyticsRange
+)
+
 data class AnalyticsUiState(
     val isLoading: Boolean = true,
     val selectedRange: AnalyticsRange = AnalyticsRange.TODAY,
@@ -283,7 +293,8 @@ data class AnalyticsUiState(
     val ispPerformance: IspPerformance = IspPerformance(),
     val trendData: List<TrendPoint> = emptyList(),
     val trendPeriod: TrendPeriod = TrendPeriod.WEEKLY,
-    val trendStats: TrendStats = TrendStats()
+    val trendStats: TrendStats = TrendStats(),
+    val summaries: List<NetworkSummary> = emptyList()
 )
 
 enum class AnalyticsRange { TODAY, WEEK, MONTH }

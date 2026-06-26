@@ -39,6 +39,7 @@ fun AnalyticsScreen(
     onNavigateBack: () -> Unit = {},
     onNavigateToDashboard: () -> Unit = {},
     onNavigateToHistory: () -> Unit = {},
+    onNavigateToSummary: (AnalyticsRange) -> Unit = {},
     viewModel: AnalyticsViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -142,9 +143,19 @@ fun AnalyticsScreen(
 
                 // FEATURE 1: Internet Health Score
                 item {
-                    HealthScoreCard(
+                    InternetHealthHero(
                         score = uiState.healthScore,
-                        trend = uiState.healthTrend
+                        trend = uiState.healthTrend,
+                        status = uiState.networkQuality.label,
+                        networkType = uiState.networkStatus.type
+                    )
+                }
+
+                // NEW: Summary Cards
+                item {
+                    SummaryCardSection(
+                        summaries = uiState.summaries,
+                        onSummaryClick = { summary -> onNavigateToSummary(summary.range) }
                     )
                 }
 
