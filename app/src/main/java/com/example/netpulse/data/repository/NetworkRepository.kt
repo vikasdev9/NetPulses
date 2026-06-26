@@ -7,6 +7,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.wifi.WifiManager
 import android.os.Build
+import android.telephony.*
 import android.text.format.Formatter
 import com.example.netpulse.NetPulseApplication
 import com.example.netpulse.data.SpeedResult
@@ -123,6 +124,103 @@ class NetworkRepository(private val context: Context) {
         // Real data usage requires NetworkStatsManager and special permissions.
         // For now, we return empty usage or mocked zeros.
         emit(NetworkDataUsage())
+    }
+
+    fun getMobileNetworkInfo(): Flow<MobileNetworkInfo> = flow {
+        val tm = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        
+        val simOperator = tm.simOperator ?: "—"
+        val networkOperator = tm.networkOperator ?: "—"
+        val carrierName = tm.networkOperatorName ?: "—"
+        val simCountry = tm.simCountryIso?.uppercase() ?: "—"
+        
+        val mcc = if (networkOperator.length >= 3) networkOperator.substring(0, 3) else "—"
+        val mnc = if (networkOperator.length >= 5) networkOperator.substring(3) else "—"
+        
+        val roamingStatus = if (tm.isNetworkRoaming) "Roaming" else "Not Roaming"
+        
+        val networkType = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            try {
+                when (tm.dataNetworkType) {
+                    TelephonyManager.NETWORK_TYPE_GPRS, TelephonyManager.NETWORK_TYPE_EDGE,
+                    TelephonyManager.NETWORK_TYPE_CDMA, TelephonyManager.NETWORK_TYPE_1xRTT,
+                    TelephonyManager.NETWORK_TYPE_IDEN -> "2G"
+                    TelephonyManager.NETWORK_TYPE_UMTS, TelephonyManager.NETWORK_TYPE_EVDO_0,
+                    TelephonyManager.NETWORK_TYPE_EVDO_A, TelephonyManager.NETWORK_TYPE_HSDPA,
+                    TelephonyManager.NETWORK_TYPE_HSUPA, TelephonyManager.NETWORK_TYPE_HSPA,
+                    TelephonyManager.NETWORK_TYPE_EVDO_B, TelephonyManager.NETWORK_TYPE_EHRPD,
+                    TelephonyManager.NETWORK_TYPE_HSPAP -> "3G"
+                    TelephonyManager.NETWORK_TYPE_LTE -> "4G (LTE)"
+                    TelephonyManager.NETWORK_TYPE_NR -> "5G"
+                    else -> "Unknown"
+                }
+            } catch (e: SecurityException) { "—" }
+        } else "—"
+
+        var signalStr = "—"
+        var lteSignal = "—"
+        var nrSignal = "—"
+        var cellId = "—"
+        var tac = "—"
+        var pci = "—"
+        
+        try {
+            val allCellInfo = tm.allCellInfo
+            if (!allCellInfo.isNullOrEmpty()) {
+                val primaryCell = allCellInfo.firstOrNull { it.isRegistered } ?: allCellInfo.first()
+                
+                when (primaryCell) {
+                    is CellInfoLte -> {
+                        val identity = primaryCell.cellIdentity
+                        cellId = identity.ci.toString()
+                        tac = identity.tac.toString()
+                        pci = identity.pci.toString()
+                        lteSignal = "${primaryCell.cellSignalStrength.dbm} dBm"
+                        signalStr = lteSignal
+                    }
+                    is CellInfoGsm -> {
+                        cellId = primaryCell.cellIdentity.cid.toString()
+                        signalStr = "${primaryCell.cellSignalStrength.dbm} dBm"
+                    }
+                    is CellInfoWcdma -> {
+                        cellId = primaryCell.cellIdentity.cid.toString()
+                        signalStr = "${primaryCell.cellSignalStrength.dbm} dBm"
+                    }
+                    is CellInfoCdma -> {
+                        cellId = primaryCell.cellIdentity.basestationId.toString()
+                        signalStr = "${primaryCell.cellSignalStrength.dbm} dBm"
+                    }
+                }
+                
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    allCellInfo.filterIsInstance<CellInfoNr>().firstOrNull()?.let { nrCell ->
+                        nrSignal = "${nrCell.cellSignalStrength.dbm} dBm"
+                        if (primaryCell is CellInfoNr) signalStr = nrSignal
+                    }
+                }
+            }
+        } catch (e: SecurityException) {
+            // Permission not granted
+        }
+
+        emit(MobileNetworkInfo(
+            simOperator = simOperator,
+            networkOperator = networkOperator,
+            carrierName = carrierName,
+            simCountry = simCountry,
+            mcc = mcc,
+            mnc = mnc,
+            roamingStatus = roamingStatus,
+            networkGeneration = networkType,
+            signalStrength = signalStr,
+            lteSignalStrength = lteSignal,
+            nrSignalStrength = nrSignal,
+            cellId = cellId,
+            tac = tac,
+            pci = pci,
+            registeredNetwork = if (tm.isNetworkRoaming) "Roaming" else "Home Network",
+            preferredNetworkType = "Auto"
+        ))
     }
 
     fun getDeviceInfo(): Flow<DeviceInfo> = flow {

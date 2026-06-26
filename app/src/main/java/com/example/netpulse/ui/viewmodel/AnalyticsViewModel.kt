@@ -43,6 +43,7 @@ data class AnalyticsUiState(
 
     // Network Intelligence (Repository)
     val networkStatus: NetworkStatus = NetworkStatus(),
+    val mobileNetworkInfo: MobileNetworkInfo = MobileNetworkInfo(),
     val internetDetails: InternetDetails = InternetDetails(),
     val ispInfo: IspInfo = IspInfo(),
     val speedSummary: SpeedSummary = SpeedSummary(),
@@ -141,6 +142,7 @@ class AnalyticsViewModel(application: Application) : AndroidViewModel(applicatio
             // 1. Fetch Network Intelligence (Reactive)
             val networkIntelligenceFlow = combine(
                 networkRepository.getNetworkStatus(),
+                networkRepository.getMobileNetworkInfo(),
                 networkRepository.getInternetDetails(),
                 networkRepository.getIspInfo(),
                 networkRepository.getSpeedSummary(),
@@ -229,21 +231,22 @@ class AnalyticsViewModel(application: Application) : AndroidViewModel(applicatio
                             
                             // Map Network Intelligence
                             networkStatus = networkResults[0] as NetworkStatus,
-                            internetDetails = networkResults[1] as InternetDetails,
-                            ispInfo = networkResults[2] as IspInfo,
-                            speedSummary = networkResults[3] as SpeedSummary,
-                            deviceInfo = networkResults[4] as DeviceInfo,
-                            timeline = networkResults[5] as List<TimelineEvent>,
-                            diagnostics = networkResults[6] as AdvancedDiagnostics,
-                            security = networkResults[7] as SecurityStatus,
-                            recommendations = networkResults[8] as List<RecommendationItem>,
+                            mobileNetworkInfo = networkResults[1] as MobileNetworkInfo,
+                            internetDetails = networkResults[2] as InternetDetails,
+                            ispInfo = networkResults[3] as IspInfo,
+                            speedSummary = networkResults[4] as SpeedSummary,
+                            deviceInfo = networkResults[5] as DeviceInfo,
+                            timeline = networkResults[6] as List<TimelineEvent>,
+                            diagnostics = networkResults[7] as AdvancedDiagnostics,
+                            security = networkResults[8] as SecurityStatus,
+                            recommendations = networkResults[9] as List<RecommendationItem>,
 
                             // Feature Data
                             healthScore = networkRepository.calculateHealthScore(
-                                (networkResults[3] as SpeedSummary).download,
-                                (networkResults[3] as SpeedSummary).upload,
-                                (networkResults[3] as SpeedSummary).ping,
-                                (networkResults[3] as SpeedSummary).jitter.toFloat()
+                                (networkResults[4] as SpeedSummary).download,
+                                (networkResults[4] as SpeedSummary).upload,
+                                (networkResults[4] as SpeedSummary).ping,
+                                (networkResults[4] as SpeedSummary).jitter.toFloat()
                             ),
                             streak = streakCount,
                             estimatedUsage = EstimatedUsage(usageToday, usageWeek, usageMonth, actualLimit),

@@ -194,7 +194,36 @@ fun AnalyticsScreen(
                     }
                 }
 
-                // 3. Internet Intelligence
+                // 3. Mobile Network Intelligence
+                item {
+                    AnalyticsCard(title = "Mobile Network", icon = Icons.Default.SignalCellularAlt) {
+                        SectionSubHeader("SIM & Carrier")
+                        InfoRow("SIM Operator", uiState.mobileNetworkInfo.simOperator)
+                        InfoRow("Network Operator", uiState.mobileNetworkInfo.networkOperator)
+                        InfoRow("Carrier Name", uiState.mobileNetworkInfo.carrierName)
+                        InfoRow("SIM Country", uiState.mobileNetworkInfo.simCountry)
+                        InfoRow("MCC", uiState.mobileNetworkInfo.mcc)
+                        InfoRow("MNC", uiState.mobileNetworkInfo.mnc)
+                        InfoRow("Roaming Status", uiState.mobileNetworkInfo.roamingStatus)
+
+                        Spacer(modifier = Modifier.height(12.dp))
+                        SectionSubHeader("Network Technology")
+                        InfoRow("Network Generation", uiState.mobileNetworkInfo.networkGeneration)
+                        InfoRow("Signal Strength", uiState.mobileNetworkInfo.signalStrength)
+                        InfoRow("LTE Signal Strength", uiState.mobileNetworkInfo.lteSignalStrength)
+                        InfoRow("NR (5G) Signal Strength", uiState.mobileNetworkInfo.nrSignalStrength)
+
+                        Spacer(modifier = Modifier.height(12.dp))
+                        SectionSubHeader("Cell Tower Info")
+                        InfoRow("Cell ID", uiState.mobileNetworkInfo.cellId)
+                        InfoRow("TAC", uiState.mobileNetworkInfo.tac)
+                        InfoRow("PCI", uiState.mobileNetworkInfo.pci)
+                        InfoRow("Registered Network", uiState.mobileNetworkInfo.registeredNetwork)
+                        InfoRow("Preferred Network Type", uiState.mobileNetworkInfo.preferredNetworkType)
+                    }
+                }
+
+                // 4. Internet Intelligence
                 item {
                     AnalyticsCard(title = "Internet Intelligence", icon = Icons.Default.Public) {
                         InfoRow("Public IP", uiState.internetDetails.publicIp)

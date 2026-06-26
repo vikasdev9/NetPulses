@@ -31,6 +31,25 @@ data class InternetDetails(
     val interfaceName: String = "—"
 )
 
+data class MobileNetworkInfo(
+    val simOperator: String = "—",
+    val networkOperator: String = "—",
+    val carrierName: String = "—",
+    val simCountry: String = "—",
+    val mcc: String = "—",
+    val mnc: String = "—",
+    val roamingStatus: String = "—",
+    val networkGeneration: String = "—",
+    val signalStrength: String = "—",
+    val lteSignalStrength: String = "—",
+    val nrSignalStrength: String = "—",
+    val cellId: String = "—",
+    val tac: String = "—",
+    val pci: String = "—",
+    val registeredNetwork: String = "—",
+    val preferredNetworkType: String = "—"
+)
+
 data class IspInfo(
     val name: String = "—",
     val asn: String = "—",
