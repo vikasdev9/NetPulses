@@ -1,6 +1,8 @@
 package com.example.netpulse.data.repository
 
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.wifi.WifiManager
@@ -124,18 +126,114 @@ class NetworkRepository(private val context: Context) {
     }
 
     fun getDeviceInfo(): Flow<DeviceInfo> = flow {
+        val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as android.app.ActivityManager
+        val memoryInfo = android.app.ActivityManager.MemoryInfo()
+        activityManager.getMemoryInfo(memoryInfo)
+
         val displayMetrics = context.resources.displayMetrics
-        val totalStorage = context.filesDir.totalSpace / (1024 * 1024 * 1024)
+        val defaultDisplay = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            try {
+                context.display
+            } catch (e: Exception) {
+                val dm = context.getSystemService(Context.DISPLAY_SERVICE) as android.hardware.display.DisplayManager
+                dm.getDisplay(android.view.Display.DEFAULT_DISPLAY)
+            }
+        } else {
+            val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as android.view.WindowManager
+            @Suppress("DEPRECATION")
+            windowManager.defaultDisplay
+        }
         
+        val stat = android.os.StatFs(android.os.Environment.getDataDirectory().path)
+        val blockSize = stat.blockSizeLong
+        val totalBlocks = stat.blockCountLong
+        val availableBlocks = stat.availableBlocksLong
+        val totalStorageBytes = totalBlocks * blockSize
+        val availableStorageBytes = availableBlocks * blockSize
+        val usedStorageBytes = totalStorageBytes - availableStorageBytes
+
+        val batteryStatus: Intent? = context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+        val level = batteryStatus?.getIntExtra(android.os.BatteryManager.EXTRA_LEVEL, -1) ?: -1
+        val scale = batteryStatus?.getIntExtra(android.os.BatteryManager.EXTRA_SCALE, -1) ?: -1
+        val batteryPct = if (scale > 0) (level * 100 / scale.toFloat()).toInt() else -1
+        val status = batteryStatus?.getIntExtra(android.os.BatteryManager.EXTRA_STATUS, -1) ?: -1
+        val isCharging = status == android.os.BatteryManager.BATTERY_STATUS_CHARGING ||
+                status == android.os.BatteryManager.BATTERY_STATUS_FULL
+        val chargePlug = batteryStatus?.getIntExtra(android.os.BatteryManager.EXTRA_PLUGGED, -1) ?: -1
+        val chargingType = when (chargePlug) {
+            android.os.BatteryManager.BATTERY_PLUGGED_AC -> "AC"
+            android.os.BatteryManager.BATTERY_PLUGGED_USB -> "USB"
+            android.os.BatteryManager.BATTERY_PLUGGED_WIRELESS -> "Wireless"
+            else -> "—"
+        }
+
+        val health = batteryStatus?.getIntExtra(android.os.BatteryManager.EXTRA_HEALTH, -1) ?: -1
+        val healthLabel = when (health) {
+            android.os.BatteryManager.BATTERY_HEALTH_COLD -> "Cold"
+            android.os.BatteryManager.BATTERY_HEALTH_DEAD -> "Dead"
+            android.os.BatteryManager.BATTERY_HEALTH_GOOD -> "Good"
+            android.os.BatteryManager.BATTERY_HEALTH_OVERHEAT -> "Overheat"
+            android.os.BatteryManager.BATTERY_HEALTH_OVER_VOLTAGE -> "Over Voltage"
+            else -> "Unknown"
+        }
+        val temp = (batteryStatus?.getIntExtra(android.os.BatteryManager.EXTRA_TEMPERATURE, 0) ?: 0) / 10f
+        val voltage = (batteryStatus?.getIntExtra(android.os.BatteryManager.EXTRA_VOLTAGE, 0) ?: 0) / 1000f
+        val technology = batteryStatus?.getStringExtra(android.os.BatteryManager.EXTRA_TECHNOLOGY) ?: "—"
+
+        val powerManager = context.getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
+
         emit(DeviceInfo(
-            androidVersion = "Android ${Build.VERSION.RELEASE}",
-            sdk = Build.VERSION.SDK_INT,
+            brand = Build.BRAND,
             manufacturer = Build.MANUFACTURER,
             model = Build.MODEL,
+            device = Build.DEVICE,
+            product = Build.PRODUCT,
+            board = Build.BOARD,
+            hardware = Build.HARDWARE,
+            androidVersion = "Android ${Build.VERSION.RELEASE}",
+            sdk = Build.VERSION.SDK_INT,
+            securityPatch = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) Build.VERSION.SECURITY_PATCH else "—",
+            bootloader = Build.BOOTLOADER,
+            kernelVersion = System.getProperty("os.version") ?: "—",
+            buildNumber = Build.DISPLAY,
+            supportedAbis = Build.SUPPORTED_ABIS.joinToString(", "),
+            
+            totalRam = formatSize(memoryInfo.totalMem),
+            availableRam = formatSize(memoryInfo.availMem),
+            usedRam = formatSize(memoryInfo.totalMem - memoryInfo.availMem),
+            isLowMemory = memoryInfo.lowMemory,
+            
+            totalStorage = formatSize(totalStorageBytes),
+            availableStorage = formatSize(availableStorageBytes),
+            usedStorage = formatSize(usedStorageBytes),
+            storageUsagePercent = ((usedStorageBytes.toFloat() / totalStorageBytes.toFloat()) * 100).toInt(),
+            
             resolution = "${displayMetrics.widthPixels} x ${displayMetrics.heightPixels}",
-            cpuAbi = Build.SUPPORTED_ABIS.firstOrNull() ?: "—",
-            storage = "${totalStorage} GB"
+            density = displayMetrics.densityDpi,
+            refreshRate = "${defaultDisplay?.refreshRate?.toInt() ?: 0} Hz",
+            screenSize = calculateScreenSize(displayMetrics),
+            orientation = if (context.resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE) "Landscape" else "Portrait",
+
+            batteryLevel = batteryPct,
+            isCharging = isCharging,
+            chargingType = chargingType,
+            batteryHealth = healthLabel,
+            batteryTemp = "$temp°C",
+            batteryVoltage = "$voltage V",
+            batteryTech = technology,
+            isPowerSaveMode = powerManager.isPowerSaveMode
         ))
+    }
+
+    private fun formatSize(bytes: Long): String {
+        return Formatter.formatFileSize(context, bytes)
+    }
+
+    private fun calculateScreenSize(metrics: android.util.DisplayMetrics): String {
+        val x = Math.pow(metrics.widthPixels.toDouble() / metrics.xdpi.toDouble(), 2.0)
+        val y = Math.pow(metrics.heightPixels.toDouble() / metrics.ydpi.toDouble(), 2.0)
+        val screenInches = Math.sqrt(x + y)
+        return "%.1f\"".format(screenInches)
     }
 
     fun getTimeline(): Flow<List<TimelineEvent>> = flow {

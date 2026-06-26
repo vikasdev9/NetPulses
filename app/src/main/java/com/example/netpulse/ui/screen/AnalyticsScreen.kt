@@ -305,6 +305,59 @@ fun AnalyticsScreen(
                     )
                 }
 
+                // FEATURE 10: Device Intelligence
+                item {
+                    AnalyticsCard(title = "Device Intelligence", icon = Icons.Default.Smartphone) {
+                        SectionSubHeader("System & Hardware")
+                        InfoRow("Brand", uiState.deviceInfo.brand)
+                        InfoRow("Manufacturer", uiState.deviceInfo.manufacturer)
+                        InfoRow("Model", uiState.deviceInfo.model)
+                        InfoRow("Device", uiState.deviceInfo.device)
+                        InfoRow("Board", uiState.deviceInfo.board)
+                        InfoRow("Hardware", uiState.deviceInfo.hardware)
+                        InfoRow("Supported ABIs", uiState.deviceInfo.supportedAbis)
+                        
+                        Spacer(modifier = Modifier.height(12.dp))
+                        SectionSubHeader("Software & OS")
+                        InfoRow("Android Version", uiState.deviceInfo.androidVersion)
+                        InfoRow("SDK Version", uiState.deviceInfo.sdk.toString())
+                        InfoRow("Security Patch", uiState.deviceInfo.securityPatch)
+                        InfoRow("Kernel Version", uiState.deviceInfo.kernelVersion)
+                        InfoRow("Build Number", uiState.deviceInfo.buildNumber)
+                        InfoRow("Bootloader", uiState.deviceInfo.bootloader)
+
+                        Spacer(modifier = Modifier.height(12.dp))
+                        SectionSubHeader("Memory & Storage")
+                        InfoRow("Total RAM", uiState.deviceInfo.totalRam)
+                        InfoRow("Used RAM", uiState.deviceInfo.usedRam)
+                        InfoRow("Available RAM", uiState.deviceInfo.availableRam)
+                        InfoRow("Low Memory", if (uiState.deviceInfo.isLowMemory) "Yes" else "No")
+                        Spacer(modifier = Modifier.height(8.dp))
+                        InfoRow("Internal Storage", uiState.deviceInfo.totalStorage)
+                        InfoRow("Used Storage", uiState.deviceInfo.usedStorage)
+                        InfoRow("Available Storage", uiState.deviceInfo.availableStorage)
+                        LinearProgressRow("Storage Usage", uiState.deviceInfo.storageUsagePercent.toFloat(), 100f, MaterialTheme.colorScheme.primary, unit = "%")
+                        
+                        Spacer(modifier = Modifier.height(12.dp))
+                        SectionSubHeader("Battery Information")
+                        InfoRow("Battery Level", "${uiState.deviceInfo.batteryLevel}%")
+                        InfoRow("Status", if (uiState.deviceInfo.isCharging) "Charging (${uiState.deviceInfo.chargingType})" else "Discharging")
+                        InfoRow("Health", uiState.deviceInfo.batteryHealth)
+                        InfoRow("Temperature", uiState.deviceInfo.batteryTemp)
+                        InfoRow("Voltage", uiState.deviceInfo.batteryVoltage)
+                        InfoRow("Technology", uiState.deviceInfo.batteryTech)
+                        InfoRow("Power Save", if (uiState.deviceInfo.isPowerSaveMode) "Active" else "Inactive")
+
+                        Spacer(modifier = Modifier.height(12.dp))
+                        SectionSubHeader("Display Information")
+                        InfoRow("Resolution", uiState.deviceInfo.resolution)
+                        InfoRow("Refresh Rate", uiState.deviceInfo.refreshRate)
+                        InfoRow("Screen Size", uiState.deviceInfo.screenSize)
+                        InfoRow("Density", "${uiState.deviceInfo.density} DPI")
+                        InfoRow("Orientation", uiState.deviceInfo.orientation)
+                    }
+                }
+
                 // 10. Master Actions
                 item {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -346,14 +399,14 @@ fun SummaryItem(label: String, value: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun LinearProgressRow(label: String, value: Float, max: Float, color: Color) {
+fun LinearProgressRow(label: String, value: Float, max: Float, color: Color, unit: String = "Mbps") {
     Column(modifier = Modifier.padding(vertical = 6.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
-            Text("${value.toInt()} Mbps", color = MaterialTheme.colorScheme.onBackground, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+            Text("${value.toInt()} $unit", color = MaterialTheme.colorScheme.onBackground, fontSize = 11.sp, fontWeight = FontWeight.Bold)
         }
         Spacer(modifier = Modifier.height(4.dp))
         LinearProgressIndicator(

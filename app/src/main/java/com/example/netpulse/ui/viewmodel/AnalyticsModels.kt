@@ -63,14 +63,50 @@ data class NetworkDataUsage(
 )
 
 data class DeviceInfo(
-    val androidVersion: String = "—",
-    val sdk: Int = 0,
+    val brand: String = "—",
     val manufacturer: String = "—",
     val model: String = "—",
+    val device: String = "—",
+    val product: String = "—",
+    val board: String = "—",
+    val hardware: String = "—",
+    val androidVersion: String = "—",
+    val sdk: Int = 0,
+    val securityPatch: String = "—",
+    val bootloader: String = "—",
+    val kernelVersion: String = "—",
+    val buildNumber: String = "—",
+    val supportedAbis: String = "—",
+    
+    // Memory
+    val totalRam: String = "—",
+    val availableRam: String = "—",
+    val usedRam: String = "—",
+    val isLowMemory: Boolean = false,
+    
+    // Storage
+    val totalStorage: String = "—",
+    val availableStorage: String = "—",
+    val usedStorage: String = "—",
+    val storageUsagePercent: Int = 0,
+    
+    // Display
     val resolution: String = "—",
-    val cpuAbi: String = "—",
-    val ram: String = "—",
-    val storage: String = "—"
+    val density: Int = 0,
+    val refreshRate: String = "—",
+    val screenSize: String = "—",
+    val orientation: String = "—",
+
+    // Battery
+    val batteryLevel: Int = 0,
+    val isCharging: Boolean = false,
+    val chargingType: String = "—",
+    val batteryHealth: String = "—",
+    val batteryTemp: String = "—",
+    val batteryVoltage: String = "—",
+    val batteryTech: String = "—",
+    val batteryCapacity: String = "—",
+    val isPowerSaveMode: Boolean = false
 )
 
 data class TimelineEvent(
