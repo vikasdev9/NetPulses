@@ -14,6 +14,10 @@ data class NetworkStatus(
     val frequency: String = "—",
     val band: String = "—",
     val channel: Int = 0,
+    val wifiStandard: String = "—",
+    val signalPercentage: Int = 0,
+    val isHidden: Boolean = false,
+    val isRandomizedMac: Boolean = false,
     val linkSpeed: Int = 0,
     val txSpeed: Int = 0,
     val rxSpeed: Int = 0

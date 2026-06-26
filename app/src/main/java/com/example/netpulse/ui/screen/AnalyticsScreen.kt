@@ -171,13 +171,16 @@ fun AnalyticsScreen(
 
                         Spacer(modifier = Modifier.height(12.dp))
                         SectionSubHeader("Link Quality")
+                        InfoRow("Wi-Fi Standard", uiState.networkStatus.wifiStandard)
                         InfoRow("Link Speed", "${uiState.networkStatus.linkSpeed} Mbps")
                         InfoRow("Tx Link Speed", "${uiState.networkStatus.txSpeed} Mbps")
                         InfoRow("Rx Link Speed", "${uiState.networkStatus.rxSpeed} Mbps")
                         InfoRow("Signal (RSSI)", "${uiState.networkStatus.rssi} dBm")
-                        InfoRow("Signal Level", "${uiState.networkStatus.signalLevel} / 4")
+                        InfoRow("Signal Level", "${uiState.networkStatus.signalLevel} / 5")
+                        InfoRow("Signal Percentage", "${uiState.networkStatus.signalPercentage}%")
                         InfoRow("Frequency", uiState.networkStatus.frequency)
                         InfoRow("Band", uiState.networkStatus.band)
+                        InfoRow("Channel", uiState.networkStatus.channel.toString())
                         InfoRow("Security", uiState.networkStatus.security)
 
                         Spacer(modifier = Modifier.height(12.dp))
@@ -185,6 +188,8 @@ fun AnalyticsScreen(
                         InfoRow("Metered", if (uiState.security.metered) "Yes" else "No")
                         InfoRow("VPN Active", if (uiState.security.vpnActive) "Yes" else "No")
                         InfoRow("Captive Portal", if (uiState.security.captivePortal) "Yes" else "No")
+                        InfoRow("Hidden Network", if (uiState.networkStatus.isHidden) "Yes" else "No")
+                        InfoRow("Randomized MAC", if (uiState.networkStatus.isRandomizedMac) "Enabled" else "Disabled")
 
                         Spacer(modifier = Modifier.height(12.dp))
                         Text("Live Traffic", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp, fontWeight = FontWeight.Bold)

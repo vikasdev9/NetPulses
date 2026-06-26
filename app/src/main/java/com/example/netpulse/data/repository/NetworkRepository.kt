@@ -5,6 +5,8 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.net.wifi.ScanResult
+import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.telephony.*
@@ -53,17 +55,58 @@ class NetworkRepository(private val context: Context) {
             frequency > 5900 -> "6 GHz"
             else -> "—"
         }
+        
+        val wifiStandard = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && wifiInfo != null) {
+            when (wifiInfo.wifiStandard) {
+                ScanResult.WIFI_STANDARD_LEGACY -> "Legacy"
+                ScanResult.WIFI_STANDARD_11N -> "Wi-Fi 4 (802.11n)"
+                ScanResult.WIFI_STANDARD_11AC -> "Wi-Fi 5 (802.11ac)"
+                ScanResult.WIFI_STANDARD_11AX -> "Wi-Fi 6 (802.11ax)"
+                ScanResult.WIFI_STANDARD_11AD -> "Wi-Fi 60GHz (802.11ad)"
+                else -> "—"
+            }
+        } else "—"
+
+        val security = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && wifiInfo != null) {
+            when (wifiInfo.currentSecurityType) {
+                WifiInfo.SECURITY_TYPE_OPEN -> "Open"
+                WifiInfo.SECURITY_TYPE_PSK -> "WPA2-PSK"
+                WifiInfo.SECURITY_TYPE_SAE -> "WPA3-SAE"
+                WifiInfo.SECURITY_TYPE_EAP -> "WPA-EAP"
+                else -> "WPA2/WPA3"
+            }
+        } else "WPA2/WPA3"
 
         emit(NetworkStatus(
             isConnected = isConnected,
             type = type,
-            ssid = if (type == "Wi-Fi" && wifiInfo != null) wifiInfo.ssid.removeSurrounding("\"") else "—",
+            ssid = if (type == "Wi-Fi" && wifiInfo != null) {
+                val s = wifiInfo.ssid.removeSurrounding("\"")
+                if (s == "<unknown ssid>") "—" else s
+            } else "—",
             bssid = wifiInfo?.bssid ?: "—",
+            security = security,
             signalStrength = if (type == "Wi-Fi" && wifiInfo != null) WifiManager.calculateSignalLevel(wifiInfo.rssi, 100) else 0,
             signalLevel = if (type == "Wi-Fi" && wifiInfo != null) WifiManager.calculateSignalLevel(wifiInfo.rssi, 5) else 0,
+            signalPercentage = if (type == "Wi-Fi" && wifiInfo != null) {
+                ((wifiInfo.rssi + 100) * 2).coerceIn(0, 100)
+            } else 0,
             rssi = wifiInfo?.rssi ?: 0,
             frequency = if (type == "Wi-Fi" && frequency > 0) "$frequency MHz" else "—",
             band = band,
+            channel = if (frequency > 0) {
+                when {
+                    frequency in 2412..2484 -> (frequency - 2412) / 5 + 1
+                    frequency in 5170..5825 -> (frequency - 5170) / 5 + 34
+                    else -> 0
+                }
+            } else 0,
+            wifiStandard = wifiStandard,
+            isHidden = false, // isHiddenSsid is hidden/restricted on some versions
+            isRandomizedMac = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                // Heuristic: check if OUI is randomized
+                wifiInfo?.macAddress?.let { it.startsWith("02:") || it.startsWith("06:") || it.startsWith("0a:") || it.startsWith("0e:") } ?: false
+            } else false,
             linkSpeed = wifiInfo?.linkSpeed ?: 0,
             txSpeed = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) wifiInfo?.txLinkSpeedMbps ?: 0 else 0,
             rxSpeed = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) wifiInfo?.rxLinkSpeedMbps ?: 0 else 0
