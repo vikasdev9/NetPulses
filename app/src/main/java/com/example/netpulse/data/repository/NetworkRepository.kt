@@ -37,19 +37,30 @@ class NetworkRepository(private val context: Context) {
 
         val isConnected = caps?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
         val type = when {
-            caps?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true -> "WiFi"
+            caps?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true -> "Wi-Fi"
             caps?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true -> "Mobile"
             caps?.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) == true -> "Ethernet"
-            else -> "None"
+            else -> "Disconnected"
+        }
+
+        val frequency = wifiInfo?.frequency ?: 0
+        val band = when {
+            frequency in 2400..2500 -> "2.4 GHz"
+            frequency in 4900..5900 -> "5 GHz"
+            frequency > 5900 -> "6 GHz"
+            else -> "—"
         }
 
         emit(NetworkStatus(
             isConnected = isConnected,
             type = type,
-            ssid = if (type == "WiFi" && wifiInfo != null) wifiInfo.ssid.removeSurrounding("\"") else "—",
-            signalStrength = if (type == "WiFi" && wifiInfo != null) WifiManager.calculateSignalLevel(wifiInfo.rssi, 100) else 0,
+            ssid = if (type == "Wi-Fi" && wifiInfo != null) wifiInfo.ssid.removeSurrounding("\"") else "—",
+            bssid = wifiInfo?.bssid ?: "—",
+            signalStrength = if (type == "Wi-Fi" && wifiInfo != null) WifiManager.calculateSignalLevel(wifiInfo.rssi, 100) else 0,
+            signalLevel = if (type == "Wi-Fi" && wifiInfo != null) WifiManager.calculateSignalLevel(wifiInfo.rssi, 5) else 0,
             rssi = wifiInfo?.rssi ?: 0,
-            frequency = if (type == "WiFi" && wifiInfo != null) "${wifiInfo.frequency} MHz" else "—",
+            frequency = if (type == "Wi-Fi" && frequency > 0) "$frequency MHz" else "—",
+            band = band,
             linkSpeed = wifiInfo?.linkSpeed ?: 0,
             txSpeed = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) wifiInfo?.txLinkSpeedMbps ?: 0 else 0,
             rxSpeed = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) wifiInfo?.rxLinkSpeedMbps ?: 0 else 0
@@ -57,13 +68,23 @@ class NetworkRepository(private val context: Context) {
     }
 
     fun getInternetDetails(): Flow<InternetDetails> = flow {
-        val ispDetailed = IspInfoHelper.fetchDetailedIspInfo()
-        val localIp = getLocalIpAddress()
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork = cm.activeNetwork
+        val linkProperties = cm.getLinkProperties(activeNetwork)
         
+        val localIp = getLocalIpAddress()
+        val dnsServers = linkProperties?.dnsServers?.map { it.hostAddress } ?: emptyList()
+        val gateway = linkProperties?.routes?.firstOrNull { it.isDefaultRoute }?.gateway?.hostAddress
+        val ipv6 = linkProperties?.linkAddresses?.firstOrNull { it.address is java.net.Inet6Address }?.address?.hostAddress
+
         emit(InternetDetails(
-            publicIp = ispDetailed.ip,
+            publicIp = "Fetching...", // Usually needs a network call, logic exists in ViewModel/Helper
             localIp = localIp ?: "—",
-            interfaceName = "wlan0" // Simplified
+            ipv6 = ipv6 ?: "—",
+            gateway = gateway ?: "—",
+            dns1 = dnsServers.getOrNull(0) ?: "—",
+            dns2 = dnsServers.getOrNull(1) ?: "—",
+            mac = getMacAddress()
         ))
     }
 
@@ -217,5 +238,26 @@ class NetworkRepository(private val context: Context) {
             }
         } catch (e: Exception) { }
         return null
+    }
+
+    private fun getMacAddress(): String {
+        return try {
+            val all = Collections.list(NetworkInterface.getNetworkInterfaces())
+            for (nif in all) {
+                if (!nif.name.equals("wlan0", ignoreCase = true)) continue
+                val macBytes = nif.hardwareAddress ?: return "—"
+                val res1 = StringBuilder()
+                for (b in macBytes) {
+                    res1.append(String.format("%02X:", b))
+                }
+                if (res1.isNotEmpty()) {
+                    res1.deleteCharAt(res1.length - 1)
+                }
+                return res1.toString()
+            }
+            "—"
+        } catch (ex: Exception) {
+            "—"
+        }
     }
 }

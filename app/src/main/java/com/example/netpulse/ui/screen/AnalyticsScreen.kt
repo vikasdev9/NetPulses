@@ -151,16 +151,46 @@ fun AnalyticsScreen(
                     AnalyticsCard(title = "Current Network", icon = Icons.Default.Wifi) {
                         QualityIndicator(uiState.networkQuality.label)
                         Spacer(modifier = Modifier.height(16.dp))
+
+                        // BASIC INFO
+                        InfoRow("Network Type", uiState.networkStatus.type)
+                        InfoRow("Connection State", if (uiState.networkStatus.isConnected) "Connected" else "Disconnected")
                         InfoRow("SSID", uiState.networkStatus.ssid)
-                        InfoRow("Security", uiState.networkStatus.security)
-                        InfoRow("Frequency", uiState.networkStatus.frequency)
-                        InfoRow("Link Speed", "${uiState.networkStatus.linkSpeed} Mbps")
-                        
+                        InfoRow("BSSID", uiState.networkStatus.bssid)
+
                         Spacer(modifier = Modifier.height(12.dp))
-                        Text("Traffic", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        SectionSubHeader("Addressing & Routing")
+                        InfoRow("Local IP", uiState.internetDetails.localIp)
+                        InfoRow("Gateway IP", uiState.internetDetails.gateway)
+                        InfoRow("Subnet Mask", uiState.internetDetails.subnet)
+                        InfoRow("DNS 1", uiState.internetDetails.dns1)
+                        InfoRow("DNS 2", uiState.internetDetails.dns2)
+                        InfoRow("IPv6 Address", uiState.internetDetails.ipv6)
+                        InfoRow("Private DNS", if (uiState.security.privateDns) "Active" else "Inactive")
+                        InfoRow("MAC Address", uiState.internetDetails.mac)
+
+                        Spacer(modifier = Modifier.height(12.dp))
+                        SectionSubHeader("Link Quality")
+                        InfoRow("Link Speed", "${uiState.networkStatus.linkSpeed} Mbps")
+                        InfoRow("Tx Link Speed", "${uiState.networkStatus.txSpeed} Mbps")
+                        InfoRow("Rx Link Speed", "${uiState.networkStatus.rxSpeed} Mbps")
+                        InfoRow("Signal (RSSI)", "${uiState.networkStatus.rssi} dBm")
+                        InfoRow("Signal Level", "${uiState.networkStatus.signalLevel} / 4")
+                        InfoRow("Frequency", uiState.networkStatus.frequency)
+                        InfoRow("Band", uiState.networkStatus.band)
+                        InfoRow("Security", uiState.networkStatus.security)
+
+                        Spacer(modifier = Modifier.height(12.dp))
+                        SectionSubHeader("Environment & Security")
+                        InfoRow("Metered", if (uiState.security.metered) "Yes" else "No")
+                        InfoRow("VPN Active", if (uiState.security.vpnActive) "Yes" else "No")
+                        InfoRow("Captive Portal", if (uiState.security.captivePortal) "Yes" else "No")
+
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text("Live Traffic", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.height(8.dp))
-                        LinearProgressRow("TX Speed", uiState.networkStatus.txSpeed.toFloat(), 1000f, MaterialTheme.colorScheme.primary)
-                        LinearProgressRow("RX Speed", uiState.networkStatus.rxSpeed.toFloat(), 1000f, MaterialTheme.colorScheme.secondary)
+                        LinearProgressRow("TX Load", uiState.networkStatus.txSpeed.toFloat(), 1000f, MaterialTheme.colorScheme.primary)
+                        LinearProgressRow("RX Load", uiState.networkStatus.rxSpeed.toFloat(), 1000f, MaterialTheme.colorScheme.secondary)
                     }
                 }
 
@@ -293,6 +323,18 @@ fun AnalyticsScreen(
             }
         }
     }
+}
+
+@Composable
+fun SectionSubHeader(text: String) {
+    Text(
+        text = text.uppercase(),
+        color = MaterialTheme.colorScheme.primary,
+        fontSize = 10.sp,
+        fontWeight = FontWeight.ExtraBold,
+        letterSpacing = 1.sp,
+        modifier = Modifier.padding(vertical = 4.dp)
+    )
 }
 
 @Composable
