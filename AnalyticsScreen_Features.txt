@@ -1,0 +1,82 @@
+AnalyticsScreen Components and Features:
+
+1. Live Performance Indicators:
+   - Real-time Circular Metric Indicators for Signal Strength (%), Latency (ms), and Jitter (ms).
+
+2. Internet Health Score:
+   - A dedicated card showing the overall Internet Health Score and trend.
+
+3. Connection Suitability (Use Case Ratings):
+   - Ratings for specific activities: Gaming, 4K Streaming, Video Conferencing, Web Browsing, and Large Downloads.
+
+4. Current Network Status:
+   - General info: Network Type, Connection State, SSID, BSSID.
+   - Addressing & Routing: Local IP, Gateway, Subnet, DNS 1/2, IPv6, Private DNS, MAC Address.
+   - Link Quality: Wi-Fi Standard, Link Speeds (Tx/Rx), Signal (RSSI), Frequency, Band, Channel, Security type.
+   - Environment & Security: Metered status, VPN Active, Captive Portal, Hidden Network, Randomized MAC.
+   - Live Traffic: Visual progress bars for TX and RX loads.
+
+5. Mobile Network Intelligence:
+   - SIM & Carrier details: Operator, Carrier Name, Country, MCC, MNC, Roaming status.
+   - Network Technology: Generation (4G/5G), Signal Strength (LTE/NR).
+   - Cell Tower Info: Cell ID, TAC, PCI, Registered Network, Preferred Type.
+
+6. Internet Intelligence:
+   - Public IP, ISP name, ASN, and Location (City/Country).
+   - DNS Intelligence: Primary/Secondary DNS, Private DNS status, DNS over TLS, and DNS Response Time.
+
+7. Speed Test Intelligence:
+   - Last test results (Download/Upload Mbps, Ping, Jitter).
+   - Peak Performance: Peak Download and Upload speeds.
+   - Average & Stability: Avg speeds, Min/Max Ping.
+   - Diagnostic Details: Test Duration, Packet Loss, and Test Server.
+   - Navigation: Shortcut to Test History.
+
+8. Weekly & Monthly Trends:
+   - Trend charts for network performance over time.
+
+9. Internet Usage:
+   - Estimated data usage based on tests.
+
+10. ISP Performance Dashboard:
+    - Detailed performance metrics for the current Internet Service Provider.
+
+11. Traffic Analysis:
+    - Data usage breakdown for Mobile vs. WiFi.
+    - Weekly usage bar chart (DataBarChart).
+
+12. App Usage Insights:
+    - Top 3 most data-hungry or time-consuming apps.
+    - Usage access permission handling.
+    - Breakdown of screen time and data usage per app.
+
+13. Achievement & Streak System:
+    - Current testing streak (days).
+    - Recent activity tracking.
+    - Unlocked achievements/badges.
+
+14. Wi-Fi Stability Monitoring:
+    - Metrics regarding connection stability and uptime.
+
+15. Advanced Diagnostics:
+    - Interface Name, MTU Size, IPv6 Support, Dual Stack status.
+    - Protocol Latency: TCP Latency, DNS Lookup, SSL Handshake.
+
+16. Security & Privacy:
+    - Toggles/Status for VPN, Private DNS, Captive Portal, and Metered Network.
+
+17. Connection Timeline:
+    - Historical log of connection events (Connected, Disconnected, IP Changes).
+
+18. Smart Recommendations:
+    - AI-driven suggestions based on network health and performance.
+
+19. Device Intelligence:
+    - System & Hardware: Device name, Brand, Model, CPU Arch/Cores.
+    - Software & OS: Android version, SDK, Security Patch, Kernel, Build number.
+    - Memory & Storage: Total/Used/Available RAM and Storage with usage percentage.
+    - Battery Information: Level, Charging status, Health, Temperature, Voltage.
+    - Display Information: Resolution, Refresh Rate, Screen Size, Density.
+
+20. Master Actions:
+    - Quick actions: Run Diagnostics, Export PDF, Copy IP, and Share.

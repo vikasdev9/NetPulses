@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -499,15 +500,36 @@ fun AnalyticsScreen(
 
                 // 10. Master Actions
                 item {
+                    val context = LocalContext.current
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        GradientButton("Run Diagnostics Again", Icons.Default.Refresh, Modifier.fillMaxWidth())
+                        GradientButton(
+                            text = "Run Diagnostics Again", 
+                            icon = Icons.Default.Refresh, 
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = { viewModel.runDiagnosticsAgain() }
+                        )
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            SecondaryActionButton("Export PDF", Icons.Default.PictureAsPdf, Modifier.weight(1f))
-                            SecondaryActionButton("Copy IP", Icons.Default.ContentCopy, Modifier.weight(1f))
-                            SecondaryActionButton("Share", Icons.Default.Share, Modifier.weight(1f))
+                            SecondaryActionButton(
+                                text = "Export PDF", 
+                                icon = Icons.Default.PictureAsPdf, 
+                                modifier = Modifier.weight(1f),
+                                onClick = { viewModel.exportPdf(context) }
+                            )
+                            SecondaryActionButton(
+                                text = "Copy IP", 
+                                icon = Icons.Default.ContentCopy, 
+                                modifier = Modifier.weight(1f),
+                                onClick = { viewModel.copyIp(context) }
+                            )
+                            SecondaryActionButton(
+                                text = "Share", 
+                                icon = Icons.Default.Share, 
+                                modifier = Modifier.weight(1f),
+                                onClick = { viewModel.shareAnalytics(context) }
+                            )
                         }
                     }
                     Spacer(modifier = Modifier.height(40.dp))
@@ -709,9 +731,9 @@ fun RecommendationCard(item: RecommendationItem, onDismiss: () -> Unit) {
 }
 
 @Composable
-fun SecondaryActionButton(text: String, icon: ImageVector, modifier: Modifier = Modifier) {
+fun SecondaryActionButton(text: String, icon: ImageVector, modifier: Modifier = Modifier, onClick: () -> Unit) {
     OutlinedButton(
-        onClick = {},
+        onClick = onClick,
         modifier = modifier.height(52.dp),
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
@@ -725,9 +747,9 @@ fun SecondaryActionButton(text: String, icon: ImageVector, modifier: Modifier = 
 }
 
 @Composable
-fun GradientButton(text: String, icon: ImageVector, modifier: Modifier = Modifier) {
+fun GradientButton(text: String, icon: ImageVector, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Button(
-        onClick = {},
+        onClick = onClick,
         modifier = modifier.height(52.dp),
         shape = RoundedCornerShape(16.dp),
         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
