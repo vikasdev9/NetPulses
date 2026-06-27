@@ -12,12 +12,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.netpulse.data.datastore.UserPreferences
+import com.example.netpulse.data.NetPulseDatabase
+import com.example.netpulse.data.wifi.WifiScannerRepository
 import com.example.netpulse.navigation.NavRoutes
 import com.example.netpulse.ui.screen.*
+import com.example.netpulse.ui.screen.wifi.WifiScannerSettingsScreen
 import com.example.netpulse.ui.theme.NetPulseTheme
 import com.example.netpulse.ui.viewmodel.*
 import com.example.netpulse.utils.LocaleUtils
 import com.example.netpulse.utils.WiFiAutoRunManager
+import com.example.netpulse.utils.wifi.WifiScannerManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -49,6 +53,19 @@ class MainActivity : BaseActivity() {
 
         val analyticsViewModel: AnalyticsViewModel by viewModels()
         val historyViewModel: HistoryViewModel by viewModels()
+
+        val database = NetPulseDatabase.getDatabase(this)
+        val wifiScannerRepository = WifiScannerRepository(
+            WifiScannerManager(this),
+            database.wifiDao()
+        )
+        val wifiScannerViewModel: WifiScannerViewModel by viewModels {
+            object : androidx.lifecycle.ViewModelProvider.Factory {
+                override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                    return WifiScannerViewModel(wifiScannerRepository) as T
+                }
+            }
+        }
 
         wifiAutoRunManager = WiFiAutoRunManager(this) {
             lifecycleScope.launch {
@@ -185,8 +202,21 @@ class MainActivity : BaseActivity() {
                                     onNavigateToLanguage = { navController.navigate(NavRoutes.Language) },
                                     onNavigateToPrivacyPolicy = { navController.navigate(NavRoutes.PrivacyPolicy) },
                                     onNavigateToWidgetCollection = { navController.navigate(NavRoutes.WidgetCollection) },
+                                    onNavigateToWifiScanner = { navController.navigate(NavRoutes.WIFI_SCANNER) },
+                                    onNavigateToWifiSettings = { navController.navigate(NavRoutes.WIFI_SCANNER_SETTINGS) },
                                     viewModel = settingsViewModel,
                                     speedTestViewModel = speedTestSettingsViewModel
+                                )
+                            }
+                            composable(NavRoutes.WIFI_SCANNER) {
+                                WifiScannerScreen(
+                                    navController = navController,
+                                    viewModel = wifiScannerViewModel
+                                )
+                            }
+                            composable(NavRoutes.WIFI_SCANNER_SETTINGS) {
+                                WifiScannerSettingsScreen(
+                                    onBack = { navController.popBackStack() }
                                 )
                             }
                             composable(NavRoutes.Language) {

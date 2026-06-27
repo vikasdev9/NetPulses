@@ -49,6 +49,8 @@ fun SettingsScreen(
     onNavigateToLanguage: () -> Unit,
     onNavigateToPrivacyPolicy: () -> Unit,
     onNavigateToWidgetCollection: () -> Unit,
+    onNavigateToWifiScanner: () -> Unit,
+    onNavigateToWifiSettings: () -> Unit,
     viewModel: SettingsViewModel = viewModel(),
     speedTestViewModel: SpeedTestSettingsViewModel = viewModel()
 ) {
@@ -395,6 +397,34 @@ fun SettingsScreen(
                             showDivider = false
                         )
                     }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // WI-FI SCANNER SECTION
+            SectionLabel("WI-FI SCANNER")
+            Card(
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                shape = RoundedCornerShape(16.dp),
+                border = androidx.compose.foundation.BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline)
+            ) {
+                Column {
+                    SettingsRow(
+                        icon = Icons.Outlined.Wifi,
+                        title = "Nearby Wi-Fi Scanner",
+                        subtitle = "Scan and analyze networks around you",
+                        trailing = { ChevronIcon() },
+                        onClick = onNavigateToWifiScanner
+                    )
+//                    SettingsRow(
+//                        icon = Icons.Outlined.Settings,
+//                        title = "Scanner Settings",
+//                        subtitle = "Auto-scan, auto-sort and display options",
+//                        trailing = { ChevronIcon() },
+//                        onClick = onNavigateToWifiSettings,
+//                        showDivider = false
+//                    )
                 }
             }
 

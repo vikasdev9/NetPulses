@@ -6,6 +6,8 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.netpulse.data.analytics.*
 import com.example.netpulse.data.db.*
+import com.example.netpulse.data.wifi.WifiHistoryEntity
+import com.example.netpulse.data.wifi.db.WifiDao
 
 @Database(
     entities = [
@@ -14,9 +16,10 @@ import com.example.netpulse.data.db.*
         ISPEntity::class,
         WifiStabilityEntity::class,
         AchievementEntity::class,
-        DailyReportEntity::class
+        DailyReportEntity::class,
+        WifiHistoryEntity::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 abstract class NetPulseDatabase : RoomDatabase() {
@@ -26,6 +29,7 @@ abstract class NetPulseDatabase : RoomDatabase() {
     abstract fun wifiStabilityDao(): WifiStabilityDao
     abstract fun achievementDao(): AchievementDao
     abstract fun dailyReportDao(): DailyReportDao
+    abstract fun wifiDao(): WifiDao
 
     companion object {
         @Volatile

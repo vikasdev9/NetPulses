@@ -12,4 +12,8 @@ object NavRoutes {
     const val PrivacyPolicy = "privacy_policy"
     const val WidgetCollection = "widget_collection"
     const val NetworkSummaryDetail = "network_summary_detail/{range}"
+    
+    // WiFi Scanner Routes
+    const val WIFI_SCANNER = "wifi_scanner"
+    const val WIFI_SCANNER_SETTINGS = "wifi_scanner_settings"
 }
