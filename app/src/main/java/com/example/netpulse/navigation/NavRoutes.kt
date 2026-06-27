@@ -16,4 +16,5 @@ object NavRoutes {
     // WiFi Scanner Routes
     const val WIFI_SCANNER = "wifi_scanner"
     const val WIFI_SCANNER_SETTINGS = "wifi_scanner_settings"
+    const val LAN_SCANNER = "lan_scanner"
 }

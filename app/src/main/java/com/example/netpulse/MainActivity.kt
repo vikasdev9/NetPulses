@@ -22,6 +22,9 @@ import com.example.netpulse.ui.viewmodel.*
 import com.example.netpulse.utils.LocaleUtils
 import com.example.netpulse.utils.WiFiAutoRunManager
 import com.example.netpulse.utils.wifi.WifiScannerManager
+import com.example.netpulse.data.lan.LanScannerRepository
+import com.example.netpulse.ui.screen.lan.LanScannerScreen
+import com.example.netpulse.utils.lan.LanScannerManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -63,6 +66,18 @@ class MainActivity : BaseActivity() {
             object : androidx.lifecycle.ViewModelProvider.Factory {
                 override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
                     return WifiScannerViewModel(wifiScannerRepository) as T
+                }
+            }
+        }
+
+        val lanScannerRepository = LanScannerRepository(
+            LanScannerManager(this),
+            database.lanDao()
+        )
+        val lanScannerViewModel: LanScannerViewModel by viewModels {
+            object : androidx.lifecycle.ViewModelProvider.Factory {
+                override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                    return LanScannerViewModel(lanScannerRepository) as T
                 }
             }
         }
@@ -204,6 +219,7 @@ class MainActivity : BaseActivity() {
                                     onNavigateToWidgetCollection = { navController.navigate(NavRoutes.WidgetCollection) },
                                     onNavigateToWifiScanner = { navController.navigate(NavRoutes.WIFI_SCANNER) },
                                     onNavigateToWifiSettings = { navController.navigate(NavRoutes.WIFI_SCANNER_SETTINGS) },
+                                    onNavigateToLanScanner = { navController.navigate(NavRoutes.LAN_SCANNER) },
                                     viewModel = settingsViewModel,
                                     speedTestViewModel = speedTestSettingsViewModel
                                 )
@@ -217,6 +233,12 @@ class MainActivity : BaseActivity() {
                             composable(NavRoutes.WIFI_SCANNER_SETTINGS) {
                                 WifiScannerSettingsScreen(
                                     onBack = { navController.popBackStack() }
+                                )
+                            }
+                            composable(NavRoutes.LAN_SCANNER) {
+                                LanScannerScreen(
+                                    onBack = { navController.popBackStack() },
+                                    viewModel = lanScannerViewModel
                                 )
                             }
                             composable(NavRoutes.Language) {

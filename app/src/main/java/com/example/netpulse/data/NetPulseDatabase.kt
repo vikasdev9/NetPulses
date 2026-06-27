@@ -8,6 +8,8 @@ import com.example.netpulse.data.analytics.*
 import com.example.netpulse.data.db.*
 import com.example.netpulse.data.wifi.WifiHistoryEntity
 import com.example.netpulse.data.wifi.db.WifiDao
+import com.example.netpulse.data.lan.LanDeviceEntity
+import com.example.netpulse.data.lan.db.LanDao
 
 @Database(
     entities = [
@@ -17,9 +19,10 @@ import com.example.netpulse.data.wifi.db.WifiDao
         WifiStabilityEntity::class,
         AchievementEntity::class,
         DailyReportEntity::class,
-        WifiHistoryEntity::class
+        WifiHistoryEntity::class,
+        LanDeviceEntity::class
     ],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 abstract class NetPulseDatabase : RoomDatabase() {
@@ -30,6 +33,7 @@ abstract class NetPulseDatabase : RoomDatabase() {
     abstract fun achievementDao(): AchievementDao
     abstract fun dailyReportDao(): DailyReportDao
     abstract fun wifiDao(): WifiDao
+    abstract fun lanDao(): LanDao
 
     companion object {
         @Volatile

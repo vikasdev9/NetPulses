@@ -51,6 +51,7 @@ fun SettingsScreen(
     onNavigateToWidgetCollection: () -> Unit,
     onNavigateToWifiScanner: () -> Unit,
     onNavigateToWifiSettings: () -> Unit,
+    onNavigateToLanScanner: () -> Unit,
     viewModel: SettingsViewModel = viewModel(),
     speedTestViewModel: SpeedTestSettingsViewModel = viewModel()
 ) {
@@ -417,14 +418,26 @@ fun SettingsScreen(
                         trailing = { ChevronIcon() },
                         onClick = onNavigateToWifiScanner
                     )
-//                    SettingsRow(
-//                        icon = Icons.Outlined.Settings,
-//                        title = "Scanner Settings",
-//                        subtitle = "Auto-scan, auto-sort and display options",
-//                        trailing = { ChevronIcon() },
-//                        onClick = onNavigateToWifiSettings,
-//                        showDivider = false
-//                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // LAN SCANNER SECTION
+            SectionLabel("CONNECTED DEVICES")
+            Card(
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                shape = RoundedCornerShape(16.dp),
+                border = androidx.compose.foundation.BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline)
+            ) {
+                Column {
+                    SettingsRow(
+                        icon = Icons.Outlined.Router,
+                        title = "LAN Scanner",
+                        subtitle = "See who is using your Wi-Fi",
+                        trailing = { ChevronIcon() },
+                        onClick = onNavigateToLanScanner
+                    )
                 }
             }
 
