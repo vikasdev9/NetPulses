@@ -51,6 +51,17 @@
         </provider>
 
         <receiver
+            android:name=".widget.QuickSpeedTestWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/quick_test_widget_info" />
+        </receiver>
+
+        <receiver
             android:name=".widget.NetPulseWidgetReceiver"
             android:exported="true">
             <intent-filter>
@@ -59,6 +70,50 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/netpulse_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.LiveSpeedWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/live_speed_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.InternetIntelligenceWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/intelligence_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.PerformanceDashboardWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/dashboard_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.MiniAnalyticsWidgetReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/mini_analytics_widget_info" />
         </receiver>
 
         <service

@@ -7,6 +7,8 @@ import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
+import androidx.glance.action.ActionParameters
+import androidx.glance.action.actionParametersOf
 import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.cornerRadius
@@ -22,10 +24,9 @@ import java.util.Locale
 
 @Composable
 fun SmallWidget(data: WidgetData) {
-    // Using fully qualified factory functions to avoid restricted API issues in Glance 1.0.0
-    val backgroundColor = androidx.glance.color.ColorProvider(day = Color(0xFFF0F4FF), night = Color(0xFF0A0E1A))
-    val textPrimary = androidx.glance.color.ColorProvider(day = Color(0xFF0A0E1A), night = Color.White)
-    val textSecondary = androidx.glance.color.ColorProvider(day = Color(0xFF475569), night = Color(0xFF8892A4))
+    val backgroundColor = WidgetThemeHelper.getBackgroundColor(data.theme)
+    val textPrimary = WidgetThemeHelper.getTextPrimary(data.theme)
+    val textSecondary = WidgetThemeHelper.getTextSecondary(data.theme)
     val dividerColor = androidx.glance.color.ColorProvider(day = Color(0xFFCBD5E1), night = Color(0xFF2E3A50))
 
     Box(
@@ -33,7 +34,9 @@ fun SmallWidget(data: WidgetData) {
             .fillMaxSize()
             .background(backgroundColor)
             .cornerRadius(16.dp)
-            .clickable(actionStartActivity<MainActivity>())
+            .clickable(actionStartActivity<MainActivity>(
+                parameters = actionParametersOf(ActionParameters.Key<Boolean>("START_TEST") to true)
+            ))
             .padding(10.dp)
     ) {
         Row(

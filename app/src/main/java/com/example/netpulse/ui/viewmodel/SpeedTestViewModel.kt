@@ -12,8 +12,8 @@ import com.example.netpulse.data.network.SpeedTestEngine
 import com.example.netpulse.utils.IspInfo
 import com.example.netpulse.utils.IspInfoHelper
 import com.example.netpulse.utils.NotificationHelper
-import com.example.netpulse.widget.NetPulseWidget
 import com.example.netpulse.widget.WidgetDataStore
+import com.example.netpulse.widget.WidgetRefreshManager
 import com.example.netpulse.utils.NetworkState
 import com.example.netpulse.utils.NetworkStateManager
 import kotlinx.coroutines.Dispatchers
@@ -239,7 +239,7 @@ class SpeedTestViewModel(
             }
 
             WidgetDataStore.saveWidgetData(getApplication(), result)
-            NetPulseWidget().updateAll(getApplication())
+            WidgetRefreshManager.refreshAllWidgets(getApplication())
 
             val overshootValue = (download * 1.12).toFloat().coerceAtMost(100f)
             _uiState.value = _uiState.value.copy(

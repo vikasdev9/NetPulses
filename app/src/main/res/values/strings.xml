@@ -103,6 +103,26 @@
     <string name="widget_testing">Testing…</string>
     <string name="widget_last_tested">%1$s</string>
     <string name="widget_run_test">Run Test</string>
+    <string name="widget_quick_test_desc">Start a speed test with one tap and see last results.</string>
+    <string name="widget_live_speed_desc">Displays the most recent download, upload, and ping metrics.</string>
+    <string name="widget_intelligence_desc">Comprehensive view of your IP, ISP, and network security.</string>
+    <string name="widget_dashboard_desc">Premium performance dashboard with use-case ratings.</string>
+    <string name="widget_mini_desc">Compact network and device status badge.</string>
+
+    <!-- Widget Settings -->
+    <string name="settings_widgets_section">Home Screen Widgets</string>
+    <string name="settings_enable_widgets">Enable Widgets</string>
+    <string name="settings_widget_refresh">Refresh Interval</string>
+    <string name="settings_widget_auto_refresh">Auto-Refresh on Network Change</string>
+    <string name="settings_widget_theme">Widget Theme</string>
+    <string name="settings_widget_transparency">Transparency</string>
+    <string name="settings_widget_accent">Accent Color</string>
+    <string name="settings_widget_show_name">Show Network Name</string>
+    <string name="settings_widget_show_ip">Show Public IP</string>
+    <string name="settings_widget_show_isp">Show ISP</string>
+    <string name="settings_widget_show_health">Show Health Score</string>
+    <string name="settings_widget_show_updated">Show Last Updated</string>
+    <string name="settings_widget_open_app">Open App On Tap</string>
 
     <!-- Notifications -->
     <string name="notif_channel_widget">Widget Speed Test</string>

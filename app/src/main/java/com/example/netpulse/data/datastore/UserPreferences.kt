@@ -32,6 +32,104 @@ class UserPreferences(private val context: Context) {
         val BASELINE_SPEED = floatPreferencesKey("baseline_speed")
         val LAST_AUTO_TEST_TIME = longPreferencesKey("last_auto_test_time")
         val ADVERTISED_SPEED = floatPreferencesKey("advertised_speed")
+        
+        // Widget Settings
+        val WIDGETS_ENABLED = booleanPreferencesKey("widgets_enabled")
+        val WIDGET_REFRESH_INTERVAL = stringPreferencesKey("widget_refresh_interval")
+        val WIDGET_AUTO_REFRESH_NETWORK = booleanPreferencesKey("widget_auto_refresh_network")
+        val WIDGET_THEME = stringPreferencesKey("widget_theme")
+        val WIDGET_TRANSPARENCY = floatPreferencesKey("widget_transparency")
+        val WIDGET_ACCENT_COLOR = stringPreferencesKey("widget_accent_color")
+        val WIDGET_SHOW_NETWORK_NAME = booleanPreferencesKey("widget_show_network_name")
+        val WIDGET_SHOW_PUBLIC_IP = booleanPreferencesKey("widget_show_public_ip")
+        val WIDGET_SHOW_ISP = booleanPreferencesKey("widget_show_isp")
+        val WIDGET_SHOW_HEALTH_SCORE = booleanPreferencesKey("widget_show_health_score")
+        val WIDGET_SHOW_LAST_UPDATED = booleanPreferencesKey("widget_show_last_updated")
+        val WIDGET_OPEN_DESTINATION = stringPreferencesKey("widget_open_destination")
+    }
+
+    val widgetsEnabled: Flow<Boolean> = context.dataStore.data
+        .map { prefs -> prefs[WIDGETS_ENABLED] ?: true }
+
+    val widgetRefreshInterval: Flow<String> = context.dataStore.data
+        .map { prefs -> prefs[WIDGET_REFRESH_INTERVAL] ?: "1 Hour" }
+
+    val widgetAutoRefreshNetwork: Flow<Boolean> = context.dataStore.data
+        .map { prefs -> prefs[WIDGET_AUTO_REFRESH_NETWORK] ?: true }
+
+    val widgetTheme: Flow<String> = context.dataStore.data
+        .map { prefs -> prefs[WIDGET_THEME] ?: "System" }
+
+    val widgetTransparency: Flow<Float> = context.dataStore.data
+        .map { prefs -> prefs[WIDGET_TRANSPARENCY] ?: 0f }
+
+    val widgetAccentColor: Flow<String> = context.dataStore.data
+        .map { prefs -> prefs[WIDGET_ACCENT_COLOR] ?: "Blue" }
+
+    val widgetShowNetworkName: Flow<Boolean> = context.dataStore.data
+        .map { prefs -> prefs[WIDGET_SHOW_NETWORK_NAME] ?: true }
+
+    val widgetShowPublicIp: Flow<Boolean> = context.dataStore.data
+        .map { prefs -> prefs[WIDGET_SHOW_PUBLIC_IP] ?: true }
+
+    val widgetShowIsp: Flow<Boolean> = context.dataStore.data
+        .map { prefs -> prefs[WIDGET_SHOW_ISP] ?: true }
+
+    val widgetShowHealthScore: Flow<Boolean> = context.dataStore.data
+        .map { prefs -> prefs[WIDGET_SHOW_HEALTH_SCORE] ?: true }
+
+    val widgetShowLastUpdated: Flow<Boolean> = context.dataStore.data
+        .map { prefs -> prefs[WIDGET_SHOW_LAST_UPDATED] ?: true }
+
+    val widgetOpenDestination: Flow<String> = context.dataStore.data
+        .map { prefs -> prefs[WIDGET_OPEN_DESTINATION] ?: "Home" }
+
+    suspend fun setWidgetsEnabled(enabled: Boolean) {
+        context.dataStore.edit { prefs -> prefs[WIDGETS_ENABLED] = enabled }
+    }
+
+    suspend fun setWidgetRefreshInterval(interval: String) {
+        context.dataStore.edit { prefs -> prefs[WIDGET_REFRESH_INTERVAL] = interval }
+    }
+
+    suspend fun setWidgetAutoRefreshNetwork(enabled: Boolean) {
+        context.dataStore.edit { prefs -> prefs[WIDGET_AUTO_REFRESH_NETWORK] = enabled }
+    }
+
+    suspend fun setWidgetTheme(theme: String) {
+        context.dataStore.edit { prefs -> prefs[WIDGET_THEME] = theme }
+    }
+
+    suspend fun setWidgetTransparency(transparency: Float) {
+        context.dataStore.edit { prefs -> prefs[WIDGET_TRANSPARENCY] = transparency }
+    }
+
+    suspend fun setWidgetAccentColor(color: String) {
+        context.dataStore.edit { prefs -> prefs[WIDGET_ACCENT_COLOR] = color }
+    }
+
+    suspend fun setWidgetShowNetworkName(show: Boolean) {
+        context.dataStore.edit { prefs -> prefs[WIDGET_SHOW_NETWORK_NAME] = show }
+    }
+
+    suspend fun setWidgetShowPublicIp(show: Boolean) {
+        context.dataStore.edit { prefs -> prefs[WIDGET_SHOW_PUBLIC_IP] = show }
+    }
+
+    suspend fun setWidgetShowIsp(show: Boolean) {
+        context.dataStore.edit { prefs -> prefs[WIDGET_SHOW_ISP] = show }
+    }
+
+    suspend fun setWidgetShowHealthScore(show: Boolean) {
+        context.dataStore.edit { prefs -> prefs[WIDGET_SHOW_HEALTH_SCORE] = show }
+    }
+
+    suspend fun setWidgetShowLastUpdated(show: Boolean) {
+        context.dataStore.edit { prefs -> prefs[WIDGET_SHOW_LAST_UPDATED] = show }
+    }
+
+    suspend fun setWidgetOpenDestination(destination: String) {
+        context.dataStore.edit { prefs -> prefs[WIDGET_OPEN_DESTINATION] = destination }
     }
 
     val languageCode: Flow<String> = context.dataStore.data

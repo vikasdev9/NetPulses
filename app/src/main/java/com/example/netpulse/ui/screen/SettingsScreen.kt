@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -48,6 +49,7 @@ fun SettingsScreen(
     onNavigateToHistory: () -> Unit,
     onNavigateToLanguage: () -> Unit,
     onNavigateToPrivacyPolicy: () -> Unit,
+    onNavigateToWidgetCollection: () -> Unit,
     viewModel: SettingsViewModel = viewModel(),
     speedTestViewModel: SpeedTestSettingsViewModel = viewModel()
 ) {
@@ -303,6 +305,100 @@ fun SettingsScreen(
                 }
             }
             
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // HOME SCREEN WIDGETS SECTION
+            SectionLabel(stringResource(R.string.settings_widgets_section))
+            Card(
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                shape = RoundedCornerShape(16.dp),
+                border = androidx.compose.foundation.BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline)
+            ) {
+                Column {
+                    SettingsRow(
+                        icon = Icons.Outlined.Widgets,
+                        title = stringResource(R.string.settings_enable_widgets),
+                        trailing = {
+                            Switch(
+                                checked = state.widgetsEnabled,
+                                onCheckedChange = { viewModel.setWidgetsEnabled(it) },
+                                colors = customSwitchColors()
+                            )
+                        },
+                        onClick = onNavigateToWidgetCollection
+                    )
+                    
+                    if (state.widgetsEnabled) {
+                        SettingsRow(
+                            icon = Icons.Outlined.Update,
+                            title = stringResource(R.string.settings_widget_refresh),
+                            trailing = {
+                                Text(
+                                    text = state.widgetRefreshInterval,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            },
+                            onClick = {
+                                // TODO: Show picker dialog
+                            }
+                        )
+                        
+                        SettingsRow(
+                            icon = Icons.Outlined.NetworkCheck,
+                            title = stringResource(R.string.settings_widget_auto_refresh),
+                            trailing = {
+                                Switch(
+                                    checked = state.widgetAutoRefreshNetwork,
+                                    onCheckedChange = { viewModel.setWidgetAutoRefreshNetwork(it) },
+                                    colors = customSwitchColors()
+                                )
+                            }
+                        )
+
+                        SettingsRow(
+                            icon = Icons.Outlined.Palette,
+                            title = stringResource(R.string.settings_widget_theme),
+                            trailing = {
+                                Text(
+                                    text = state.widgetTheme,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    fontSize = 13.sp
+                                )
+                            },
+                            onClick = onNavigateToWidgetCollection
+                        )
+
+                        // VISIBILITY TOGGLES
+                        SettingsRow(
+                            icon = Icons.Outlined.Visibility,
+                            title = stringResource(R.string.settings_widget_show_ip),
+                            trailing = {
+                                Switch(
+                                    checked = state.widgetShowPublicIp,
+                                    onCheckedChange = { viewModel.setWidgetShowPublicIp(it) },
+                                    colors = customSwitchColors()
+                                )
+                            }
+                        )
+
+                        SettingsRow(
+                            icon = Icons.Outlined.Business,
+                            title = stringResource(R.string.settings_widget_show_isp),
+                            trailing = {
+                                Switch(
+                                    checked = state.widgetShowIsp,
+                                    onCheckedChange = { viewModel.setWidgetShowIsp(it) },
+                                    colors = customSwitchColors()
+                                )
+                            },
+                            showDivider = false
+                        )
+                    }
+                }
+            }
+
             Spacer(modifier = Modifier.height(24.dp))
             
             // ABOUT SECTION

@@ -7,6 +7,8 @@ import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
+import androidx.glance.action.ActionParameters
+import androidx.glance.action.actionParametersOf
 import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.cornerRadius
@@ -22,9 +24,9 @@ import java.util.Locale
 
 @Composable
 fun MediumWidget(data: WidgetData) {
-    val backgroundColor = androidx.glance.color.ColorProvider(day = Color(0xFFF0F4FF), night = Color(0xFF0A0E1A))
-    val textPrimary = androidx.glance.color.ColorProvider(day = Color(0xFF0A0E1A), night = Color.White)
-    val textSecondary = androidx.glance.color.ColorProvider(day = Color(0xFF475569), night = Color(0xFF8892A4))
+    val backgroundColor = WidgetThemeHelper.getBackgroundColor(data.theme)
+    val textPrimary = WidgetThemeHelper.getTextPrimary(data.theme)
+    val textSecondary = WidgetThemeHelper.getTextSecondary(data.theme)
     val blueAccent = androidx.glance.color.ColorProvider(day = Color(0xFF3B8BFF), night = Color(0xFF3B8BFF))
     val cyanAccent = androidx.glance.color.ColorProvider(day = Color(0xFF00D4FF), night = Color(0xFF00D4FF))
     val greenAccent = androidx.glance.color.ColorProvider(day = Color(0xFF00E676), night = Color(0xFF00E676))
@@ -35,7 +37,9 @@ fun MediumWidget(data: WidgetData) {
             .background(backgroundColor)
             .cornerRadius(20.dp)
             .padding(14.dp)
-            .clickable(actionStartActivity<MainActivity>())
+            .clickable(actionStartActivity<MainActivity>(
+                parameters = actionParametersOf(ActionParameters.Key<Boolean>("START_TEST") to true)
+            ))
     ) {
         // TOP ROW
         Row(

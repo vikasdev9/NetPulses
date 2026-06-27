@@ -46,7 +46,7 @@ class WidgetSpeedTestService : Service() {
                 )
                 
                 WidgetDataStore.updateData(applicationContext, data)
-                NetPulseWidget().updateAll(applicationContext)
+                WidgetRefreshManager.refreshAllWidgets(applicationContext)
 
                 // Fire notification
                 NotificationHelper.showWidgetTestComplete(applicationContext, download, upload)
@@ -63,7 +63,7 @@ class WidgetSpeedTestService : Service() {
     private suspend fun updateWidgetState(state: WidgetState) {
         val current = WidgetDataStore.getData(applicationContext)
         WidgetDataStore.updateData(applicationContext, current.copy(state = state))
-        NetPulseWidget().updateAll(applicationContext)
+        WidgetRefreshManager.refreshAllWidgets(applicationContext)
     }
 
     private fun createNotificationChannel() {

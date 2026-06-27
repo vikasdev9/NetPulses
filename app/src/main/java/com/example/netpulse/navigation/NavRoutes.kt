@@ -10,5 +10,6 @@ object NavRoutes {
     const val AppUsageDashboard = "app_usage_dashboard"
     const val Language = "language"
     const val PrivacyPolicy = "privacy_policy"
+    const val WidgetCollection = "widget_collection"
     const val NetworkSummaryDetail = "network_summary_detail/{range}"
 }

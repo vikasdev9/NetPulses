@@ -180,6 +180,7 @@ class MainActivity : BaseActivity() {
                                     },
                                     onNavigateToLanguage = { navController.navigate(NavRoutes.Language) },
                                     onNavigateToPrivacyPolicy = { navController.navigate(NavRoutes.PrivacyPolicy) },
+                                    onNavigateToWidgetCollection = { navController.navigate(NavRoutes.WidgetCollection) },
                                     viewModel = settingsViewModel,
                                     speedTestViewModel = speedTestSettingsViewModel
                                 )
@@ -205,6 +206,9 @@ class MainActivity : BaseActivity() {
                             }
                             composable(NavRoutes.PrivacyPolicy) {
                                 PrivacyPolicyScreen(onBack = { navController.popBackStack() })
+                            }
+                            composable(NavRoutes.WidgetCollection) {
+                                WidgetCollectionScreen(onBack = { navController.popBackStack() })
                             }
                         }
                     }
