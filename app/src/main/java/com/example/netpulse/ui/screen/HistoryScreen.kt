@@ -62,10 +62,12 @@ fun HistoryScreen(
     var selectedResult by remember { mutableStateOf<SpeedResult?>(null) }
     val sheetState = rememberModalBottomSheetState()
 
-    val filteredResults = if (selectedFilter == "All") {
-        results
-    } else {
-        results.filter { it.networkType == selectedFilter }
+    val filteredResults = remember(results, selectedFilter) {
+        if (selectedFilter == "All") {
+            results
+        } else {
+            results.filter { it.networkType == selectedFilter }
+        }
     }
 
     Scaffold(

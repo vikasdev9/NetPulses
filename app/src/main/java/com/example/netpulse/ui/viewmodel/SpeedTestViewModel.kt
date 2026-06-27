@@ -84,7 +84,6 @@ class SpeedTestViewModel(
     val uiState: StateFlow<SpeedTestUiState> = _uiState.asStateFlow()
 
     private val _ispInfo = MutableStateFlow(IspInfo())
-    val ispInfo: StateFlow<IspInfo> = _ispInfo.asStateFlow()
 
     private val networkStateManager = NetworkStateManager(application)
     val networkState: StateFlow<NetworkState> = networkStateManager.networkState

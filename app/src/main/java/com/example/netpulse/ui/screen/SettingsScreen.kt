@@ -36,7 +36,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.netpulse.R
 import com.example.netpulse.navigation.NavRoutes
 import com.example.netpulse.ui.components.AppBottomNavigation
-import com.example.netpulse.ui.components.ProUpgradeCard
 import com.example.netpulse.ui.components.SegmentedControl
 import com.example.netpulse.ui.components.SettingsRow
 import com.example.netpulse.ui.viewmodel.SettingsViewModel

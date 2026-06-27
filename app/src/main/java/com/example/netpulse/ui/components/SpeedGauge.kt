@@ -7,21 +7,18 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -30,14 +27,15 @@ import java.util.Locale
 import kotlin.math.cos
 import kotlin.math.sin
 
+@OptIn(ExperimentalTextApi::class)
 @Composable
 fun SpeedGauge(
     speedMbps: Float,
-    maxSpeed: Float = 100f,
     statusLabel: String,
     statusColor: Color,
     isRunning: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    maxSpeed: Float = 100f,
 ) {
     val primaryColor = MaterialTheme.colorScheme.primary
     val secondaryColor = MaterialTheme.colorScheme.secondary
@@ -69,174 +67,181 @@ fun SpeedGauge(
             label = "PulseAnimation"
         )
     } else {
-        remember { mutableStateOf(1f) }
+        remember { mutableFloatStateOf(1f) }
     }
 
-    Box(modifier = modifier.aspectRatio(1f)) {
-        Canvas(Modifier.fillMaxSize()) {
-            val w = size.width
-            val h = size.height
-            val cx = w / 2f
-            val cy = h * 0.50f
-            val radius = w * 0.38f
-            val strokeWidth = w * 0.048f
-            
-            val startAngle = 135f
-            val sweepAngle = 270f
-            
-            val arcRectTopLeft = Offset(cx - radius, cy - radius)
-            val arcRectSize = Size(radius * 2, radius * 2)
+    val textMeasurer = rememberTextMeasurer()
+    val tickTextStyle = TextStyle(
+        color = onSurfaceVariant,
+        fontSize = 10.sp,
+        fontFamily = FontFamily.Monospace
+    )
 
-            // 1. Background arc track
-            drawArc(
-                color = outlineColor.copy(alpha = 0.2f),
-                startAngle = startAngle,
-                sweepAngle = sweepAngle,
-                useCenter = false,
-                topLeft = arcRectTopLeft,
-                size = arcRectSize,
-                style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
-            )
+    Box(
+        modifier = modifier
+            .aspectRatio(1f)
+            .drawWithCache {
+                val w = size.width
+                val h = size.height
+                val cx = w / 2f
+                val cy = h * 0.50f
+                val radius = w * 0.38f
+                val strokeWidth = w * 0.048f
+                
+                val startAngle = 135f
+                val sweepAngle = 270f
+                
+                val arcRectTopLeft = Offset(cx - radius, cy - radius)
+                val arcRectSize = Size(radius * 2, radius * 2)
 
-            if (animatedArcProgress > 0f) {
-                // 3. Outer glow arc
-                drawArc(
-                    color = primaryColor.copy(alpha = 0.15f),
-                    startAngle = startAngle,
-                    sweepAngle = sweepAngle * animatedArcProgress,
-                    useCenter = false,
-                    topLeft = arcRectTopLeft,
-                    size = arcRectSize,
-                    style = Stroke(width = strokeWidth * 2.2f, cap = StrokeCap.Round)
-                )
+                val majorTicks = listOf(0f, 25f, 50f, 75f, 100f)
+                val minorTicks = listOf(12.5f, 37.5f, 62.5f, 87.5f)
 
-                // 4. Mid glow arc
-                drawArc(
-                    color = primaryColor.copy(alpha = 0.35f),
-                    startAngle = startAngle,
-                    sweepAngle = sweepAngle * animatedArcProgress,
-                    useCenter = false,
-                    topLeft = arcRectTopLeft,
-                    size = arcRectSize,
-                    style = Stroke(width = strokeWidth * 1.5f, cap = StrokeCap.Round)
-                )
-
-                // 5. Secondary color arc (first half of fill)
-                drawArc(
-                    color = secondaryColor,
-                    startAngle = startAngle,
-                    sweepAngle = sweepAngle * animatedArcProgress * 0.5f,
-                    useCenter = false,
-                    topLeft = arcRectTopLeft,
-                    size = arcRectSize,
-                    style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
-                )
-
-                // 6. Primary color arc (second half of fill)
-                if (animatedArcProgress > 0.5f) {
+                onDrawBehind {
+                    // 1. Background arc track
                     drawArc(
-                        color = primaryColor,
-                        startAngle = startAngle + sweepAngle * animatedArcProgress * 0.5f,
-                        sweepAngle = sweepAngle * animatedArcProgress * 0.5f,
+                        color = outlineColor.copy(alpha = 0.2f),
+                        startAngle = startAngle,
+                        sweepAngle = sweepAngle,
                         useCenter = false,
                         topLeft = arcRectTopLeft,
                         size = arcRectSize,
                         style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
                     )
-                }
 
-                val tipAngle = Math.toRadians((startAngle + sweepAngle * animatedArcProgress).toDouble())
-                val tipX = cx + radius * cos(tipAngle).toFloat()
-                val tipY = cy + radius * sin(tipAngle).toFloat()
-                val tipOffset = Offset(tipX, tipY)
+                    if (animatedArcProgress > 0f) {
+                        val currentSweep = sweepAngle * animatedArcProgress
 
-                // 7. Tip outer glow circle
-                drawCircle(
-                    color = primaryColor.copy(alpha = 0.25f),
-                    radius = strokeWidth * 1.1f * pulseScale,
-                    center = tipOffset
-                )
+                        // 3. Outer glow arc
+                        drawArc(
+                            color = primaryColor.copy(alpha = 0.15f),
+                            startAngle = startAngle,
+                            sweepAngle = currentSweep,
+                            useCenter = false,
+                            topLeft = arcRectTopLeft,
+                            size = arcRectSize,
+                            style = Stroke(width = strokeWidth * 2.2f, cap = StrokeCap.Round)
+                        )
 
-                // 8. Tip mid glow circle
-                drawCircle(
-                    color = secondaryColor.copy(alpha = 0.5f),
-                    radius = strokeWidth * 0.7f,
-                    center = tipOffset
-                )
+                        // 4. Mid glow arc
+                        drawArc(
+                            color = primaryColor.copy(alpha = 0.35f),
+                            startAngle = startAngle,
+                            sweepAngle = currentSweep,
+                            useCenter = false,
+                            topLeft = arcRectTopLeft,
+                            size = arcRectSize,
+                            style = Stroke(width = strokeWidth * 1.5f, cap = StrokeCap.Round)
+                        )
 
-                // 9. Tip core dot
-                drawCircle(
-                    color = onBackground,
-                    radius = strokeWidth * 0.42f,
-                    center = tipOffset
-                )
-            }
+                        // 5. Secondary color arc (first half of fill)
+                        drawArc(
+                            color = secondaryColor,
+                            startAngle = startAngle,
+                            sweepAngle = currentSweep * 0.5f,
+                            useCenter = false,
+                            topLeft = arcRectTopLeft,
+                            size = arcRectSize,
+                            style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+                        )
 
-            val majorTicks = listOf(0f, 25f, 50f, 75f, 100f)
-            val minorTicks = listOf(12.5f, 37.5f, 62.5f, 87.5f)
+                        // 6. Primary color arc (second half of fill)
+                        if (animatedArcProgress > 0.5f) {
+                            drawArc(
+                                color = primaryColor,
+                                startAngle = startAngle + currentSweep * 0.5f,
+                                sweepAngle = currentSweep * 0.5f,
+                                useCenter = false,
+                                topLeft = arcRectTopLeft,
+                                size = arcRectSize,
+                                style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+                            )
+                        }
 
-            minorTicks.forEach { tick ->
-                val tickAngle = Math.toRadians((startAngle + sweepAngle * (tick / maxSpeed)).toDouble())
-                val outerR = radius + strokeWidth * 0.45f
-                val innerR = outerR - (strokeWidth * 0.3f)
-                drawLine(
-                    color = onSurfaceVariant.copy(alpha = 0.8f),
-                    start = Offset(cx + innerR * cos(tickAngle).toFloat(), cy + innerR * sin(tickAngle).toFloat()),
-                    end = Offset(cx + outerR * cos(tickAngle).toFloat(), cy + outerR * sin(tickAngle).toFloat()),
-                    strokeWidth = 1.dp.toPx()
-                )
-            }
+                        val tipAngle = Math.toRadians((startAngle + currentSweep).toDouble())
+                        val tipX = cx + radius * cos(tipAngle).toFloat()
+                        val tipY = cy + radius * sin(tipAngle).toFloat()
+                        val tipOffset = Offset(tipX, tipY)
 
-            majorTicks.forEach { tick ->
-                val tickAngle = Math.toRadians((startAngle + sweepAngle * (tick / maxSpeed)).toDouble())
-                val outerR = radius + strokeWidth * 0.6f
-                val innerR = outerR - (strokeWidth * 0.55f)
-                drawLine(
-                    color = primaryColor.copy(alpha = 0.7f),
-                    start = Offset(cx + innerR * cos(tickAngle).toFloat(), cy + innerR * sin(tickAngle).toFloat()),
-                    end = Offset(cx + outerR * cos(tickAngle).toFloat(), cy + outerR * sin(tickAngle).toFloat()),
-                    strokeWidth = 2.5.dp.toPx()
-                )
+                        // 7. Tip outer glow circle
+                        drawCircle(
+                            color = primaryColor.copy(alpha = 0.25f),
+                            radius = strokeWidth * 1.1f * pulseScale,
+                            center = tipOffset
+                        )
 
-                val baseLabelRadius = radius + strokeWidth * 1.5f
-                val labelRadius = when(tick) {
-                    0f       -> baseLabelRadius + strokeWidth * 0.5f
-                    maxSpeed -> baseLabelRadius + strokeWidth * 0.5f
-                    else     -> baseLabelRadius
-                }
-                val xNudge = when(tick) {
-                    0f       -> -strokeWidth * 0.3f
-                    maxSpeed -> strokeWidth * 0.3f
-                    else     -> 0f
-                }
-                
-                val yNudge = when(tick) {
-                    0f       -> -strokeWidth * 0.8f
-                    maxSpeed -> -strokeWidth * 0.8f
-                    else     -> 0f
-                }
-                
-                val labelX = cx + labelRadius * cos(tickAngle).toFloat() + xNudge
-                val labelY = cy + labelRadius * sin(tickAngle).toFloat() + yNudge
+                        // 8. Tip mid glow circle
+                        drawCircle(
+                            color = secondaryColor.copy(alpha = 0.5f),
+                            radius = strokeWidth * 0.7f,
+                            center = tipOffset
+                        )
 
-                drawContext.canvas.nativeCanvas.apply {
-                    val paint = android.graphics.Paint().apply {
-                        color = onSurfaceVariant.toArgb()
-                        textSize = 24f
-                        textAlign = android.graphics.Paint.Align.CENTER
-                        isAntiAlias = true
-                        typeface = android.graphics.Typeface.MONOSPACE
+                        // 9. Tip core dot
+                        drawCircle(
+                            color = onBackground,
+                            radius = strokeWidth * 0.42f,
+                            center = tipOffset
+                        )
                     }
-                    drawText(
-                        tick.toInt().toString(),
-                        labelX,
-                        labelY + paint.textSize / 3f,
-                        paint
-                    )
+
+                    minorTicks.forEach { tick ->
+                        val tickAngle = Math.toRadians((startAngle + sweepAngle * (tick / maxSpeed)).toDouble())
+                        val outerR = radius + strokeWidth * 0.45f
+                        val innerR = outerR - (strokeWidth * 0.3f)
+                        drawLine(
+                            color = onSurfaceVariant.copy(alpha = 0.8f),
+                            start = Offset(cx + innerR * cos(tickAngle).toFloat(), cy + innerR * sin(tickAngle).toFloat()),
+                            end = Offset(cx + outerR * cos(tickAngle).toFloat(), cy + outerR * sin(tickAngle).toFloat()),
+                            strokeWidth = 1.dp.toPx()
+                        )
+                    }
+
+                    majorTicks.forEach { tick ->
+                        val tickAngle = Math.toRadians((startAngle + sweepAngle * (tick / maxSpeed)).toDouble())
+                        val outerR = radius + strokeWidth * 0.6f
+                        val innerR = outerR - (strokeWidth * 0.55f)
+                        drawLine(
+                            color = primaryColor.copy(alpha = 0.7f),
+                            start = Offset(cx + innerR * cos(tickAngle).toFloat(), cy + innerR * sin(tickAngle).toFloat()),
+                            end = Offset(cx + outerR * cos(tickAngle).toFloat(), cy + outerR * sin(tickAngle).toFloat()),
+                            strokeWidth = 2.5.dp.toPx()
+                        )
+
+                        val baseLabelRadius = radius + strokeWidth * 1.5f
+                        val labelRadius = when(tick) {
+                            0f       -> baseLabelRadius + strokeWidth * 0.5f
+                            maxSpeed -> baseLabelRadius + strokeWidth * 0.5f
+                            else     -> baseLabelRadius
+                        }
+                        val xNudge = when(tick) {
+                            0f       -> -strokeWidth * 0.3f
+                            maxSpeed -> strokeWidth * 0.3f
+                            else     -> 0f
+                        }
+                        
+                        val yNudge = when(tick) {
+                            0f       -> -strokeWidth * 0.8f
+                            maxSpeed -> -strokeWidth * 0.8f
+                            else     -> 0f
+                        }
+                        
+                        val labelX = cx + labelRadius * cos(tickAngle).toFloat() + xNudge
+                        val labelY = cy + labelRadius * sin(tickAngle).toFloat() + yNudge
+
+                        val textLayoutResult = textMeasurer.measure(
+                            text = tick.toInt().toString(),
+                            style = tickTextStyle
+                        )
+                        
+                        drawText(
+                            textLayoutResult = textLayoutResult,
+                            topLeft = Offset(labelX - textLayoutResult.size.width / 2f, labelY - textLayoutResult.size.height / 2f)
+                        )
+                    }
                 }
             }
-        }
-
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()

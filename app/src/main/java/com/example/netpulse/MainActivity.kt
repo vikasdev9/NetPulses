@@ -1,7 +1,6 @@
 package com.example.netpulse
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,11 +15,7 @@ import com.example.netpulse.data.datastore.UserPreferences
 import com.example.netpulse.navigation.NavRoutes
 import com.example.netpulse.ui.screen.*
 import com.example.netpulse.ui.theme.NetPulseTheme
-import com.example.netpulse.ui.viewmodel.AnalyticsRange
-import com.example.netpulse.ui.viewmodel.AnalyticsViewModel
-import com.example.netpulse.ui.viewmodel.SettingsViewModel
-import com.example.netpulse.ui.viewmodel.SpeedTestSettingsViewModel
-import com.example.netpulse.ui.viewmodel.SpeedTestViewModel
+import com.example.netpulse.ui.viewmodel.*
 import com.example.netpulse.utils.LocaleUtils
 import com.example.netpulse.utils.WiFiAutoRunManager
 import kotlinx.coroutines.delay
@@ -51,6 +46,9 @@ class MainActivity : BaseActivity() {
         val speedTestSettingsViewModel: SpeedTestSettingsViewModel by viewModels {
             SpeedTestSettingsViewModel.Factory(application, userPreferences)
         }
+
+        val analyticsViewModel: AnalyticsViewModel by viewModels()
+        val historyViewModel: HistoryViewModel by viewModels()
 
         wifiAutoRunManager = WiFiAutoRunManager(this) {
             lifecycleScope.launch {
@@ -123,16 +121,21 @@ class MainActivity : BaseActivity() {
                                     },
                                     onNavigateToAnalytics = {
                                         navController.navigate(NavRoutes.Analytics) { launchSingleTop = true }
-                                    }
+                                    },
+                                    viewModel = speedTestViewModel
                                 )
                             }
                             composable(NavRoutes.Analytics) {
                                 AnalyticsScreen(
                                     onNavigateBack = { navController.popBackStack() },
                                     onNavigateToDashboard = { navController.navigate(NavRoutes.AppUsageDashboard) },
+                                    onNavigateToHistory = {
+                                        navController.navigate(NavRoutes.History) { launchSingleTop = true }
+                                    },
                                     onNavigateToSummary = { range ->
                                         navController.navigate("network_summary_detail/${range.name}")
-                                    }
+                                    },
+                                    viewModel = analyticsViewModel
                                 )
                             }
                             composable(
@@ -144,13 +147,13 @@ class MainActivity : BaseActivity() {
                                 NetworkSummaryDetailScreen(
                                     range = range,
                                     onBack = { navController.popBackStack() },
-                                    viewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+                                    viewModel = analyticsViewModel
                                 )
                             }
                             composable(NavRoutes.AppUsageDashboard) {
                                 AppUsageDashboardScreen(
                                     onBack = { navController.popBackStack() },
-                                    viewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+                                    viewModel = analyticsViewModel
                                 )
                             }
                             composable(NavRoutes.History) {
@@ -164,7 +167,8 @@ class MainActivity : BaseActivity() {
                                     onNavigateToSettings = {
                                         navController.navigate(NavRoutes.Settings) { launchSingleTop = true }
                                     },
-                                    onBack = { navController.popBackStack() }
+                                    onBack = { navController.popBackStack() },
+                                    viewModel = historyViewModel
                                 )
                             }
                             composable(NavRoutes.Settings) {

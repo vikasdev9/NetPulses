@@ -139,13 +139,13 @@ fun AppUsageDashboardScreen(
                     EmptyState()
                 }
             } else {
-                itemsIndexed(uiState.allAppsCombined) { index, app ->
-                    val maxVal = if (uiState.dashboardTab == DashboardTab.DATA) {
-                        uiState.allAppsCombined.maxOf { it.totalBytes }.coerceAtLeast(1L)
-                    } else {
-                        uiState.allAppsCombined.maxOf { it.screenTimeMs }.coerceAtLeast(1L)
-                    }
-                    
+                val maxVal = if (uiState.dashboardTab == DashboardTab.DATA) {
+                    uiState.allAppsCombined.maxOf { it.totalBytes }.coerceAtLeast(1L)
+                } else {
+                    uiState.allAppsCombined.maxOf { it.screenTimeMs }.coerceAtLeast(1L)
+                }
+
+                itemsIndexed(uiState.allAppsCombined, key = { _, app -> app.packageName }) { index, app ->
                     val currentVal = if (uiState.dashboardTab == DashboardTab.DATA) app.totalBytes else app.screenTimeMs
                     val ratio = currentVal.toFloat() / maxVal
 

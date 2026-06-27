@@ -79,7 +79,8 @@ class AnalyticsViewModel(application: Application) : AndroidViewModel(applicatio
                 val startTime = calendar.timeInMillis
 
                 val perAppData = dataUsageHelper.getPerAppDataUsage(startTime, endTime)
-                val perAppDataWithIcons = perAppData.map { 
+                // Performance: Only load icons for the top apps being displayed
+                val perAppDataWithIcons = perAppData.take(15).map { 
                     it.copy(appIcon = try { packageManager.getApplicationIcon(it.packageName) } catch (e: Exception) { null })
                 }
 
@@ -90,13 +91,13 @@ class AnalyticsViewModel(application: Application) : AndroidViewModel(applicatio
                 if (hasPermission) {
                     totalTime = screenTimeHelper.getTodayTotalScreenTime()
                     perAppTime = screenTimeHelper.getPerAppScreenTime(startTime, endTime)
+                        .take(15) // Performance: limit processing
                         .map { it.copy(appIcon = try { packageManager.getApplicationIcon(it.packageName) } catch (e: Exception) { null }) }
                     weeklyTime = screenTimeHelper.getWeeklyScreenTime()
                 }
 
-                val tipApp = perAppData.firstOrNull { it.totalBytes > 500 * 1024 * 1024 }
-                
                 val combinedList = combineAppData(perAppDataWithIcons, perAppTime)
+                val tipApp = perAppData.firstOrNull { it.totalBytes > 500 * 1024 * 1024 }
                 val sortedByDefault = combinedList.sortedByDescending { it.totalBytes }
 
                 // FEATURE DATA
@@ -228,25 +229,29 @@ class AnalyticsViewModel(application: Application) : AndroidViewModel(applicatio
     private fun calculateTrendPoints(results: List<com.example.netpulse.data.SpeedResult>, period: TrendPeriod): List<TrendPoint> {
         if (results.isEmpty()) return emptyList()
         val daysToFetch = if (period == TrendPeriod.WEEKLY) 7 else 30
+        
         val calendar = Calendar.getInstance()
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+        
         val points = mutableListOf<TrendPoint>()
+        val sdf = java.text.SimpleDateFormat("EEE", Locale.getDefault())
 
+        // Optimization: Filter results once for the entire period
+        val periodStart = calendar.timeInMillis - ((daysToFetch - 1) * 24 * 60 * 60 * 1000L)
+        val relevantResults = results.filter { it.timestamp >= periodStart }
+        
         for (i in 0 until daysToFetch) {
-            val calCopy = calendar.clone() as Calendar
-            calCopy.add(Calendar.DAY_OF_YEAR, -i)
-            calCopy.set(Calendar.HOUR_OF_DAY, 0)
-            calCopy.set(Calendar.MINUTE, 0)
-            val dayStart = calCopy.timeInMillis
+            val dayStart = calendar.timeInMillis
+            val dayEnd = dayStart + (24 * 60 * 60 * 1000L) - 1
             
-            calCopy.set(Calendar.HOUR_OF_DAY, 23)
-            calCopy.set(Calendar.MINUTE, 59)
-            val dayEnd = calCopy.timeInMillis
-            
-            val dayResults = results.filter { it.timestamp in dayStart..dayEnd }
+            val dayResults = relevantResults.filter { it.timestamp in dayStart..dayEnd }
             val avg = if (dayResults.isNotEmpty()) dayResults.map { it.downloadMbps }.average().toFloat() else 0f
             
-            val label = java.text.SimpleDateFormat("EEE", Locale.getDefault()).format(Date(dayStart))
-            points.add(0, TrendPoint(label, avg))
+            points.add(0, TrendPoint(sdf.format(Date(dayStart)), avg))
+            calendar.add(Calendar.DAY_OF_YEAR, -1)
         }
         return points
     }
@@ -352,10 +357,6 @@ class AnalyticsViewModel(application: Application) : AndroidViewModel(applicatio
     fun setDateRange(range: AnalyticsRange) {
         _uiState.update { it.copy(selectedRange = range) }
         loadAnalytics()
-    }
-
-    fun setAppListTab(tab: AnalyticsTab) {
-        _uiState.update { it.copy(selectedTab = tab) }
     }
 
     fun setDashboardTab(tab: DashboardTab) {

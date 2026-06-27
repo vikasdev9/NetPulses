@@ -258,7 +258,6 @@ data class NetworkSummary(
 data class AnalyticsUiState(
     val isLoading: Boolean = true,
     val selectedRange: AnalyticsRange = AnalyticsRange.TODAY,
-    val selectedTab: AnalyticsTab = AnalyticsTab.DATA,
     val dashboardTab: DashboardTab = DashboardTab.DATA,
     val networkStatus: NetworkStatus = NetworkStatus(),
     val mobileNetworkInfo: MobileNetworkInfo = MobileNetworkInfo(),
@@ -298,5 +297,4 @@ data class AnalyticsUiState(
 )
 
 enum class AnalyticsRange { TODAY, WEEK, MONTH }
-enum class AnalyticsTab { DATA, TIME }
 enum class DashboardTab { DATA, TIME }

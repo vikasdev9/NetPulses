@@ -40,12 +40,9 @@ fun MainScreen(
     onNavigateToHome: () -> Unit = {},
     onNavigateToHistory: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
-    onNavigateToAnalytics: () -> Unit = {}
+    onNavigateToAnalytics: () -> Unit = {},
+    viewModel: SpeedTestViewModel = viewModel()
 ) {
-    val context = LocalContext.current
-    val application = context.applicationContext as Application
-    val userPreferences = remember { UserPreferences(context) }
-    val viewModel: SpeedTestViewModel = viewModel(factory = SpeedTestViewModel.Factory(application, userPreferences))
     val uiState by viewModel.uiState.collectAsState()
     val networkState by viewModel.networkState.collectAsState()
 

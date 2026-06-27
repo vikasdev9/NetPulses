@@ -108,6 +108,16 @@ fun DataBarChart(
 }
 
 @Composable
+fun getBarColor(index: Int): Color {
+    return when (index % 4) {
+        0 -> MaterialTheme.colorScheme.primary
+        1 -> MaterialTheme.colorScheme.secondary
+        2 -> MaterialTheme.colorScheme.tertiary
+        else -> MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+    }
+}
+
+@Composable
 fun LegendItem(color: Color, label: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Box(

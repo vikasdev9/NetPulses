@@ -3,11 +3,8 @@ package com.example.netpulse.data.analytics
 import android.app.usage.NetworkStats
 import android.app.usage.NetworkStatsManager
 import android.content.Context
-import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
-import android.os.Process
-import android.os.RemoteException
 import android.util.Log
 import java.util.*
 
@@ -55,49 +52,57 @@ class DataUsageHelper(private val context: Context) {
 
     fun getPerAppDataUsage(startTime: Long, endTime: Long): List<AppDataUsage> {
         val appDataList = mutableListOf<AppDataUsage>()
+        
+        // 1. Get all stats for the period in one go (very fast)
+        val wifiStats = networkStatsManager.querySummary(ConnectivityManager.TYPE_WIFI, null, startTime, endTime)
+        val mobileStats = networkStatsManager.querySummary(ConnectivityManager.TYPE_MOBILE, null, startTime, endTime)
+        
+        val usageMap = mutableMapOf<Int, Pair<Long, Long>>() // uid -> <rx, tx>
+
+        val bucket = NetworkStats.Bucket()
+        
+        // Process WiFi
+        while (wifiStats.hasNextBucket()) {
+            wifiStats.getNextBucket(bucket)
+            val current = usageMap.getOrDefault(bucket.uid, Pair(0L, 0L))
+            usageMap[bucket.uid] = Pair(current.first + bucket.rxBytes, current.second + bucket.txBytes)
+        }
+        wifiStats.close()
+
+        // Process Mobile
+        while (mobileStats.hasNextBucket()) {
+            mobileStats.getNextBucket(bucket)
+            val current = usageMap.getOrDefault(bucket.uid, Pair(0L, 0L))
+            usageMap[bucket.uid] = Pair(current.first + bucket.rxBytes, current.second + bucket.txBytes)
+        }
+        mobileStats.close()
+
+        // 2. Map UIDs to actual apps (only for apps that have usage)
         val installedApps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
+        val appsByUid = installedApps.associateBy { it.uid }
 
-        for (app in installedApps) {
-            if (app.uid < 10000) continue // Skip system apps
+        for ((uid, usage) in usageMap) {
+            if (uid < 10000) continue // Skip system
+            
+            val appInfo = appsByUid[uid] ?: continue
+            val totalRx = usage.first
+            val totalTx = usage.second
 
-            val wifiData = getAppNetworkData(ConnectivityManager.TYPE_WIFI, app.uid, startTime, endTime)
-            val mobileData = getAppNetworkData(ConnectivityManager.TYPE_MOBILE, app.uid, startTime, endTime)
-
-            val totalRx = wifiData.rxBytes + mobileData.rxBytes
-            val totalTx = wifiData.txBytes + mobileData.txBytes
-
-            if (totalRx + totalTx > 0) {
+            if (totalRx + totalTx > 1024 * 10) { // > 10KB to ignore noise
                 appDataList.add(
                     AppDataUsage(
-                        uid = app.uid,
-                        packageName = app.packageName,
-                        appName = packageManager.getApplicationLabel(app).toString(),
-                        appIcon = null, // Will load icon in UI or ViewModel to avoid heavy objects here
+                        uid = uid,
+                        packageName = appInfo.packageName,
+                        appName = packageManager.getApplicationLabel(appInfo).toString(),
+                        appIcon = null,
                         rxBytes = totalRx,
                         txBytes = totalTx
                     )
                 )
             }
         }
-        return appDataList.sortedByDescending { it.rxBytes + it.txBytes }
-    }
 
-    private fun getAppNetworkData(networkType: Int, uid: Int, startTime: Long, endTime: Long): DataUsage {
-        var rxBytes = 0L
-        var txBytes = 0L
-        try {
-            val stats = networkStatsManager.queryDetailsForUid(networkType, null, startTime, endTime, uid)
-            val bucket = NetworkStats.Bucket()
-            while (stats.hasNextBucket()) {
-                stats.getNextBucket(bucket)
-                rxBytes += bucket.rxBytes
-                txBytes += bucket.txBytes
-            }
-            stats.close()
-        } catch (e: Exception) {
-            // Log.e("DataUsageHelper", "Error querying app details for uid $uid", e)
-        }
-        return DataUsage(rxBytes, txBytes)
+        return appDataList.sortedByDescending { it.rxBytes + it.txBytes }
     }
 
     fun getWeeklyDailyUsage(): List<DailyUsage> {
