@@ -53,7 +53,28 @@ class SettingsViewModel(
         val lanSaveHistory: Boolean = true,
         val lanShowOfflineDevices: Boolean = true,
         val lanScanEntireNetwork: Boolean = true,
-        val lanExportFormat: String = "PDF"
+        val lanExportFormat: String = "PDF",
+
+        // Thermal Monitor Settings
+        val thermalMonitorEnabled: Boolean = false,
+        val thermalBackgroundMonitoring: Boolean = true,
+        val thermalMonitorWhileCharging: Boolean = true,
+        val thermalMonitorDuringSpeedTest: Boolean = true,
+        val thermalMonitorDuringGaming: Boolean = false,
+        val thermalMonitorDuringStreaming: Boolean = false,
+        val thermalMonitorDuringHeavyNetwork: Boolean = false,
+        val thermalMonitorInterval: String = "5 Minutes",
+        val thermalHighThreshold: Float = 42f,
+        val thermalCriticalThreshold: Float = 47f,
+        val thermalNotifyHigh: Boolean = true,
+        val thermalNotifyCritical: Boolean = true,
+        val thermalNotifySound: Boolean = true,
+        val thermalNotifyVibration: Boolean = true,
+        val thermalNotifyRingtone: String = "",
+        val thermalNotifyPriority: String = "Default",
+        val thermalSaveHistory: Boolean = true,
+        val thermalMaxHistoryDays: Int = 7,
+        val thermalAutoDeleteOld: Boolean = true
     )
 
     private val _state = MutableStateFlow(SettingsState())
@@ -97,7 +118,18 @@ class SettingsViewModel(
                 userPreferences.lanSaveHistory,
                 userPreferences.lanShowOfflineDevices,
                 userPreferences.lanScanEntireNetwork,
-                userPreferences.lanExportFormat
+                userPreferences.lanExportFormat,
+                
+                // Thermal Monitor
+                userPreferences.thermalMonitorEnabled,
+                userPreferences.thermalMonitorInterval,
+                userPreferences.thermalSaveHistory,
+                userPreferences.thermalNotifyHigh,
+                userPreferences.thermalBackgroundMonitoring,
+                userPreferences.thermalMonitorWhileCharging,
+                userPreferences.thermalMonitorDuringSpeedTest,
+                userPreferences.thermalHighThreshold,
+                userPreferences.thermalCriticalThreshold
             ) { values ->
                 val langCode = values[6] as String
                 SettingsState(
@@ -135,7 +167,17 @@ class SettingsViewModel(
                     lanSaveHistory = values[28] as Boolean,
                     lanShowOfflineDevices = values[29] as Boolean,
                     lanScanEntireNetwork = values[30] as Boolean,
-                    lanExportFormat = values[31] as String
+                    lanExportFormat = values[31] as String,
+
+                    thermalMonitorEnabled = values[32] as Boolean,
+                    thermalMonitorInterval = values[33] as String,
+                    thermalSaveHistory = values[34] as Boolean,
+                    thermalNotifyHigh = values[35] as Boolean,
+                    thermalBackgroundMonitoring = values[36] as Boolean,
+                    thermalMonitorWhileCharging = values[37] as Boolean,
+                    thermalMonitorDuringSpeedTest = values[38] as Boolean,
+                    thermalHighThreshold = values[39] as Float,
+                    thermalCriticalThreshold = values[40] as Float
                 )
             }.collect { 
                 _state.value = it 
@@ -227,6 +269,29 @@ class SettingsViewModel(
     fun setLanShowOfflineDevices(enabled: Boolean) = viewModelScope.launch { userPreferences.setLanShowOfflineDevices(enabled) }
     fun setLanScanEntireNetwork(enabled: Boolean) = viewModelScope.launch { userPreferences.setLanScanEntireNetwork(enabled) }
     fun setLanExportFormat(format: String) = viewModelScope.launch { userPreferences.setLanExportFormat(format) }
+
+    // --- Thermal Monitor Settings ---
+    fun setThermalMonitorEnabled(enabled: Boolean) = viewModelScope.launch { 
+        userPreferences.setThermalMonitorEnabled(enabled)
+        if (enabled) {
+            val interval = when (state.value.thermalMonitorInterval) {
+                "30 Seconds" -> 1L
+                "1 Minute" -> 1L
+                "5 Minutes" -> 5L
+                else -> 15L
+            }
+            com.example.netpulse.thermal.worker.ThermalWorker.schedule(getApplication(), interval)
+        } else {
+            com.example.netpulse.thermal.worker.ThermalWorker.cancel(getApplication())
+        }
+    }
+    fun setThermalSaveHistory(enabled: Boolean) = viewModelScope.launch { userPreferences.setThermalSaveHistory(enabled) }
+    fun setThermalNotifyHigh(enabled: Boolean) = viewModelScope.launch { userPreferences.setThermalNotifyHigh(enabled) }
+    fun setThermalBackgroundMonitoring(enabled: Boolean) = viewModelScope.launch { userPreferences.setThermalBackgroundMonitoring(enabled) }
+    fun setThermalMonitorWhileCharging(enabled: Boolean) = viewModelScope.launch { userPreferences.setThermalMonitorWhileCharging(enabled) }
+    fun setThermalMonitorDuringSpeedTest(enabled: Boolean) = viewModelScope.launch { userPreferences.setThermalMonitorDuringSpeedTest(enabled) }
+    fun setThermalHighThreshold(value: Float) = viewModelScope.launch { userPreferences.setThermalHighThreshold(value) }
+    fun setThermalCriticalThreshold(value: Float) = viewModelScope.launch { userPreferences.setThermalCriticalThreshold(value) }
 
     fun onUpgradeTapped() = viewModelScope.launch { userPreferences.setIsPro(true) }
     fun onRestorePurchase() {}

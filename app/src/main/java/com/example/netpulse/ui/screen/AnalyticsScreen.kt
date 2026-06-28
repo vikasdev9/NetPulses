@@ -27,6 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.netpulse.data.analytics.CombinedAppUsage
+import com.example.netpulse.thermal.components.ThermalDashboardCard
+import com.example.netpulse.thermal.viewmodel.ThermalViewModel
 import com.example.netpulse.ui.components.*
 import com.example.netpulse.ui.theme.*
 import com.example.netpulse.ui.viewmodel.*
@@ -39,9 +41,12 @@ fun AnalyticsScreen(
     onNavigateToDashboard: () -> Unit = {},
     onNavigateToHistory: () -> Unit = {},
     onNavigateToSummary: (AnalyticsRange) -> Unit = {},
-    viewModel: AnalyticsViewModel = viewModel()
+    onNavigateToThermal: () -> Unit = {},
+    viewModel: AnalyticsViewModel = viewModel(),
+    thermalViewModel: ThermalViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val thermalData by thermalViewModel.currentThermalData.collectAsState()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     Scaffold(
@@ -401,6 +406,14 @@ fun AnalyticsScreen(
                 // Stability
                 item {
                     StabilityCard(metrics = uiState.stabilityMetrics)
+                }
+
+                // Thermal Monitor Card
+                item {
+                    ThermalDashboardCard(
+                        data = thermalData,
+                        onClick = onNavigateToThermal
+                    )
                 }
 
                 // Advanced Diagnostics

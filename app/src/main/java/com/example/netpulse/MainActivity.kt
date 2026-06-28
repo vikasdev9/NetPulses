@@ -24,6 +24,8 @@ import com.example.netpulse.utils.WiFiAutoRunManager
 import com.example.netpulse.utils.wifi.WifiScannerManager
 import com.example.netpulse.data.lan.LanScannerRepository
 import com.example.netpulse.ui.screen.lan.LanScannerScreen
+import com.example.netpulse.thermal.screen.ThermalDetailsScreen
+import com.example.netpulse.thermal.viewmodel.ThermalViewModel
 import com.example.netpulse.utils.lan.LanScannerManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
@@ -81,6 +83,8 @@ class MainActivity : BaseActivity() {
                 }
             }
         }
+
+        val thermalViewModel: ThermalViewModel by viewModels()
 
         wifiAutoRunManager = WiFiAutoRunManager(this) {
             lifecycleScope.launch {
@@ -167,7 +171,11 @@ class MainActivity : BaseActivity() {
                                     onNavigateToSummary = { range ->
                                         navController.navigate("network_summary_detail/${range.name}")
                                     },
-                                    viewModel = analyticsViewModel
+                                    onNavigateToThermal = {
+                                        navController.navigate(NavRoutes.ThermalDetails)
+                                    },
+                                    viewModel = analyticsViewModel,
+                                    thermalViewModel = thermalViewModel
                                 )
                             }
                             composable(
@@ -239,6 +247,12 @@ class MainActivity : BaseActivity() {
                                 LanScannerScreen(
                                     onBack = { navController.popBackStack() },
                                     viewModel = lanScannerViewModel
+                                )
+                            }
+                            composable(NavRoutes.ThermalDetails) {
+                                ThermalDetailsScreen(
+                                    onBack = { navController.popBackStack() },
+                                    viewModel = thermalViewModel
                                 )
                             }
                             composable(NavRoutes.Language) {

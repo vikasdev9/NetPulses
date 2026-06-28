@@ -531,6 +531,126 @@ fun SettingsScreen(
             }
 
             Spacer(modifier = Modifier.height(24.dp))
+
+            // THERMAL MONITOR SECTION
+            SectionLabel("DEVICE THERMAL MONITOR")
+            Card(
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                shape = RoundedCornerShape(16.dp),
+                border = androidx.compose.foundation.BorderStroke(0.5.dp, MaterialTheme.colorScheme.outline)
+            ) {
+                Column {
+                    SettingsRow(
+                        icon = Icons.Outlined.Thermostat,
+                        title = "Enable Thermal Monitoring",
+                        trailing = {
+                            Switch(
+                                checked = state.thermalMonitorEnabled,
+                                onCheckedChange = { viewModel.setThermalMonitorEnabled(it) },
+                                colors = customSwitchColors()
+                            )
+                        }
+                    )
+                    
+                    if (state.thermalMonitorEnabled) {
+                        SettingsRow(
+                            icon = Icons.Outlined.History,
+                            title = "Save Temperature History",
+                            trailing = {
+                                Switch(
+                                    checked = state.thermalSaveHistory,
+                                    onCheckedChange = { viewModel.setThermalSaveHistory(it) },
+                                    colors = customSwitchColors()
+                                )
+                            }
+                        )
+                        
+                        SettingsRow(
+                            icon = Icons.Outlined.NotificationsActive,
+                            title = "High Temp Alerts",
+                            trailing = {
+                                Switch(
+                                    checked = state.thermalNotifyHigh,
+                                    onCheckedChange = { viewModel.setThermalNotifyHigh(it) },
+                                    colors = customSwitchColors()
+                                )
+                            }
+                        )
+
+                        SettingsRow(
+                            icon = Icons.Outlined.CloudSync,
+                            title = "Background Monitoring",
+                            trailing = {
+                                Switch(
+                                    checked = state.thermalBackgroundMonitoring,
+                                    onCheckedChange = { viewModel.setThermalBackgroundMonitoring(it) },
+                                    colors = customSwitchColors()
+                                )
+                            }
+                        )
+
+                        SettingsRow(
+                            icon = Icons.Outlined.Power,
+                            title = "Monitor While Charging",
+                            trailing = {
+                                Switch(
+                                    checked = state.thermalMonitorWhileCharging,
+                                    onCheckedChange = { viewModel.setThermalMonitorWhileCharging(it) },
+                                    colors = customSwitchColors()
+                                )
+                            }
+                        )
+
+                        SettingsRow(
+                            icon = Icons.Outlined.Speed,
+                            title = "Monitor During Speed Test",
+                            trailing = {
+                                Switch(
+                                    checked = state.thermalMonitorDuringSpeedTest,
+                                    onCheckedChange = { viewModel.setThermalMonitorDuringSpeedTest(it) },
+                                    colors = customSwitchColors()
+                                )
+                            }
+                        )
+                        
+                        SettingsRow(
+                            icon = Icons.Outlined.Update,
+                            title = "Monitor Interval",
+                            trailing = {
+                                Text(
+                                    text = state.thermalMonitorInterval,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            },
+                            onClick = { /* TODO: Interval Picker */ }
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("High Threshold: ${state.thermalHighThreshold.toInt()}°C", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(horizontal = 16.dp))
+                        Slider(
+                            value = state.thermalHighThreshold,
+                            onValueChange = { viewModel.setThermalHighThreshold(it) },
+                            valueRange = 35f..55f,
+                            steps = 20,
+                            modifier = Modifier.padding(horizontal = 16.dp)
+                        )
+
+                        Text("Critical Threshold: ${state.thermalCriticalThreshold.toInt()}°C", fontSize = 12.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(horizontal = 16.dp))
+                        Slider(
+                            value = state.thermalCriticalThreshold,
+                            onValueChange = { viewModel.setThermalCriticalThreshold(it) },
+                            valueRange = 40f..60f,
+                            steps = 20,
+                            modifier = Modifier.padding(horizontal = 16.dp)
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
             
             // ABOUT SECTION
             SectionLabel(stringResource(R.string.settings_section_about))

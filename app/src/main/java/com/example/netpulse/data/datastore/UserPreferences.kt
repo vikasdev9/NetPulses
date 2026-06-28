@@ -61,6 +61,27 @@ class UserPreferences(private val context: Context) {
         val LAN_SHOW_OFFLINE_DEVICES = booleanPreferencesKey("lan_show_offline_devices")
         val LAN_SCAN_ENTIRE_NETWORK = booleanPreferencesKey("lan_scan_entire_network")
         val LAN_EXPORT_FORMAT = stringPreferencesKey("lan_export_format")
+
+        // Thermal Monitor Settings
+        val THERMAL_MONITOR_ENABLED = booleanPreferencesKey("thermal_monitor_enabled")
+        val THERMAL_BACKGROUND_MONITORING = booleanPreferencesKey("thermal_background_monitoring")
+        val THERMAL_MONITOR_WHILE_CHARGING = booleanPreferencesKey("thermal_monitor_while_charging")
+        val THERMAL_MONITOR_DURING_SPEED_TEST = booleanPreferencesKey("thermal_monitor_during_speed_test")
+        val THERMAL_MONITOR_DURING_GAMING = booleanPreferencesKey("thermal_monitor_during_gaming")
+        val THERMAL_MONITOR_DURING_STREAMING = booleanPreferencesKey("thermal_monitor_during_streaming")
+        val THERMAL_MONITOR_DURING_HEAVY_NETWORK = booleanPreferencesKey("thermal_monitor_during_heavy_network")
+        val THERMAL_MONITOR_INTERVAL = stringPreferencesKey("thermal_monitor_interval")
+        val THERMAL_HIGH_THRESHOLD = floatPreferencesKey("thermal_high_threshold")
+        val THERMAL_CRITICAL_THRESHOLD = floatPreferencesKey("thermal_critical_threshold")
+        val THERMAL_NOTIFY_HIGH = booleanPreferencesKey("thermal_notify_high")
+        val THERMAL_NOTIFY_CRITICAL = booleanPreferencesKey("thermal_notify_critical")
+        val THERMAL_NOTIFY_SOUND = booleanPreferencesKey("thermal_notify_sound")
+        val THERMAL_NOTIFY_VIBRATION = booleanPreferencesKey("thermal_notify_vibration")
+        val THERMAL_NOTIFY_RINGTONE = stringPreferencesKey("thermal_notify_ringtone")
+        val THERMAL_NOTIFY_PRIORITY = stringPreferencesKey("thermal_notify_priority")
+        val THERMAL_SAVE_HISTORY = booleanPreferencesKey("thermal_save_history")
+        val THERMAL_MAX_HISTORY_DAYS = intPreferencesKey("thermal_max_history_days")
+        val THERMAL_AUTO_DELETE_OLD = booleanPreferencesKey("thermal_auto_delete_old")
     }
 
     // LAN Scanner Flows
@@ -91,6 +112,47 @@ class UserPreferences(private val context: Context) {
     suspend fun setLanShowOfflineDevices(enabled: Boolean) = context.dataStore.edit { it[LAN_SHOW_OFFLINE_DEVICES] = enabled }
     suspend fun setLanScanEntireNetwork(enabled: Boolean) = context.dataStore.edit { it[LAN_SCAN_ENTIRE_NETWORK] = enabled }
     suspend fun setLanExportFormat(format: String) = context.dataStore.edit { it[LAN_EXPORT_FORMAT] = format }
+
+    // Thermal Monitor Flows
+    val thermalMonitorEnabled: Flow<Boolean> = context.dataStore.data.map { it[THERMAL_MONITOR_ENABLED] ?: false }
+    val thermalBackgroundMonitoring: Flow<Boolean> = context.dataStore.data.map { it[THERMAL_BACKGROUND_MONITORING] ?: true }
+    val thermalMonitorWhileCharging: Flow<Boolean> = context.dataStore.data.map { it[THERMAL_MONITOR_WHILE_CHARGING] ?: true }
+    val thermalMonitorDuringSpeedTest: Flow<Boolean> = context.dataStore.data.map { it[THERMAL_MONITOR_DURING_SPEED_TEST] ?: true }
+    val thermalMonitorDuringGaming: Flow<Boolean> = context.dataStore.data.map { it[THERMAL_MONITOR_DURING_GAMING] ?: false }
+    val thermalMonitorDuringStreaming: Flow<Boolean> = context.dataStore.data.map { it[THERMAL_MONITOR_DURING_STREAMING] ?: false }
+    val thermalMonitorDuringHeavyNetwork: Flow<Boolean> = context.dataStore.data.map { it[THERMAL_MONITOR_DURING_HEAVY_NETWORK] ?: false }
+    val thermalMonitorInterval: Flow<String> = context.dataStore.data.map { it[THERMAL_MONITOR_INTERVAL] ?: "5 Minutes" }
+    val thermalHighThreshold: Flow<Float> = context.dataStore.data.map { it[THERMAL_HIGH_THRESHOLD] ?: 42f }
+    val thermalCriticalThreshold: Flow<Float> = context.dataStore.data.map { it[THERMAL_CRITICAL_THRESHOLD] ?: 47f }
+    val thermalNotifyHigh: Flow<Boolean> = context.dataStore.data.map { it[THERMAL_NOTIFY_HIGH] ?: true }
+    val thermalNotifyCritical: Flow<Boolean> = context.dataStore.data.map { it[THERMAL_NOTIFY_CRITICAL] ?: true }
+    val thermalNotifySound: Flow<Boolean> = context.dataStore.data.map { it[THERMAL_NOTIFY_SOUND] ?: true }
+    val thermalNotifyVibration: Flow<Boolean> = context.dataStore.data.map { it[THERMAL_NOTIFY_VIBRATION] ?: true }
+    val thermalNotifyRingtone: Flow<String> = context.dataStore.data.map { it[THERMAL_NOTIFY_RINGTONE] ?: "" }
+    val thermalNotifyPriority: Flow<String> = context.dataStore.data.map { it[THERMAL_NOTIFY_PRIORITY] ?: "Default" }
+    val thermalSaveHistory: Flow<Boolean> = context.dataStore.data.map { it[THERMAL_SAVE_HISTORY] ?: true }
+    val thermalMaxHistoryDays: Flow<Int> = context.dataStore.data.map { it[THERMAL_MAX_HISTORY_DAYS] ?: 7 }
+    val thermalAutoDeleteOld: Flow<Boolean> = context.dataStore.data.map { it[THERMAL_AUTO_DELETE_OLD] ?: true }
+
+    suspend fun setThermalMonitorEnabled(enabled: Boolean) = context.dataStore.edit { it[THERMAL_MONITOR_ENABLED] = enabled }
+    suspend fun setThermalBackgroundMonitoring(enabled: Boolean) = context.dataStore.edit { it[THERMAL_BACKGROUND_MONITORING] = enabled }
+    suspend fun setThermalMonitorWhileCharging(enabled: Boolean) = context.dataStore.edit { it[THERMAL_MONITOR_WHILE_CHARGING] = enabled }
+    suspend fun setThermalMonitorDuringSpeedTest(enabled: Boolean) = context.dataStore.edit { it[THERMAL_MONITOR_DURING_SPEED_TEST] = enabled }
+    suspend fun setThermalMonitorDuringGaming(enabled: Boolean) = context.dataStore.edit { it[THERMAL_MONITOR_DURING_GAMING] = enabled }
+    suspend fun setThermalMonitorDuringStreaming(enabled: Boolean) = context.dataStore.edit { it[THERMAL_MONITOR_DURING_STREAMING] = enabled }
+    suspend fun setThermalMonitorDuringHeavyNetwork(enabled: Boolean) = context.dataStore.edit { it[THERMAL_MONITOR_DURING_HEAVY_NETWORK] = enabled }
+    suspend fun setThermalMonitorInterval(interval: String) = context.dataStore.edit { it[THERMAL_MONITOR_INTERVAL] = interval }
+    suspend fun setThermalHighThreshold(value: Float) = context.dataStore.edit { it[THERMAL_HIGH_THRESHOLD] = value }
+    suspend fun setThermalCriticalThreshold(value: Float) = context.dataStore.edit { it[THERMAL_CRITICAL_THRESHOLD] = value }
+    suspend fun setThermalNotifyHigh(enabled: Boolean) = context.dataStore.edit { it[THERMAL_NOTIFY_HIGH] = enabled }
+    suspend fun setThermalNotifyCritical(enabled: Boolean) = context.dataStore.edit { it[THERMAL_NOTIFY_CRITICAL] = enabled }
+    suspend fun setThermalNotifySound(enabled: Boolean) = context.dataStore.edit { it[THERMAL_NOTIFY_SOUND] = enabled }
+    suspend fun setThermalNotifyVibration(enabled: Boolean) = context.dataStore.edit { it[THERMAL_NOTIFY_VIBRATION] = enabled }
+    suspend fun setThermalNotifyRingtone(uri: String) = context.dataStore.edit { it[THERMAL_NOTIFY_RINGTONE] = uri }
+    suspend fun setThermalNotifyPriority(priority: String) = context.dataStore.edit { it[THERMAL_NOTIFY_PRIORITY] = priority }
+    suspend fun setThermalSaveHistory(enabled: Boolean) = context.dataStore.edit { it[THERMAL_SAVE_HISTORY] = enabled }
+    suspend fun setThermalMaxHistoryDays(days: Int) = context.dataStore.edit { it[THERMAL_MAX_HISTORY_DAYS] = days }
+    suspend fun setThermalAutoDeleteOld(enabled: Boolean) = context.dataStore.edit { it[THERMAL_AUTO_DELETE_OLD] = enabled }
 
     val widgetsEnabled: Flow<Boolean> = context.dataStore.data
         .map { prefs -> prefs[WIDGETS_ENABLED] ?: true }
