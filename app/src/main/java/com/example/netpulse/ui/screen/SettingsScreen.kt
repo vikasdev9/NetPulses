@@ -424,7 +424,7 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // LAN SCANNER SECTION
-            SectionLabel("CONNECTED DEVICES")
+            SectionLabel("CONNECTED DEVICES SCANNER")
             Card(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 shape = RoundedCornerShape(16.dp),
@@ -434,10 +434,99 @@ fun SettingsScreen(
                     SettingsRow(
                         icon = Icons.Outlined.Router,
                         title = "LAN Scanner",
-                        subtitle = "See who is using your Wi-Fi",
+                        subtitle = "Launch network discovery tool",
                         trailing = { ChevronIcon() },
                         onClick = onNavigateToLanScanner
                     )
+                    
+                    SettingsRow(
+                        icon = Icons.Outlined.Lan,
+                        title = "Enable LAN Scanner",
+                        trailing = {
+                            Switch(
+                                checked = state.lanScannerEnabled,
+                                onCheckedChange = { viewModel.setLanScannerEnabled(it) },
+                                colors = customSwitchColors()
+                            )
+                        }
+                    )
+                    
+                    if (state.lanScannerEnabled) {
+                        SettingsRow(
+                            icon = Icons.Outlined.Update,
+                            title = "Auto Scan",
+                            trailing = {
+                                Text(
+                                    text = state.lanAutoScanInterval,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            },
+                            onClick = { /* TODO: Interval Picker */ }
+                        )
+                        
+                        SettingsRow(
+                            icon = Icons.Outlined.PowerSettingsNew,
+                            title = "Scan On App Launch",
+                            trailing = {
+                                Switch(
+                                    checked = state.lanScanOnLaunch,
+                                    onCheckedChange = { viewModel.setLanScanOnLaunch(it) },
+                                    colors = customSwitchColors()
+                                )
+                            }
+                        )
+
+                        SettingsRow(
+                            icon = Icons.Outlined.History,
+                            title = "Save Device History",
+                            trailing = {
+                                Switch(
+                                    checked = state.lanSaveHistory,
+                                    onCheckedChange = { viewModel.setLanSaveHistory(it) },
+                                    colors = customSwitchColors()
+                                )
+                            }
+                        )
+
+                        SettingsRow(
+                            icon = Icons.Outlined.DevicesOther,
+                            title = "Show Offline Devices",
+                            trailing = {
+                                Switch(
+                                    checked = state.lanShowOfflineDevices,
+                                    onCheckedChange = { viewModel.setLanShowOfflineDevices(it) },
+                                    colors = customSwitchColors()
+                                )
+                            }
+                        )
+
+                        SettingsRow(
+                            icon = Icons.Outlined.NotificationsActive,
+                            title = "Notify New Devices",
+                            trailing = {
+                                Switch(
+                                    checked = state.lanNotifyNewDevice,
+                                    onCheckedChange = { viewModel.setLanNotifyNewDevice(it) },
+                                    colors = customSwitchColors()
+                                )
+                            }
+                        )
+
+                        SettingsRow(
+                            icon = Icons.Outlined.FileDownload,
+                            title = "Export Format",
+                            trailing = {
+                                Text(
+                                    text = state.lanExportFormat,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    fontSize = 13.sp
+                                )
+                            },
+                            onClick = { /* TODO: Format Picker */ }
+                        )
+                    }
                 }
             }
 

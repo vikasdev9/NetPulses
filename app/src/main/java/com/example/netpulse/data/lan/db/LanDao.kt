@@ -15,6 +15,9 @@ interface LanDao {
     @Query("UPDATE lan_device_history SET nickname = :nickname WHERE ipAddress = :ip")
     suspend fun updateNickname(ip: String, nickname: String?)
 
+    @Query("UPDATE lan_device_history SET notes = :notes WHERE ipAddress = :ip")
+    suspend fun updateNotes(ip: String, notes: String?)
+
     @Query("UPDATE lan_device_history SET isFavorite = :isFavorite WHERE ipAddress = :ip")
     suspend fun updateFavorite(ip: String, isFavorite: Boolean)
 

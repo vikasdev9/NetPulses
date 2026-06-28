@@ -38,7 +38,22 @@ class SettingsViewModel(
         val widgetShowIsp: Boolean = true,
         val widgetShowHealthScore: Boolean = true,
         val widgetShowLastUpdated: Boolean = true,
-        val widgetOpenDestination: String = "Home"
+        val widgetOpenDestination: String = "Home",
+
+        // LAN Scanner Settings
+        val lanScannerEnabled: Boolean = true,
+        val lanAutoScanInterval: String = "Manual",
+        val lanScanOnLaunch: Boolean = false,
+        val lanScanOnWifiConnected: Boolean = false,
+        val lanScanOnNetworkChange: Boolean = false,
+        val lanNotifyNewDevice: Boolean = false,
+        val lanNotifyDeviceLeaves: Boolean = false,
+        val lanNotifyUnknownDevice: Boolean = false,
+        val lanRememberNicknames: Boolean = true,
+        val lanSaveHistory: Boolean = true,
+        val lanShowOfflineDevices: Boolean = true,
+        val lanScanEntireNetwork: Boolean = true,
+        val lanExportFormat: String = "PDF"
     )
 
     private val _state = MutableStateFlow(SettingsState())
@@ -67,7 +82,22 @@ class SettingsViewModel(
                 userPreferences.widgetShowIsp,
                 userPreferences.widgetShowHealthScore,
                 userPreferences.widgetShowLastUpdated,
-                userPreferences.widgetOpenDestination
+                userPreferences.widgetOpenDestination,
+                
+                // LAN Scanner
+                userPreferences.lanScannerEnabled,
+                userPreferences.lanAutoScanInterval,
+                userPreferences.lanScanOnLaunch,
+                userPreferences.lanScanOnWifiConnected,
+                userPreferences.lanScanOnNetworkChange,
+                userPreferences.lanNotifyNewDevice,
+                userPreferences.lanNotifyDeviceLeaves,
+                userPreferences.lanNotifyUnknownDevice,
+                userPreferences.lanRememberNicknames,
+                userPreferences.lanSaveHistory,
+                userPreferences.lanShowOfflineDevices,
+                userPreferences.lanScanEntireNetwork,
+                userPreferences.lanExportFormat
             ) { values ->
                 val langCode = values[6] as String
                 SettingsState(
@@ -91,7 +121,21 @@ class SettingsViewModel(
                     widgetShowIsp = values[15] as Boolean,
                     widgetShowHealthScore = values[16] as Boolean,
                     widgetShowLastUpdated = values[17] as Boolean,
-                    widgetOpenDestination = values[18] as String
+                    widgetOpenDestination = values[18] as String,
+                    
+                    lanScannerEnabled = values[19] as Boolean,
+                    lanAutoScanInterval = values[20] as String,
+                    lanScanOnLaunch = values[21] as Boolean,
+                    lanScanOnWifiConnected = values[22] as Boolean,
+                    lanScanOnNetworkChange = values[23] as Boolean,
+                    lanNotifyNewDevice = values[24] as Boolean,
+                    lanNotifyDeviceLeaves = values[25] as Boolean,
+                    lanNotifyUnknownDevice = values[26] as Boolean,
+                    lanRememberNicknames = values[27] as Boolean,
+                    lanSaveHistory = values[28] as Boolean,
+                    lanShowOfflineDevices = values[29] as Boolean,
+                    lanScanEntireNetwork = values[30] as Boolean,
+                    lanExportFormat = values[31] as String
                 )
             }.collect { 
                 _state.value = it 
@@ -168,6 +212,21 @@ class SettingsViewModel(
         WidgetRefreshManager.refreshAllWidgets(getApplication())
     }
     fun setWidgetOpenDestination(destination: String) = viewModelScope.launch { userPreferences.setWidgetOpenDestination(destination) }
+
+    // --- LAN Scanner Settings ---
+    fun setLanScannerEnabled(enabled: Boolean) = viewModelScope.launch { userPreferences.setLanScannerEnabled(enabled) }
+    fun setLanAutoScanInterval(interval: String) = viewModelScope.launch { userPreferences.setLanAutoScanInterval(interval) }
+    fun setLanScanOnLaunch(enabled: Boolean) = viewModelScope.launch { userPreferences.setLanScanOnLaunch(enabled) }
+    fun setLanScanOnWifiConnected(enabled: Boolean) = viewModelScope.launch { userPreferences.setLanScanOnWifiConnected(enabled) }
+    fun setLanScanOnNetworkChange(enabled: Boolean) = viewModelScope.launch { userPreferences.setLanScanOnNetworkChange(enabled) }
+    fun setLanNotifyNewDevice(enabled: Boolean) = viewModelScope.launch { userPreferences.setLanNotifyNewDevice(enabled) }
+    fun setLanNotifyDeviceLeaves(enabled: Boolean) = viewModelScope.launch { userPreferences.setLanNotifyDeviceLeaves(enabled) }
+    fun setLanNotifyUnknownDevice(enabled: Boolean) = viewModelScope.launch { userPreferences.setLanNotifyUnknownDevice(enabled) }
+    fun setLanRememberNicknames(enabled: Boolean) = viewModelScope.launch { userPreferences.setLanRememberNicknames(enabled) }
+    fun setLanSaveHistory(enabled: Boolean) = viewModelScope.launch { userPreferences.setLanSaveHistory(enabled) }
+    fun setLanShowOfflineDevices(enabled: Boolean) = viewModelScope.launch { userPreferences.setLanShowOfflineDevices(enabled) }
+    fun setLanScanEntireNetwork(enabled: Boolean) = viewModelScope.launch { userPreferences.setLanScanEntireNetwork(enabled) }
+    fun setLanExportFormat(format: String) = viewModelScope.launch { userPreferences.setLanExportFormat(format) }
 
     fun onUpgradeTapped() = viewModelScope.launch { userPreferences.setIsPro(true) }
     fun onRestorePurchase() {}

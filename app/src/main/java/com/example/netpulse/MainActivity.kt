@@ -77,7 +77,7 @@ class MainActivity : BaseActivity() {
         val lanScannerViewModel: LanScannerViewModel by viewModels {
             object : androidx.lifecycle.ViewModelProvider.Factory {
                 override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
-                    return LanScannerViewModel(lanScannerRepository) as T
+                    return LanScannerViewModel(lanScannerRepository, userPreferences) as T
                 }
             }
         }

@@ -46,7 +46,51 @@ class UserPreferences(private val context: Context) {
         val WIDGET_SHOW_HEALTH_SCORE = booleanPreferencesKey("widget_show_health_score")
         val WIDGET_SHOW_LAST_UPDATED = booleanPreferencesKey("widget_show_last_updated")
         val WIDGET_OPEN_DESTINATION = stringPreferencesKey("widget_open_destination")
+        
+        // LAN Scanner Settings
+        val LAN_SCANNER_ENABLED = booleanPreferencesKey("lan_scanner_enabled")
+        val LAN_AUTO_SCAN_INTERVAL = stringPreferencesKey("lan_auto_scan_interval")
+        val LAN_SCAN_ON_LAUNCH = booleanPreferencesKey("lan_scan_on_launch")
+        val LAN_SCAN_ON_WIFI_CONNECTED = booleanPreferencesKey("lan_scan_on_wifi_connected")
+        val LAN_SCAN_ON_NETWORK_CHANGE = booleanPreferencesKey("lan_scan_on_network_change")
+        val LAN_NOTIFY_NEW_DEVICE = booleanPreferencesKey("lan_notify_new_device")
+        val LAN_NOTIFY_DEVICE_LEAVES = booleanPreferencesKey("lan_notify_device_leaves")
+        val LAN_NOTIFY_UNKNOWN_DEVICE = booleanPreferencesKey("lan_notify_unknown_device")
+        val LAN_REMEMBER_NICKNAMES = booleanPreferencesKey("lan_remember_nicknames")
+        val LAN_SAVE_HISTORY = booleanPreferencesKey("lan_save_history")
+        val LAN_SHOW_OFFLINE_DEVICES = booleanPreferencesKey("lan_show_offline_devices")
+        val LAN_SCAN_ENTIRE_NETWORK = booleanPreferencesKey("lan_scan_entire_network")
+        val LAN_EXPORT_FORMAT = stringPreferencesKey("lan_export_format")
     }
+
+    // LAN Scanner Flows
+    val lanScannerEnabled: Flow<Boolean> = context.dataStore.data.map { it[LAN_SCANNER_ENABLED] ?: true }
+    val lanAutoScanInterval: Flow<String> = context.dataStore.data.map { it[LAN_AUTO_SCAN_INTERVAL] ?: "Manual" }
+    val lanScanOnLaunch: Flow<Boolean> = context.dataStore.data.map { it[LAN_SCAN_ON_LAUNCH] ?: false }
+    val lanScanOnWifiConnected: Flow<Boolean> = context.dataStore.data.map { it[LAN_SCAN_ON_WIFI_CONNECTED] ?: false }
+    val lanScanOnNetworkChange: Flow<Boolean> = context.dataStore.data.map { it[LAN_SCAN_ON_NETWORK_CHANGE] ?: false }
+    val lanNotifyNewDevice: Flow<Boolean> = context.dataStore.data.map { it[LAN_NOTIFY_NEW_DEVICE] ?: false }
+    val lanNotifyDeviceLeaves: Flow<Boolean> = context.dataStore.data.map { it[LAN_NOTIFY_DEVICE_LEAVES] ?: false }
+    val lanNotifyUnknownDevice: Flow<Boolean> = context.dataStore.data.map { it[LAN_NOTIFY_UNKNOWN_DEVICE] ?: false }
+    val lanRememberNicknames: Flow<Boolean> = context.dataStore.data.map { it[LAN_REMEMBER_NICKNAMES] ?: true }
+    val lanSaveHistory: Flow<Boolean> = context.dataStore.data.map { it[LAN_SAVE_HISTORY] ?: true }
+    val lanShowOfflineDevices: Flow<Boolean> = context.dataStore.data.map { it[LAN_SHOW_OFFLINE_DEVICES] ?: true }
+    val lanScanEntireNetwork: Flow<Boolean> = context.dataStore.data.map { it[LAN_SCAN_ENTIRE_NETWORK] ?: true }
+    val lanExportFormat: Flow<String> = context.dataStore.data.map { it[LAN_EXPORT_FORMAT] ?: "PDF" }
+
+    suspend fun setLanScannerEnabled(enabled: Boolean) = context.dataStore.edit { it[LAN_SCANNER_ENABLED] = enabled }
+    suspend fun setLanAutoScanInterval(interval: String) = context.dataStore.edit { it[LAN_AUTO_SCAN_INTERVAL] = interval }
+    suspend fun setLanScanOnLaunch(enabled: Boolean) = context.dataStore.edit { it[LAN_SCAN_ON_LAUNCH] = enabled }
+    suspend fun setLanScanOnWifiConnected(enabled: Boolean) = context.dataStore.edit { it[LAN_SCAN_ON_WIFI_CONNECTED] = enabled }
+    suspend fun setLanScanOnNetworkChange(enabled: Boolean) = context.dataStore.edit { it[LAN_SCAN_ON_NETWORK_CHANGE] = enabled }
+    suspend fun setLanNotifyNewDevice(enabled: Boolean) = context.dataStore.edit { it[LAN_NOTIFY_NEW_DEVICE] = enabled }
+    suspend fun setLanNotifyDeviceLeaves(enabled: Boolean) = context.dataStore.edit { it[LAN_NOTIFY_DEVICE_LEAVES] = enabled }
+    suspend fun setLanNotifyUnknownDevice(enabled: Boolean) = context.dataStore.edit { it[LAN_NOTIFY_UNKNOWN_DEVICE] = enabled }
+    suspend fun setLanRememberNicknames(enabled: Boolean) = context.dataStore.edit { it[LAN_REMEMBER_NICKNAMES] = enabled }
+    suspend fun setLanSaveHistory(enabled: Boolean) = context.dataStore.edit { it[LAN_SAVE_HISTORY] = enabled }
+    suspend fun setLanShowOfflineDevices(enabled: Boolean) = context.dataStore.edit { it[LAN_SHOW_OFFLINE_DEVICES] = enabled }
+    suspend fun setLanScanEntireNetwork(enabled: Boolean) = context.dataStore.edit { it[LAN_SCAN_ENTIRE_NETWORK] = enabled }
+    suspend fun setLanExportFormat(format: String) = context.dataStore.edit { it[LAN_EXPORT_FORMAT] = format }
 
     val widgetsEnabled: Flow<Boolean> = context.dataStore.data
         .map { prefs -> prefs[WIDGETS_ENABLED] ?: true }

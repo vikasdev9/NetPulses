@@ -22,7 +22,7 @@ import com.example.netpulse.data.lan.db.LanDao
         WifiHistoryEntity::class,
         LanDeviceEntity::class
     ],
-    version = 5,
+    version = 6,
     exportSchema = false
 )
 abstract class NetPulseDatabase : RoomDatabase() {
