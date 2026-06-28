@@ -59,7 +59,9 @@ fun AnalyticsScreen(
                             text = "Network Analytics",
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.ExtraBold,
-                            color = MaterialTheme.colorScheme.onBackground
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontSize = 18.sp
+
                         )
                         if (scrollBehavior.state.collapsedFraction < 0.5f) {
                             Text(
@@ -80,10 +82,10 @@ fun AnalyticsScreen(
                     }
                 },
                 actions = {
-                    RangeChip(
-                        currentRange = uiState.selectedRange,
-                        onRangeClick = { viewModel.setDateRange(getNextRange(uiState.selectedRange)) }
-                    )
+//                    RangeChip(
+//                        currentRange = uiState.selectedRange,
+//                        onRangeClick = { viewModel.setDateRange(getNextRange(uiState.selectedRange)) }
+//                    )
                     IconButton(onClick = { viewModel.refreshData() }) {
                         Icon(Icons.Default.Refresh, contentDescription = "Refresh", tint = MaterialTheme.colorScheme.onBackground)
                     }

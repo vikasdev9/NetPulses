@@ -108,9 +108,13 @@ fun MainScreen(
                                 is SpeedTestState.Error -> "ERROR"
                             }
 
+                            val isUploadPhase = (uiState.testState as? SpeedTestState.Running)?.phase == TestPhase.UPLOAD
+                            val gaugeColor = if (isUploadPhase) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
+                            val gaugeSecondaryColor = if (isUploadPhase) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
+
                             val statusColor = when (uiState.testState) {
                                 is SpeedTestState.Idle -> MaterialTheme.colorScheme.onSurfaceVariant
-                                is SpeedTestState.Running -> MaterialTheme.colorScheme.primary
+                                is SpeedTestState.Running -> gaugeColor
                                 is SpeedTestState.Complete -> MaterialTheme.colorScheme.tertiary
                                 is SpeedTestState.Error -> Color.Red
                             }
@@ -119,7 +123,9 @@ fun MainScreen(
                                 speedMbps = currentSpeed,
                                 statusLabel = statusLabel,
                                 statusColor = statusColor,
-                                isRunning = uiState.isTestRunning
+                                isRunning = uiState.isTestRunning,
+                                gaugeColor = gaugeColor,
+                                gaugeSecondaryColor = gaugeSecondaryColor
                             )
                         }
 

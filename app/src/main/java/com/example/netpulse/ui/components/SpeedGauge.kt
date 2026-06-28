@@ -36,9 +36,11 @@ fun SpeedGauge(
     isRunning: Boolean,
     modifier: Modifier = Modifier,
     maxSpeed: Float = 100f,
+    gaugeColor: Color = MaterialTheme.colorScheme.primary,
+    gaugeSecondaryColor: Color = MaterialTheme.colorScheme.secondary,
 ) {
-    val primaryColor = MaterialTheme.colorScheme.primary
-    val secondaryColor = MaterialTheme.colorScheme.secondary
+    val primaryColor = gaugeColor
+    val secondaryColor = gaugeSecondaryColor
     val outlineColor = MaterialTheme.colorScheme.outline
     val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
     val onBackground = MaterialTheme.colorScheme.onBackground
