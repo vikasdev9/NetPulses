@@ -168,11 +168,11 @@ fun AnalyticsScreen(
                 // Use Case Ratings
                 item {
                     AnalyticsCard(title = "Connection Suitability", icon = Icons.Default.Analytics) {
-                        UseCaseRatingRow("Gaming & Low Latency", uiState.useCaseRating.gaming, Icons.Default.SportsEsports)
-                        UseCaseRatingRow("4K Streaming", uiState.useCaseRating.streaming, Icons.Default.Tv)
-                        UseCaseRatingRow("Video Conferencing", uiState.useCaseRating.videoCalls, Icons.Default.VideoCall)
-                        UseCaseRatingRow("Web Browsing", uiState.useCaseRating.browsing, Icons.Default.Language)
-                        UseCaseRatingRow("Large Downloads", uiState.useCaseRating.downloads, Icons.Default.Download)
+                        UseCaseRatingRow("Gaming & Low Latency", uiState.useCaseRating.gaming.label, Icons.Default.SportsEsports)
+                        UseCaseRatingRow("4K Streaming", uiState.useCaseRating.streaming.label, Icons.Default.Tv)
+                        UseCaseRatingRow("Video Conferencing", uiState.useCaseRating.videoCalls.label, Icons.Default.VideoCall)
+                        UseCaseRatingRow("Web Browsing", uiState.useCaseRating.browsing.label, Icons.Default.Language)
+                        UseCaseRatingRow("Large Downloads", uiState.useCaseRating.downloads.label, Icons.Default.Download)
                     }
                 }
 

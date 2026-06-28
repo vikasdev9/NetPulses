@@ -247,7 +247,7 @@ fun CircularMetricIndicator(
 }
 
 @Composable
-fun UseCaseRatingRow(label: String, quality: NetworkQuality, icon: ImageVector) {
+fun UseCaseRatingRow(label: String, quality: String, icon: ImageVector) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -257,7 +257,7 @@ fun UseCaseRatingRow(label: String, quality: NetworkQuality, icon: ImageVector) 
         Icon(icon, null, modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.primary)
         Spacer(modifier = Modifier.width(12.dp))
         Text(label, modifier = Modifier.weight(1f), fontSize = 14.sp)
-        QualityIndicator(quality.label)
+        QualityIndicator(quality)
     }
 }
 
