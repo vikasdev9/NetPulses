@@ -16,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
 import java.util.*
 
@@ -43,136 +44,140 @@ class AnalyticsViewModel(application: Application) : AndroidViewModel(applicatio
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             
-            // 1. Fetch Network Intelligence (Reactive)
-            val networkIntelligenceFlow = combine(
-                networkRepository.getNetworkStatus(),
-                networkRepository.getMobileNetworkInfo(),
-                networkRepository.getInternetDetails(),
-                networkRepository.getIspInfo(),
-                networkRepository.getSpeedSummary(),
-                networkRepository.getDeviceInfo(),
-                networkRepository.getTimeline(),
-                networkRepository.getDiagnostics(),
-                networkRepository.getSecurityStatus(),
-                networkRepository.getRecommendations()
-            ) { results ->
-                results
-            }
-
-            // 2. Fetch Usage Insights (One-shot for the current range)
-            withContext(Dispatchers.IO) {
-                val hasPermission = screenTimeHelper.hasUsagePermission()
-                val todayMobile = dataUsageHelper.getTodayMobileData()
-                val todayWifi = dataUsageHelper.getTodayWifiData()
-                val weeklyUsage = dataUsageHelper.getWeeklyDailyUsage()
-                
-                val calendar = Calendar.getInstance()
-                val endTime = calendar.timeInMillis
-                
-                when (_uiState.value.selectedRange) {
-                    AnalyticsRange.TODAY -> calendar.set(Calendar.HOUR_OF_DAY, 0)
-                    AnalyticsRange.WEEK -> calendar.add(Calendar.DAY_OF_YEAR, -7)
-                    AnalyticsRange.MONTH -> calendar.add(Calendar.MONTH, -1)
-                }
-                calendar.set(Calendar.MINUTE, 0)
-                calendar.set(Calendar.SECOND, 0)
-                val startTime = calendar.timeInMillis
-
-                val perAppData = dataUsageHelper.getPerAppDataUsage(startTime, endTime)
-                // Performance: Only load icons for the top apps being displayed
-                val perAppDataWithIcons = perAppData.take(15).map { 
-                    it.copy(appIcon = try { packageManager.getApplicationIcon(it.packageName) } catch (e: Exception) { null })
-                }
-
-                var totalTime = 0L
-                var perAppTime = emptyList<AppScreenTime>()
-                var weeklyTime = emptyList<DailyScreenTime>()
-                
-                if (hasPermission) {
-                    totalTime = screenTimeHelper.getTodayTotalScreenTime()
-                    perAppTime = screenTimeHelper.getPerAppScreenTime(startTime, endTime)
-                        .take(15) // Performance: limit processing
-                        .map { it.copy(appIcon = try { packageManager.getApplicationIcon(it.packageName) } catch (e: Exception) { null }) }
-                    weeklyTime = screenTimeHelper.getWeeklyScreenTime()
-                }
-
-                val combinedList = combineAppData(perAppDataWithIcons, perAppTime)
-                val tipApp = perAppData.firstOrNull { it.totalBytes > 500 * 1024 * 1024 }
-                val sortedByDefault = combinedList.sortedByDescending { it.totalBytes }
-
-                // FEATURE DATA
-                val allTests = dao.getAll().first()
-                val streakCount = achievementRepository.calculateStreak(allTests)
-                
-                val usageToday = usageRepository.todayMB.first()
-                val usageWeek = usageRepository.weekMB.first()
-                val usageMonth = usageRepository.monthMB.first()
-                val actualLimit = usageRepository.planLimitGB.first()
-
-                val ispPerf = ispRepository.getPerformance(uiState.value.ispInfo.name, userPreferences.advertisedSpeed.first())
-                val stability = stabilityRepository.getMetrics()
-                
-                // Trend Data Calculation
-                val trendPoints = calculateTrendPoints(allTests, _uiState.value.trendPeriod)
-
-                // Collect the network intelligence results once
-                val networkResults = networkIntelligenceFlow.first()
-                val summaries = calculateSummaries(allTests)
-                
-                val currentSpeedSummary = networkResults[4] as SpeedSummary
-                val healthScore = networkRepository.calculateHealthScore(
-                    currentSpeedSummary.download,
-                    currentSpeedSummary.upload,
-                    currentSpeedSummary.ping,
-                    currentSpeedSummary.jitter.toFloat()
-                )
-                val useCaseRating = calculateUseCaseRating(
-                    currentSpeedSummary.download,
-                    currentSpeedSummary.ping,
-                    currentSpeedSummary.jitter
-                )
-
-                withContext(Dispatchers.Main) {
-                    _uiState.update { state ->
-                        state.copy(
-                            isLoading = false,
-                            hasUsagePermission = hasPermission,
-                            mobileData = NetworkUsageStats(today = todayMobile.totalBytes, totalFormatted = todayMobile.totalFormatted),
-                            wifiData = NetworkUsageStats(today = todayWifi.totalBytes, totalFormatted = todayWifi.totalFormatted),
-                            weeklyUsage = weeklyUsage,
-                            perAppData = perAppDataWithIcons.take(8),
-                            totalScreenTimeMs = totalTime,
-                            perAppScreenTime = perAppTime.take(8),
-                            weeklyScreenTime = weeklyTime,
-                            top3Apps = sortedByDefault.take(3),
-                            allAppsCombined = sortCombinedList(combinedList, state.dashboardTab),
-                            tipApp = tipApp,
-                            
-                            // Map Network Intelligence
-                            networkStatus = networkResults[0] as NetworkStatus,
-                            mobileNetworkInfo = networkResults[1] as MobileNetworkInfo,
-                            internetDetails = networkResults[2] as InternetDetails,
-                            ispInfo = networkResults[3] as IspInfo,
-                            speedSummary = currentSpeedSummary,
-                            deviceInfo = networkResults[5] as DeviceInfo,
-                            timeline = networkResults[6] as List<TimelineEvent>,
-                            diagnostics = networkResults[7] as AdvancedDiagnostics,
-                            security = networkResults[8] as SecurityStatus,
-                            recommendations = networkResults[9] as List<RecommendationItem>,
-
-                            // Feature Data
-                            healthScore = healthScore,
-                            useCaseRating = useCaseRating,
-                            streak = streakCount,
-                            estimatedUsage = EstimatedUsage(usageToday, usageWeek, usageMonth, actualLimit),
-                            ispPerformance = ispPerf,
-                            stabilityMetrics = stability,
-                            trendData = trendPoints,
-                            trendStats = calculateTrendStats(trendPoints),
-                            summaries = summaries
+            try {
+                // 1. Fetch Network Intelligence (Reactive)
+                val networkIntelligenceFlow = combine(
+                    networkRepository.getNetworkStatus(),
+                    networkRepository.getMobileNetworkInfo(),
+                    networkRepository.getInternetDetails(),
+                    networkRepository.getIspInfo(),
+                    networkRepository.getSpeedSummary(),
+                    networkRepository.getDeviceInfo(),
+                    networkRepository.getTimeline(),
+                    networkRepository.getDiagnostics(),
+                    networkRepository.getSecurityStatus(),
+                    networkRepository.getRecommendations()
+                ) { results -> results }
+    
+                // 2. Fetch Usage Insights
+                withContext(Dispatchers.IO) {
+                    val hasPermission = screenTimeHelper.hasUsagePermission()
+                    val todayMobile = dataUsageHelper.getTodayMobileData()
+                    val todayWifi = dataUsageHelper.getTodayWifiData()
+                    val weeklyUsage = dataUsageHelper.getWeeklyDailyUsage()
+                    
+                    val calendar = Calendar.getInstance()
+                    val endTime = calendar.timeInMillis
+                    
+                    when (_uiState.value.selectedRange) {
+                        AnalyticsRange.TODAY -> calendar.set(Calendar.HOUR_OF_DAY, 0)
+                        AnalyticsRange.WEEK -> calendar.add(Calendar.DAY_OF_YEAR, -7)
+                        AnalyticsRange.MONTH -> calendar.add(Calendar.MONTH, -1)
+                    }
+                    calendar.set(Calendar.MINUTE, 0)
+                    calendar.set(Calendar.SECOND, 0)
+                    val startTime = calendar.timeInMillis
+    
+                    val perAppData = dataUsageHelper.getPerAppDataUsage(startTime, endTime)
+                    val perAppDataWithIcons = perAppData.take(15).map { 
+                        it.copy(appIcon = try { packageManager.getApplicationIcon(it.packageName) } catch (e: Exception) { null })
+                    }
+    
+                    var totalTime = 0L
+                    var perAppTime = emptyList<AppScreenTime>()
+                    var weeklyTime = emptyList<DailyScreenTime>()
+                    
+                    if (hasPermission) {
+                        totalTime = screenTimeHelper.getTodayTotalScreenTime()
+                        perAppTime = screenTimeHelper.getPerAppScreenTime(startTime, endTime)
+                            .take(15)
+                            .map { it.copy(appIcon = try { packageManager.getApplicationIcon(it.packageName) } catch (e: Exception) { null }) }
+                        weeklyTime = screenTimeHelper.getWeeklyScreenTime()
+                    }
+    
+                    val combinedList = combineAppData(perAppDataWithIcons, perAppTime)
+                    val tipApp = perAppData.firstOrNull { it.totalBytes > 500 * 1024 * 1024 }
+                    val sortedByDefault = combinedList.sortedByDescending { it.totalBytes }
+    
+                    val allTests = dao.getAll().first()
+                    val streakCount = achievementRepository.calculateStreak(allTests)
+                    
+                    val usageToday = usageRepository.todayMB.first()
+                    val usageWeek = usageRepository.weekMB.first()
+                    val usageMonth = usageRepository.monthMB.first()
+                    val actualLimit = usageRepository.planLimitGB.first()
+    
+                    val ispPerf = ispRepository.getPerformance(uiState.value.ispInfo.name, userPreferences.advertisedSpeed.first())
+                    val stability = stabilityRepository.getMetrics()
+                    
+                    val trendPoints = calculateTrendPoints(allTests, _uiState.value.trendPeriod)
+    
+                    // Collect network intelligence with a timeout to prevent hanging
+                    val networkResults = withTimeoutOrNull(5000) { networkIntelligenceFlow.first() }
+                    val summaries = calculateSummaries(allTests)
+                    
+                    if (networkResults != null) {
+                        val currentSpeedSummary = networkResults[4] as SpeedSummary
+                        val healthScore = networkRepository.calculateHealthScore(
+                            currentSpeedSummary.download,
+                            currentSpeedSummary.upload,
+                            currentSpeedSummary.ping,
+                            currentSpeedSummary.jitter.toFloat()
                         )
+                        val useCaseRating = calculateUseCaseRating(
+                            currentSpeedSummary.download,
+                            currentSpeedSummary.ping,
+                            currentSpeedSummary.jitter
+                        )
+    
+                        withContext(Dispatchers.Main) {
+                            _uiState.update { state ->
+                                state.copy(
+                                    isLoading = false,
+                                    hasUsagePermission = hasPermission,
+                                    mobileData = NetworkUsageStats(today = todayMobile.totalBytes, totalFormatted = todayMobile.totalFormatted),
+                                    wifiData = NetworkUsageStats(today = todayWifi.totalBytes, totalFormatted = todayWifi.totalFormatted),
+                                    weeklyUsage = weeklyUsage,
+                                    perAppData = perAppDataWithIcons.take(8),
+                                    totalScreenTimeMs = totalTime,
+                                    perAppScreenTime = perAppTime.take(8),
+                                    weeklyScreenTime = weeklyTime,
+                                    top3Apps = sortedByDefault.take(3),
+                                    allAppsCombined = sortCombinedList(combinedList, state.dashboardTab),
+                                    tipApp = tipApp,
+                                    
+                                    networkStatus = networkResults[0] as NetworkStatus,
+                                    mobileNetworkInfo = networkResults[1] as MobileNetworkInfo,
+                                    internetDetails = networkResults[2] as InternetDetails,
+                                    ispInfo = networkResults[3] as IspInfo,
+                                    speedSummary = currentSpeedSummary,
+                                    deviceInfo = networkResults[5] as DeviceInfo,
+                                    timeline = networkResults[6] as List<TimelineEvent>,
+                                    diagnostics = networkResults[7] as AdvancedDiagnostics,
+                                    security = networkResults[8] as SecurityStatus,
+                                    recommendations = networkResults[9] as List<RecommendationItem>,
+    
+                                    healthScore = healthScore,
+                                    useCaseRating = useCaseRating,
+                                    streak = streakCount,
+                                    estimatedUsage = EstimatedUsage(usageToday, usageWeek, usageMonth, actualLimit),
+                                    ispPerformance = ispPerf,
+                                    stabilityMetrics = stability,
+                                    trendData = trendPoints,
+                                    trendStats = calculateTrendStats(trendPoints),
+                                    summaries = summaries
+                                )
+                            }
+                        }
+                    } else {
+                        withContext(Dispatchers.Main) {
+                            _uiState.update { it.copy(isLoading = false) }
+                        }
                     }
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }
@@ -377,46 +382,60 @@ class AnalyticsViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun runDiagnosticsAgain() {
-        loadAnalytics()
+        viewModelScope.launch {
+            try {
+                loadAnalytics()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
     fun copyIp(context: android.content.Context) {
         val ip = _uiState.value.internetDetails.publicIp
-        if (ip != "Fetching..." && ip != "—") {
+        if (ip != "Fetching..." && ip != "—" && ip.isNotBlank()) {
             val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
             val clip = android.content.ClipData.newPlainText("Public IP", ip)
             clipboard.setPrimaryClip(clip)
-            android.widget.Toast.makeText(context, "IP copied to clipboard", android.widget.Toast.LENGTH_SHORT).show()
+            android.widget.Toast.makeText(context, "IP copied to clipboard: $ip", android.widget.Toast.LENGTH_SHORT).show()
+        } else {
+            android.widget.Toast.makeText(context, "Public IP not available yet", android.widget.Toast.LENGTH_SHORT).show()
         }
     }
 
     fun shareAnalytics(context: android.content.Context) {
-        val state = _uiState.value
-        val text = """
-            📊 NetPulse Analytics Summary
-            ----------------------------
-            Health Score: ${state.healthScore}/100
-            
-            🌐 Connection: ${state.networkStatus.type} (${state.networkStatus.ssid})
-            📶 Signal: ${state.networkStatus.signalPercentage}%
-            🚀 Latest Speed: ${state.speedSummary.download.toInt()}/${state.speedSummary.upload.toInt()} Mbps
-            📡 Latency: ${state.speedSummary.ping} ms | Jitter: ${state.speedSummary.jitter} ms
-            
-            📍 ISP: ${state.ispInfo.name}
-            🌍 Location: ${state.ispInfo.city}, ${state.ispInfo.country}
-            
-            📱 Device: ${state.deviceInfo.manufacturer} ${state.deviceInfo.model}
-            🔋 Battery: ${state.deviceInfo.batteryLevel}% (${state.deviceInfo.batteryHealth})
-            
-            Generated by NetPulse app
-        """.trimIndent()
-
-        val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(android.content.Intent.EXTRA_SUBJECT, "NetPulse Network Analytics")
-            putExtra(android.content.Intent.EXTRA_TEXT, text)
+        try {
+            val state = _uiState.value
+            val text = """
+                📊 NetPulse Analytics Summary
+                ----------------------------
+                Health Score: ${state.healthScore}/100
+                
+                🌐 Connection: ${state.networkStatus.type} (${state.networkStatus.ssid})
+                📶 Signal: ${state.networkStatus.signalPercentage}%
+                🚀 Latest Speed: ${state.speedSummary.download.toInt()}/${state.speedSummary.upload.toInt()} Mbps
+                📡 Latency: ${state.speedSummary.ping} ms | Jitter: ${state.speedSummary.jitter} ms
+                
+                📍 ISP: ${state.ispInfo.name}
+                🌍 Location: ${state.ispInfo.city}, ${state.ispInfo.country}
+                
+                📱 Device: ${state.deviceInfo.manufacturer} ${state.deviceInfo.model}
+                🔋 Battery: ${state.deviceInfo.batteryLevel}% (${state.deviceInfo.batteryHealth})
+                
+                Generated by NetPulse app
+            """.trimIndent()
+    
+            val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(android.content.Intent.EXTRA_SUBJECT, "NetPulse Network Analytics")
+                putExtra(android.content.Intent.EXTRA_TEXT, text)
+                addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(android.content.Intent.createChooser(intent, "Share Analytics"))
+        } catch (e: Exception) {
+            e.printStackTrace()
+            android.widget.Toast.makeText(context, "Failed to share analytics", android.widget.Toast.LENGTH_SHORT).show()
         }
-        context.startActivity(android.content.Intent.createChooser(intent, "Share Analytics"))
     }
 
     fun exportPdf(context: android.content.Context) {

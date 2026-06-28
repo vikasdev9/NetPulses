@@ -479,12 +479,18 @@ fun AnalyticsScreen(
                 // Master Actions
                 item {
                     val context = LocalContext.current
-                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
                         GradientButton(
                             text = "Run Diagnostics Again", 
                             icon = Icons.Default.Refresh, 
                             modifier = Modifier.fillMaxWidth(),
-                            onClick = { viewModel.runDiagnosticsAgain() }
+                            onClick = { 
+                                android.widget.Toast.makeText(context, "Running diagnostics...", android.widget.Toast.LENGTH_SHORT).show()
+                                viewModel.runDiagnosticsAgain() 
+                            }
                         )
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -494,7 +500,10 @@ fun AnalyticsScreen(
                                 text = "Export PDF", 
                                 icon = Icons.Default.PictureAsPdf, 
                                 modifier = Modifier.weight(1f),
-                                onClick = { viewModel.exportPdf(context) }
+                                onClick = { 
+                                    android.widget.Toast.makeText(context, "Exporting report...", android.widget.Toast.LENGTH_SHORT).show()
+                                    viewModel.exportPdf(context) 
+                                }
                             )
                             SecondaryActionButton(
                                 text = "Copy IP", 
@@ -510,7 +519,6 @@ fun AnalyticsScreen(
                             )
                         }
                     }
-                    Spacer(modifier = Modifier.height(40.dp))
                 }
             }
         }
