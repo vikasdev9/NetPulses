@@ -44,9 +44,9 @@ fun WifiNetworkCard(
             .fillMaxWidth()
             .padding(bottom = 8.dp)
             .clip(RoundedCornerShape(14.dp))
-            .border(0.5.dp, Color(0xFF1E2740), RoundedCornerShape(14.dp))
+            .border(0.5.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f), RoundedCornerShape(14.dp))
             .clickable { expanded = !expanded },
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF131929))
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -65,14 +65,14 @@ fun WifiNetworkCard(
                 ) {
                     Text(
                         text = if (network.isHidden) "Hidden Network" else network.ssid,
-                        color = if (network.isHidden) Color(0xFF8892A4) else Color.White,
+                        color = if (network.isHidden) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         fontStyle = if (network.isHidden) FontStyle.Italic else FontStyle.Normal
                     )
                     Text(
                         text = network.bssid,
-                        color = Color(0xFF8892A4),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 11.sp,
                         fontFamily = FontFamily.Monospace
                     )
@@ -92,14 +92,14 @@ fun WifiNetworkCard(
                         WifiChip(
                             text = network.securityType,
                             color = when(network.securityType) {
-                                "Open" -> Color(0xFFEF4444)
+                                "Open" -> MaterialTheme.colorScheme.error
                                 "WPA2" -> Color(0xFF00E676)
                                 "WPA3" -> Color(0xFF00D4FF)
                                 else -> Color(0xFFFFB300)
                             }
                         )
                         Spacer(modifier = Modifier.width(6.dp))
-                        WifiChip(text = "Ch ${network.channel}", color = Color(0xFF8892A4))
+                        WifiChip(text = "Ch ${network.channel}", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     
                     Spacer(modifier = Modifier.height(8.dp))
@@ -109,8 +109,8 @@ fun WifiNetworkCard(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text("Signal", color = Color(0xFF8892A4), fontSize = 10.sp)
-                            Text("${network.signalStrength} dBm", color = Color(0xFF8892A4), fontSize = 10.sp)
+                            Text("Signal", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 10.sp)
+                            Text("${network.signalStrength} dBm", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 10.sp)
                         }
                         Spacer(modifier = Modifier.height(2.dp))
                         Box(
@@ -118,7 +118,7 @@ fun WifiNetworkCard(
                                 .fillMaxWidth()
                                 .height(3.dp)
                                 .clip(RoundedCornerShape(2.dp))
-                                .background(Color(0xFF1E2740))
+                                .background(MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
                         ) {
                             Box(
                                 modifier = Modifier
@@ -133,14 +133,14 @@ fun WifiNetworkCard(
                 Icon(
                     imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = null,
-                    tint = Color(0xFF8892A4),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(20.dp)
                 )
             }
             
             AnimatedVisibility(visible = expanded) {
                 Column(modifier = Modifier.padding(top = 12.dp)) {
-                    Divider(color = Color(0xFF1E2740), thickness = 0.5.dp)
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f), thickness = 0.5.dp)
                     Spacer(modifier = Modifier.height(12.dp))
                     DetailRow("Channel Width", network.channelWidth)
                     DetailRow("Standard", network.standard)
@@ -169,8 +169,8 @@ fun DetailRow(label: String, value: String) {
         modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(label, color = Color(0xFF8892A4), fontSize = 12.sp)
-        Text(value, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+        Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+        Text(value, color = MaterialTheme.colorScheme.onSurface, fontSize = 12.sp, fontWeight = FontWeight.Medium)
     }
 }
 

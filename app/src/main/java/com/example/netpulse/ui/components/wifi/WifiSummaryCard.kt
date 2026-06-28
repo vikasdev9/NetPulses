@@ -1,6 +1,7 @@
 package com.example.netpulse.ui.components.wifi
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -53,7 +54,7 @@ fun WifiSummaryCard(
                 value = openCount.toString(),
                 label = "Open Networks",
                 modifier = Modifier.weight(1f),
-                valueColor = if (openCount > 0) Color(0xFFEF4444) else Color.White
+                valueColor = if (openCount > 0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
             )
             Spacer(modifier = Modifier.width(8.dp))
             SummaryItem(
@@ -77,15 +78,16 @@ fun SummaryItem(
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(14.dp))
-            .background(Color(0xFF131929))
+            .background(MaterialTheme.colorScheme.surface)
+            .border(0.5.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f), RoundedCornerShape(14.dp))
             .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(icon, null, tint = Color(0xFF3B8BFF), modifier = Modifier.size(20.dp))
+            Icon(icon, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
             Spacer(modifier = Modifier.height(8.dp))
             Text(value, color = valueColor, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Text(label, color = Color(0xFF8892A4), fontSize = 11.sp)
+            Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
         }
     }
 }

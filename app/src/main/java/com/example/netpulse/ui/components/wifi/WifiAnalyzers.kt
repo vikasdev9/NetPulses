@@ -24,6 +24,7 @@ fun ChannelAnalyzerCard(networks: List<WifiNetwork>) {
 
     Card(
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(24.dp)
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
@@ -73,12 +74,16 @@ fun ChannelBubble(channel: Int, count: Int) {
                 .clip(RoundedCornerShape(12.dp))
                 .background(
                     if (count > 5) MaterialTheme.colorScheme.errorContainer 
-                    else if (count > 2) Color(0xFFFFECB3) // Light Amber
-                    else MaterialTheme.colorScheme.tertiaryContainer
+                    else if (count > 2) MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.5f)
+                    else MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
                 ),
             contentAlignment = Alignment.Center
         ) {
-            Text(count.toString(), fontWeight = FontWeight.Bold)
+            Text(
+                count.toString(), 
+                fontWeight = FontWeight.Bold,
+                color = if (count > 5) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onSurface
+            )
         }
         Text("CH $channel", style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(top = 4.dp))
     }
@@ -91,6 +96,7 @@ fun SecurityAnalyzerCard(networks: List<WifiNetwork>) {
 
     Card(
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(24.dp)
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
