@@ -140,7 +140,7 @@ fun GlowingIcon() {
 }
 
 @Composable
-fun AnimatedProgressBar() {
+fun AnimatedProgressBar(delayMillis: Int = 0) {
     val transition = rememberInfiniteTransition(label = "progress")
     val secondaryColor = MaterialTheme.colorScheme.secondary
     val outlineColor = MaterialTheme.colorScheme.outline
@@ -149,7 +149,11 @@ fun AnimatedProgressBar() {
         initialValue = 0f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(1800),
+            animation = tween(
+                durationMillis = 2000,
+                delayMillis = delayMillis,
+                easing = FastOutSlowInEasing
+            ),
             repeatMode = RepeatMode.Restart
         ),
         label = "progressValue"
@@ -162,6 +166,6 @@ fun AnimatedProgressBar() {
             .height(4.dp)
             .clip(RoundedCornerShape(50)),
         color = secondaryColor,
-        trackColor = outlineColor.copy(alpha = 0.2f)
+        trackColor = outlineColor.copy(alpha = 0.15f)
     )
 }

@@ -90,7 +90,11 @@ fun SplashScreen(
 
             Spacer(Modifier.height(42.dp))
 
-            AnimatedProgressBar()
+            AnimatedProgressBar(delayMillis = 0)
+            Spacer(modifier = Modifier.height(8.dp))
+            AnimatedProgressBar(delayMillis = 300)
+            Spacer(modifier = Modifier.height(8.dp))
+            AnimatedProgressBar(delayMillis = 600)
 
             Spacer(Modifier.weight(1f))
 
